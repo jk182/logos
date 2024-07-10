@@ -3,7 +3,8 @@
 struct Board {
 	uint64_t pieces[12];
 	bool turn;
-	int moveCounter;
+	int halfMoveCounter;
+	int fullMoveCounter;
 	int epSquare;
 	int castling;
 };
