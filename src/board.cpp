@@ -16,14 +16,27 @@ void clearBoard(Board *board) {
 	board->castling = 0;
 }
 
+
+int stringToSquare(char *sq) {
+	// Since a8=63, b8=62,... the 7- is needed
+	int file = 7-(sq[0]-'a');
+	int rank = sq[1]-'1';
+	return 8*rank + file;
+}
+
+
 void boardFromFEN(Board *board, const char *fen) {
 	clearBoard(board);
-	int piece = 0;
-	int index = 0;
+	int piece;
 	int square = 63;
-	char c = fen[0];
+	char c;
+
+	char *str = strdup(fen);
+	char *strPos = NULL;
+	char *token = strtok_r(str, " ", &strPos);
+
 	// Getting the piece placement
-	while (c != ' ') {
+	while ((c = *token++)) {
 		if (isdigit(c)) {
 			square -= c-'0';
 		} else if (c != '/') {
@@ -68,20 +81,14 @@ void boardFromFEN(Board *board, const char *fen) {
 			board->pieces[piece] |= 1ull << square;
 			square--;
 		}
-		index++;
-		c = fen[index];
 	}
 	// Side to move
-	index++;
-	if (fen[index] == 'w') {
-		board->turn = true;
-	} else {
-		board->turn = false;
-	}
-	index += 2;
+	token = strtok_r(NULL, " ", &strPos);
+	board->turn = token[0] == 'w' ? true : false;
+
 	// Castling rights
-	c = fen[index];
-	while (c != ' ') {
+	token = strtok_r(NULL, " ", &strPos);
+	while ((c = *token++)) {
 		switch(c) {
 			case 'K':
 				board->castling |= 1ull;
@@ -96,38 +103,31 @@ void boardFromFEN(Board *board, const char *fen) {
 				board->castling |= 1ull << 3;
 				break;
 		}
-		index++;
-		c = fen[index];
 	}
-	index++;
+
 	// En passant square
-	if (fen[index] == '-') {
-		index++;
+	token = strtok_r(NULL, " ", &strPos);
+	if (token[0] == '-') {
+		board->epSquare = -1;
 	} else {
-		// TODO: handle en passant square
-		// Write square to index method to do this
+		board->epSquare = stringToSquare(token);
 	}
+
 	// Half move counter
+	token = strtok_r(NULL, " ", &strPos);
 	int counter = 0;
-	index++;
-	c = fen[index];
-	while (c != ' ') {
+	while ((c = *token++)) {
 		counter *= 10;
 		counter += c-'0';
-		index++;
-		c = fen[index];
 	}
 	board->halfMoveCounter = counter;
+
 	// Full move counter
+	token = strtok_r(NULL, " ", &strPos);
 	counter = 0;
-	index++;
-	c = fen[index];
 	while (isdigit(c)) {
-		std::cout << c;
 		counter *= 10;
 		counter += c-'0';
-		index++;
-		c = fen[index];
 	}
 	board->fullMoveCounter = counter;
 }
