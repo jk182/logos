@@ -134,14 +134,23 @@ void boardFromFEN(Board *board, const char *fen) {
 }
 
 void printBoard(Board *board) {
-	// TODO
-	for (uint64_t bb : board->pieces) {
-		printBitboard(bb);
-		std::cout << "----------" << "\n";
+	char symbols[] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'};
+	char piece;
+	for (int square = 63; square >= 0; square--) {
+		piece = '.';
+		for (int i = 0; i < 12; i++) {
+			if ((board->pieces[i] & (1ull<<square)) != 0) {
+				piece = symbols[i];
+			} 
+		}
+		std::cout << piece;
+		if (square%8 == 0) {
+			std::cout << "\n";
+		}
 	}
-	std::cout << board->turn << ", ";
-	std::cout << board->halfMoveCounter << ", ";
-	std::cout << board->fullMoveCounter << ", ";
-	std::cout << board->epSquare << ", ";
-	std::cout << board->castling << "\n";
+	std::cout << "Side to move: " << board->turn << ", ";
+	std::cout << "Half move counter: " << board->halfMoveCounter << ", ";
+	std::cout << "Move number: " << board->fullMoveCounter << ", ";
+	std::cout << "En-passant square: " << board->epSquare << ", ";
+	std::cout << "Castling rights: " << board->castling << "\n";
 }
