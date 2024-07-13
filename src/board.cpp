@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include "bitboard.h"
+#include "types.h"
 
 
 void clearBoard(Board *board) {
@@ -42,40 +43,40 @@ void boardFromFEN(Board *board, const char *fen) {
 		} else if (c != '/') {
 			switch (c) {
 				case 'P':
-					piece = 0;
+					piece = W_PAWN;
 					break;
 				case 'N':
-					piece = 1;
+					piece = W_KNIGHT;
 					break;
 				case 'B':
-					piece = 2;
+					piece = W_BISHOP;
 					break;
 				case 'R':
-					piece = 3;
+					piece = W_ROOK;
 					break;
 				case 'Q':
-					piece = 4;
+					piece = W_QUEEN;
 					break;
 				case 'K':
-					piece = 5;
+					piece = W_KING;
 					break;
 				case 'p':
-					piece = 6;
+					piece = B_PAWN;
 					break;
 				case 'n':
-					piece = 7;
+					piece = B_KNIGHT;
 					break;
 				case 'b':
-					piece = 8;
+					piece = B_BISHOP;
 					break;
 				case 'r':
-					piece = 9;
+					piece = B_ROOK;
 					break;
 				case 'q':
-					piece = 10;
+					piece = B_QUEEN;
 					break;
 				case 'k':
-					piece = 11;
+					piece = B_KING;
 					break;
 			}
 			board->pieces[piece] |= 1ull << square;
