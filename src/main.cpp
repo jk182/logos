@@ -8,7 +8,7 @@ int main() {
 	// printBitboard(bb);
 	Board b;
 	clearBoard(&b);
-	boardFromFEN(&b, "1nbqkbn1/rppppppr/p6p/8/8/P6P/RPPPPPPR/1NBQKBN1 w - h1 2 5");
+	boardFromFEN(&b, "1nbqkbn1/rppppppr/p6p/8/8/P6P/RPPPPPPR/1NBQKBN1 w - e2 2 5");
 	printBoard(&b);
 	return 0;
 }

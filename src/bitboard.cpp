@@ -4,10 +4,13 @@
 
 #include "bitboard.h"
 
+// Note that the squares are indexed h1=0, g1=2, ..., b8=62, a8=63
+
 bool testBit(uint64_t bb, int i) {
 	assert(i >= 0 && i < 64);
 	return bb & (1ull << i);
 }
+
 
 void printBitboard(uint64_t bb) {
 	for (int rank = 7; rank >= 0; rank--) {
@@ -20,4 +23,9 @@ void printBitboard(uint64_t bb) {
 		}
 		std::cout << "\n";
 	}
+}
+
+
+int getSquare(char file, int rank) {
+	return 8*rank + (7-(file-'a'));
 }

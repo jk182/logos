@@ -19,10 +19,7 @@ void clearBoard(Board *board) {
 
 
 int stringToSquare(char *sq) {
-	// Since a8=63, b8=62,... the 7- is needed
-	int file = 7-(sq[0]-'a');
-	int rank = sq[1]-'1';
-	return 8*rank + file;
+	return getSquare(sq[0], sq[1]-'1');
 }
 
 
