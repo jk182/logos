@@ -29,3 +29,17 @@ void printBitboard(uint64_t bb) {
 int getSquare(char file, int rank) {
 	return 8*rank + (7-(file-'a'));
 }
+
+
+char* getSquareName(int square) {
+	char* ret = new char;
+	if (square > 63 || square < 0) {
+		ret =  strdup("-");
+	} else {
+		int rank = square/8 + 1;
+		char file = 'h' - (square%8);
+		ret = strcat(new char(file), new char(rank + '0'));
+	}
+
+	return ret;
+}

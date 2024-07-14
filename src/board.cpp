@@ -148,6 +148,7 @@ void printBoard(Board *board) {
 	std::cout << "Side to move: " << board->turn << ", ";
 	std::cout << "Half move counter: " << board->halfMoveCounter << ", ";
 	std::cout << "Move number: " << board->fullMoveCounter << ", ";
-	std::cout << "En-passant square: " << board->epSquare << ", ";
+	char* ep = getSquareName(board->epSquare);
+	std::cout << "En-passant square: " << ep << ", ";
 	std::cout << "Castling rights: " << board->castling << "\n";
 }
