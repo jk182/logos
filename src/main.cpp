@@ -17,7 +17,8 @@ int main() {
 
 	uint16_t move = 0;
 	uint16_t *moves = &move;
-	generateKingMoves(&b, moves);
+	uint16_t *kMoves = generateKingMoves(&b, moves);
+	generateKnightMoves(&b, kMoves);
 	while (uint16_t m = *(moves++)) {
 		printMove(m); 
 	}
