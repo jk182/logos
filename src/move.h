@@ -12,3 +12,4 @@ enum {
 
 void printMove(uint16_t move);
 uint16_t makeMove(int startSqIndex, int endSqIndex);
+uint16_t makeMove(int startSqIndex, int endSqIndex, int promotionPiece);

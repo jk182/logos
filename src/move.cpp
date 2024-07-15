@@ -13,7 +13,13 @@ void printMove(uint16_t move) {
 
 
 uint16_t makeMove(int startSqIndex, int endSqIndex) {
-	// TODO: promotion
 	uint16_t move = startSqIndex | (endSqIndex << 6);
+	return move;
+}
+
+
+uint16_t makeMove(int startSqIndex, int endSqIndex, int promotionPiece) {
+	uint16_t move = makeMove(startSqIndex, endSqIndex);
+	move |= promotionPiece << 12;
 	return move;
 }
