@@ -10,3 +10,10 @@ void printMove(uint16_t move) {
 	char* endSquare = getSquareName((move & 0xFC0) >> 6);
 	std::cout << startSquare << "->" << endSquare << "\n";
 }
+
+
+uint16_t makeMove(int startSqIndex, int endSqIndex) {
+	// TODO: promotion
+	uint16_t move = startSqIndex | (endSqIndex << 6);
+	return move;
+}

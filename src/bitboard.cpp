@@ -45,9 +45,12 @@ char* getSquareName(int square) {
 }
 
 
-int getLSB(uint64_t *bb) {
+int popLSB(uint64_t *bb) {
 	for (int i = 0; i < 64; i++) {
-		if ((*bb & (1ull << i)) != 0) return i;
+		if ((*bb & (1ull << i)) != 0){
+			*bb ^= (1ull << i);
+			return i;
+		}
 	}
 	return -1;
 }
