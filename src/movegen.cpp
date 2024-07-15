@@ -23,7 +23,8 @@ uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
 	movesBB ^= (king & (~(H_FILE|RANK_1))) >> 9;
 	movesBB ^= (king & (~(H_FILE|RANK_8))) << 7;
 
-	printBitboard(movesBB);	
+	movesBB &= piece==W_KING ? ~whitePieces(board) : ~blackPieces(board);
+
 	int square = popLSB(&king);
 	while (movesBB) {
 		int endSquare = popLSB(&movesBB);

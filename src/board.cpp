@@ -152,3 +152,20 @@ void printBoard(Board *board) {
 	std::cout << "En-passant square: " << ep << ", ";
 	std::cout << "Castling rights: " << board->castling << "\n";
 }
+
+
+uint64_t whitePieces(Board *board) {
+	uint64_t white = 0ull;
+	for (int i = 0; i <= 5; i++) {
+		white |= board->pieces[i];
+	}
+	return white;
+}
+
+uint64_t blackPieces(Board *board) {
+	uint64_t black = 0ull;
+	for (int i = 6; i <= 11; i++) {
+		black |= board->pieces[i];
+	}
+	return black;
+}
