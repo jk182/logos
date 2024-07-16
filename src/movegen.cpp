@@ -15,6 +15,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 	uint64_t pawnBB;
 	int endSquare;
 	uint16_t move;
+	uint64_t epBB;
 
 	if (board->turn) {
 		pawnBB = board->pieces[W_PAWN];
@@ -49,8 +50,9 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		}
 
 		// Pawn captures
+		epBB = board->epSquare > -1 ? 1ull << board->epSquare : 0ull;
 		movesBB ^= (pawnBB & (~H_FILE)) << 7;
-		movesBB &= bPieces;
+		movesBB &= (bPieces |epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare >= 56) {
@@ -64,7 +66,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 			}
 		}
 		movesBB ^= (pawnBB & (~A_FILE)) << 9;
-		movesBB &= bPieces;
+		movesBB &= (bPieces | epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare >= 56) {
@@ -110,8 +112,9 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		}
 
 		// Pawn captures
+		epBB = board->epSquare > -1 ? 1ull << board->epSquare : 0ull;
 		movesBB ^= (pawnBB & (~H_FILE)) >> 9;
-		movesBB &= wPieces;
+		movesBB &= (wPieces | epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare <= 7) {
@@ -125,7 +128,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 			}
 		}
 		movesBB ^= (pawnBB & (~A_FILE)) >> 7;
-		movesBB &= wPieces;
+		movesBB &= (wPieces | epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare <= 7) {
