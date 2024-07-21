@@ -29,3 +29,5 @@ void printBitboard(uint64_t bb);
 int getSquare(char file, int rank);
 char* getSquareName(int square);
 int popLSB(uint64_t *bb);
+uint64_t getRank(int square);
+uint64_t getFile(int square);

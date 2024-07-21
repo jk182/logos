@@ -6,6 +6,9 @@
 
 // Note that the squares are indexed h1=0, g1=2, ..., b8=62, a8=63
 
+const uint64_t FILES[8] = {H_FILE, G_FILE, F_FILE, E_FILE, D_FILE, C_FILE, B_FILE, A_FILE};
+const uint64_t RANKS[8] = {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
+
 bool testBit(uint64_t bb, int i) {
 	assert(i >= 0 && i < 64);
 	return bb & (1ull << i);
@@ -53,4 +56,14 @@ int popLSB(uint64_t *bb) {
 		}
 	}
 	return -1;
+}
+
+
+uint64_t getRank(int square) {
+	return RANKS[square/8];
+}
+
+
+uint64_t getFile(int square) {
+	return FILES[square%8];
 }

@@ -183,6 +183,32 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 }
 
 
+uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
+	int piece = board->turn ? W_ROOK : B_ROOK;
+	uint64_t occupied = occupiedSquares(board);
+	uint64_t occupiedRank;
+	uint64_t occupiedFile;
+	uint64_t rookBB = board->pieces[piece];
+	uint64_t movesBB = 0ull;
+	int square;
+	uint64_t rank;
+	uint64_t file;
+	uint64_t rook;
+
+	while (rookBB) {
+		square = popLSB(&rookBB);
+		rook = 1ull << square;
+		rank = getRank(square);
+		file = getFile(square);
+		occupiedRank = occupied & rank;
+		occupiedFile = occupied & file;
+		movesBB = occupiedRank^((occupiedRank-rook)-(rook<<8));
+		printBitboard(movesBB);
+	}
+	return moves;
+}
+
+
 uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
 	int piece = board->turn ? W_KING : B_KING;
 	uint64_t king = board->pieces[piece];

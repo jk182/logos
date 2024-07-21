@@ -169,3 +169,8 @@ uint64_t blackPieces(Board *board) {
 	}
 	return black;
 }
+
+
+uint64_t occupiedSquares(Board *board) {
+	return (whitePieces(board) | blackPieces(board));
+}
