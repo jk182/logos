@@ -183,8 +183,15 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 }
 
 
+uint64_t horizontalVerticalMoves(Board *board, int piece) {
+	uint64_t moves;
+	return moves;
+}
+
+
 uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 	int piece = board->turn ? W_ROOK : B_ROOK;
+	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
 	uint64_t occupied = occupiedSquares(board);
 	uint64_t occupiedRank;
 	uint64_t occupiedFile;
@@ -202,9 +209,16 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 		file = getFile(square);
 		occupiedRank = occupied & rank;
 		occupiedFile = occupied & file;
-		movesBB = occupiedRank^((occupiedRank-rook)-(rook<<8));
+		movesBB = occupiedRank^((occupiedRank-rook)-(rook<<1));
+		movesBB &= rank;
+		movesBB &= ~friendly;
+		printBitboard(movesBB);
+
+		movesBB = occupiedFile^((occupiedFile-rook)-(rook<<1));
+		movesBB &= file & (~friendly);
 		printBitboard(movesBB);
 	}
+	printBoard(board);
 	return moves;
 }
 
