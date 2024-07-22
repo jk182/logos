@@ -184,8 +184,40 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 
 
 uint64_t horizontalVerticalMoves(Board *board, int piece) {
-	uint64_t moves;
-	return moves;
+	uint64_t pieceBB = 1ull << piece;
+	uint64_t movesBB = 0ull;
+	uint64_t negative = 0ull;
+	uint64_t horizontal = 0ull;
+	uint64_t rank = getRank(piece);
+	uint64_t file = getFile(piece);
+	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	
+	uint64_t occupied = occupiedSquares(board);
+	uint64_t occRank = occupied & rank;
+	uint64_t occFile = occupied & file;
+
+	movesBB = occRank^((occRank-pieceBB)-(pieceBB<<1));
+	movesBB &= rank;
+	
+	uint64_t revHelp = reverse(&occRank)-(reverse(&pieceBB)<<1);
+	negative = occRank^reverse(&revHelp);
+	negative &= rank;
+	negative &= (1ull<<piece)-1;
+	movesBB ^= negative;
+
+	horizontal = occFile^((occFile-pieceBB)-(pieceBB<<1));
+	horizontal &= file;
+
+	revHelp = reverse(&occFile)-(reverse(&pieceBB)<<1);
+	negative = occFile^reverse(&revHelp);
+	negative &= file;
+	negative &= (1ull<<piece)-1;
+	horizontal ^= negative;
+
+	movesBB ^= horizontal;
+	movesBB &= ~friendly;
+
+	return movesBB;
 }
 
 
@@ -202,9 +234,13 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 	uint64_t file;
 	uint64_t rook;
 
+	printBoard(board);
+
 	while (rookBB) {
 		square = popLSB(&rookBB);
+		horizontalVerticalMoves(board, square);
 		rook = 1ull << square;
+
 		rank = getRank(square);
 		file = getFile(square);
 		occupiedRank = occupied & rank;
@@ -212,11 +248,10 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 		movesBB = occupiedRank^((occupiedRank-rook)-(rook<<1));
 		movesBB &= rank;
 		movesBB &= ~friendly;
-		printBitboard(movesBB);
 
 		movesBB = occupiedFile^((occupiedFile-rook)-(rook<<1));
 		movesBB &= file & (~friendly);
-		printBitboard(movesBB);
+
 	}
 	printBoard(board);
 	return moves;

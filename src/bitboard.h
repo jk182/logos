@@ -31,3 +31,4 @@ char* getSquareName(int square);
 int popLSB(uint64_t *bb);
 uint64_t getRank(int square);
 uint64_t getFile(int square);
+uint64_t reverse(uint64_t *bb);

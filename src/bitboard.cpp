@@ -67,3 +67,17 @@ uint64_t getRank(int square) {
 uint64_t getFile(int square) {
 	return FILES[square%8];
 }
+
+
+uint64_t reverse(uint64_t *bb) {
+	uint64_t original = *bb;
+	uint64_t reversed = 0ull;
+	for(int i = 0; i < 64; i++) {
+		reversed <<= 1;
+		if ((original & 1) == 1) {
+			reversed ^= 1;
+		}
+		original >>= 1;
+	}
+	return reversed;
+}
