@@ -224,36 +224,22 @@ uint64_t horizontalVerticalMoves(Board *board, int piece) {
 uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 	int piece = board->turn ? W_ROOK : B_ROOK;
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
-	uint64_t occupied = occupiedSquares(board);
-	uint64_t occupiedRank;
-	uint64_t occupiedFile;
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t movesBB = 0ull;
+	uint16_t move;
 	int square;
-	uint64_t rank;
-	uint64_t file;
-	uint64_t rook;
-
-	printBoard(board);
+	int endSquare;
 
 	while (rookBB) {
 		square = popLSB(&rookBB);
-		horizontalVerticalMoves(board, square);
-		rook = 1ull << square;
+		movesBB = horizontalVerticalMoves(board, square);
 
-		rank = getRank(square);
-		file = getFile(square);
-		occupiedRank = occupied & rank;
-		occupiedFile = occupied & file;
-		movesBB = occupiedRank^((occupiedRank-rook)-(rook<<1));
-		movesBB &= rank;
-		movesBB &= ~friendly;
-
-		movesBB = occupiedFile^((occupiedFile-rook)-(rook<<1));
-		movesBB &= file & (~friendly);
-
+		while (movesBB) {
+			endSquare = popLSB(&movesBB);
+			move = makeMove(square, endSquare);
+			*(moves++) = move;
+		}
 	}
-	printBoard(board);
 	return moves;
 }
 
