@@ -8,6 +8,9 @@
 
 const uint64_t FILES[8] = {H_FILE, G_FILE, F_FILE, E_FILE, D_FILE, C_FILE, B_FILE, A_FILE};
 const uint64_t RANKS[8] = {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
+const uint64_t DIAGONALS[15] = {DIAG_1, DIAG_2, DIAG_3, DIAG_4, DIAG_5, DIAG_6, DIAG_7, DIAG_8, DIAG_9, DIAG_10, DIAG_11, DIAG_12, DIAG_13, DIAG_14, DIAG_15};
+const uint64_t ANTIDIAGONALS[15] = {ADIAG_1, ADIAG_2, ADIAG_3, ADIAG_4, ADIAG_5, ADIAG_6, ADIAG_7, ADIAG_8, ADIAG_9, ADIAG_10, ADIAG_11, ADIAG_12, ADIAG_13, ADIAG_14, ADIAG_15};
+
 
 bool testBit(uint64_t bb, int i) {
 	assert(i >= 0 && i < 64);
@@ -80,4 +83,14 @@ uint64_t reverse(uint64_t *bb) {
 		original >>= 1;
 	}
 	return reversed;
+}
+
+
+uint64_t getDiagonal(int square) {
+	return DIAGONALS[7-(square%8)+square/8];
+}
+
+
+uint64_t getAntidiagonal(int square) {
+	return ANTIDIAGONALS[7-(square%8)+7-square/8];
 }

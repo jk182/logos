@@ -11,14 +11,15 @@ int main() {
 	// printBitboard(bb);
 	Board b;
 	clearBoard(&b);
-	boardFromFEN(&b, "1nbqkbn1/rppppppr/p6p/8/4R3/P6P/RPPP1PPR/1NBQKBN1 w - e2 2 5");
+	boardFromFEN(&b, "1nbqkbn1/rppppppr/p6p/8/3RB3/P6P/RPPP1PPR/1NBQKBN1 w - e2 2 5");
 	printBoard(&b);
 	printMove(0xFC0);
 
 	uint16_t move = 0;
 	uint16_t *moves = &move;
 	// generatePawnMoves(&b, moves);
-	generateRookMoves(&b, moves);
+	generateBishopMoves(&b, moves);
+	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
 	while (uint16_t m = *(moves++)) {

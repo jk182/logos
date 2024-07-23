@@ -183,41 +183,59 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint64_t horizontalVerticalMoves(Board *board, int piece) {
+uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
+	// Generates sliding moves along a file, rank or diagonal (specified by the mask)
 	uint64_t pieceBB = 1ull << piece;
 	uint64_t movesBB = 0ull;
 	uint64_t negative = 0ull;
-	uint64_t horizontal = 0ull;
-	uint64_t rank = getRank(piece);
-	uint64_t file = getFile(piece);
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
 	
 	uint64_t occupied = occupiedSquares(board);
-	uint64_t occRank = occupied & rank;
-	uint64_t occFile = occupied & file;
+	uint64_t occMask = occupied & mask;
 
-	movesBB = occRank^((occRank-pieceBB)-(pieceBB<<1));
-	movesBB &= rank;
-	
-	uint64_t revHelp = reverse(&occRank)-(reverse(&pieceBB)<<1);
-	negative = occRank^reverse(&revHelp);
-	negative &= rank;
+	movesBB = occMask^(occMask-(pieceBB<<1));
+	movesBB &= mask;
+
+	uint64_t rev = reverse(&occMask)-(reverse(&pieceBB)<<1);
+	negative = occMask^reverse(&rev);
+	negative &= mask;
 	negative &= (1ull<<piece)-1;
 	movesBB ^= negative;
 
-	horizontal = occFile^((occFile-pieceBB)-(pieceBB<<1));
-	horizontal &= file;
-
-	revHelp = reverse(&occFile)-(reverse(&pieceBB)<<1);
-	negative = occFile^reverse(&revHelp);
-	negative &= file;
-	negative &= (1ull<<piece)-1;
-	horizontal ^= negative;
-
-	movesBB ^= horizontal;
 	movesBB &= ~friendly;
-
 	return movesBB;
+}
+
+
+uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
+	int piece = board->turn ? W_BISHOP : B_BISHOP;
+	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t bishopBB = board->pieces[piece];
+	uint64_t movesBB = 0ull;
+	uint64_t diagonal;
+	uint64_t antidiagonal;
+	uint16_t move;
+	int square;
+	int endSquare;
+	
+	while (bishopBB) {
+		square = popLSB(&bishopBB);
+		diagonal = getDiagonal(square);
+		antidiagonal = getAntidiagonal(square);
+		movesBB = slidingMoves(board, square, diagonal);
+		movesBB ^= slidingMoves(board, square, antidiagonal);
+		std::cout << square << "\n";
+		printBitboard(diagonal);
+		std::cout << "----------------\n";
+		printBitboard(movesBB);
+
+		while (movesBB) {
+			endSquare = popLSB(&movesBB);
+			move = makeMove(square, endSquare);
+			*(moves++) = move;
+		}
+	}
+	return moves;
 }
 
 
@@ -226,13 +244,20 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t movesBB = 0ull;
+	uint64_t rank;
+	uint64_t file;
 	uint16_t move;
 	int square;
 	int endSquare;
 
 	while (rookBB) {
 		square = popLSB(&rookBB);
-		movesBB = horizontalVerticalMoves(board, square);
+		rank = getRank(square);
+		file = getFile(square);
+		movesBB = slidingMoves(board, square, file);
+		movesBB ^= slidingMoves(board, square, rank);
+		std::cout << square << "\n";
+		printBitboard(movesBB);
 
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
