@@ -223,10 +223,7 @@ uint16_t* generateBishopMoves(Board board, uint16_t *moves)  {
 		diagonal = getDiagonal(square);
 		antidiagonal = getAntidiagonal(square);
 		movesBB = slidingMoves(board, square, diagonal);
-		printBoard(&board);
 		movesBB |= slidingMoves(board, square, antidiagonal);
-		std::cout << square << "\n";
-		printBitboard(movesBB);
 
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -254,9 +251,41 @@ uint16_t* generateRookMoves(Board board, uint16_t *moves) {
 		rank = getRank(square);
 		file = getFile(square);
 		movesBB = slidingMoves(board, square, file);
-		movesBB ^= slidingMoves(board, square, rank);
-		std::cout << square << "\n";
-		printBitboard(movesBB);
+		movesBB |= slidingMoves(board, square, rank);
+
+		while (movesBB) {
+			endSquare = popLSB(&movesBB);
+			move = makeMove(square, endSquare);
+			*(moves++) = move;
+		}
+	}
+	return moves;
+}
+
+
+uint16_t* generateQueenMoves(Board board, uint16_t *moves) {
+	int piece = board.turn ? W_QUEEN : B_QUEEN;
+	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
+	uint64_t queenBB = board.pieces[piece];
+	uint64_t movesBB = 0ull;
+	uint64_t rank;
+	uint64_t file;
+	uint64_t diagonal;
+	uint64_t antidiagonal;
+	uint16_t move;
+	int square;
+	int endSquare;
+
+	while (queenBB) {
+		square = popLSB(&queenBB);
+		rank = getRank(square);
+		file = getFile(square);
+		diagonal = getDiagonal(square);
+		antidiagonal = getAntidiagonal(square);
+		movesBB = slidingMoves(board, square, file);
+		movesBB |= slidingMoves(board, square, rank);
+		movesBB |= slidingMoves(board, square, diagonal);
+		movesBB |= slidingMoves(board, square, antidiagonal);
 
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);

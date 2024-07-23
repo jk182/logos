@@ -18,6 +18,7 @@ int main() {
 	uint16_t *moves = &move;
 	// generatePawnMoves(&b, moves);
 	generateBishopMoves(b, moves);
+	// generateQueenMoves(b, moves);
 	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
