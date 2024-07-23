@@ -8,17 +8,17 @@
 #include "bitboard.h"
 
 
-uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
-	uint64_t wPieces = whitePieces(board);
-	uint64_t bPieces = blackPieces(board);
+uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
+	uint64_t wPieces = whitePieces(&board);
+	uint64_t bPieces = blackPieces(&board);
 	uint64_t movesBB = 0ull;
 	uint64_t pawnBB;
 	int endSquare;
 	uint16_t move;
 	uint64_t epBB;
 
-	if (board->turn) {
-		pawnBB = board->pieces[W_PAWN];
+	if (board.turn) {
+		pawnBB = board.pieces[W_PAWN];
 		
 		// Double pawn moves
 		movesBB ^= (pawnBB & RANK_2) << 16;
@@ -50,7 +50,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		}
 
 		// Pawn captures
-		epBB = board->epSquare > -1 ? 1ull << board->epSquare : 0ull;
+		epBB = board.epSquare > -1 ? 1ull << board.epSquare : 0ull;
 		movesBB ^= (pawnBB & (~H_FILE)) << 7;
 		movesBB &= (bPieces |epBB);
 		while (movesBB) {
@@ -80,7 +80,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 			}
 		}
 	} else {
-		pawnBB = board->pieces[B_PAWN];
+		pawnBB = board.pieces[B_PAWN];
 		
 		// Double pawn moves
 		movesBB ^= (pawnBB & RANK_7) >> 16;
@@ -112,7 +112,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		}
 
 		// Pawn captures
-		epBB = board->epSquare > -1 ? 1ull << board->epSquare : 0ull;
+		epBB = board.epSquare > -1 ? 1ull << board.epSquare : 0ull;
 		movesBB ^= (pawnBB & (~H_FILE)) >> 9;
 		movesBB &= (wPieces | epBB);
 		while (movesBB) {
@@ -146,9 +146,9 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
-	int piece = board->turn ? W_KNIGHT : B_KNIGHT;
-	uint64_t knightBB = board->pieces[piece];
+uint16_t* generateKnightMoves(Board board, uint16_t *moves) {
+	int piece = board.turn ? W_KNIGHT : B_KNIGHT;
+	uint64_t knightBB = board.pieces[piece];
 	uint64_t movesBB = 0ull;
 	int square;
 	int endSquare;
@@ -171,7 +171,7 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 		movesBB ^= (currKnight & (~(RANK_7|RANK_8|H_FILE))) << 15;
 		movesBB ^= (currKnight & (~(RANK_7|RANK_8|A_FILE))) << 17;
 	
-		movesBB &= piece==W_KNIGHT ? ~whitePieces(board) : ~blackPieces(board);
+		movesBB &= piece==W_KNIGHT ? ~whitePieces(&board) : ~blackPieces(&board);
 
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -183,14 +183,14 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
+uint64_t slidingMoves(Board board, int piece, uint64_t mask) {
 	// Generates sliding moves along a file, rank or diagonal (specified by the mask)
 	uint64_t pieceBB = 1ull << piece;
 	uint64_t movesBB = 0ull;
 	uint64_t negative = 0ull;
-	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
 	
-	uint64_t occupied = occupiedSquares(board);
+	uint64_t occupied = occupiedSquares(&board);
 	uint64_t occMask = occupied & mask;
 
 	movesBB = occMask^(occMask-(pieceBB<<1));
@@ -200,17 +200,17 @@ uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
 	negative = occMask^reverse(&rev);
 	negative &= mask;
 	negative &= (1ull<<piece)-1;
-	movesBB ^= negative;
+	movesBB |= negative;
 
 	movesBB &= ~friendly;
 	return movesBB;
 }
 
 
-uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
-	int piece = board->turn ? W_BISHOP : B_BISHOP;
-	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
-	uint64_t bishopBB = board->pieces[piece];
+uint16_t* generateBishopMoves(Board board, uint16_t *moves)  {
+	int piece = board.turn ? W_BISHOP : B_BISHOP;
+	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
+	uint64_t bishopBB = board.pieces[piece];
 	uint64_t movesBB = 0ull;
 	uint64_t diagonal;
 	uint64_t antidiagonal;
@@ -223,10 +223,9 @@ uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
 		diagonal = getDiagonal(square);
 		antidiagonal = getAntidiagonal(square);
 		movesBB = slidingMoves(board, square, diagonal);
-		movesBB ^= slidingMoves(board, square, antidiagonal);
+		printBoard(&board);
+		movesBB |= slidingMoves(board, square, antidiagonal);
 		std::cout << square << "\n";
-		printBitboard(diagonal);
-		std::cout << "----------------\n";
 		printBitboard(movesBB);
 
 		while (movesBB) {
@@ -239,10 +238,10 @@ uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
 }
 
 
-uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
-	int piece = board->turn ? W_ROOK : B_ROOK;
-	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
-	uint64_t rookBB = board->pieces[piece];
+uint16_t* generateRookMoves(Board board, uint16_t *moves) {
+	int piece = board.turn ? W_ROOK : B_ROOK;
+	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
+	uint64_t rookBB = board.pieces[piece];
 	uint64_t movesBB = 0ull;
 	uint64_t rank;
 	uint64_t file;
@@ -269,9 +268,9 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
-	int piece = board->turn ? W_KING : B_KING;
-	uint64_t king = board->pieces[piece];
+uint16_t* generateKingMoves(Board board, uint16_t *moves) {
+	int piece = board.turn ? W_KING : B_KING;
+	uint64_t king = board.pieces[piece];
 	uint64_t movesBB = 0ull;
 
 	movesBB ^= (king & (~A_FILE)) << 1;
@@ -285,7 +284,7 @@ uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
 	movesBB ^= (king & (~(H_FILE|RANK_8))) << 7;
 
 	// Making sure that pieces of the same colour don't occupy the same square
-	movesBB &= piece==W_KING ? ~whitePieces(board) : ~blackPieces(board);
+	movesBB &= piece==W_KING ? ~whitePieces(&board) : ~blackPieces(&board);
 
 	int square = popLSB(&king);
 	int endSquare;
