@@ -196,8 +196,7 @@ uint64_t slidingMoves(Board board, int piece, uint64_t mask) {
 	movesBB = occMask^(occMask-(pieceBB<<1));
 	movesBB &= mask;
 
-	uint64_t rev = reverse(&occMask)-(reverse(&pieceBB)<<1);
-	negative = occMask^reverse(&rev);
+	negative = occMask^reverse(reverse(occMask)-(reverse(pieceBB)<<1));
 	negative &= mask;
 	negative &= (1ull<<piece)-1;
 	movesBB |= negative;
