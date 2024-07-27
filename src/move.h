@@ -1,9 +1,12 @@
 #pragma once
 
+#include "board.h"
+
 // Move format: 
 // 	bits 0-5:	start square
 // 	bits 6-11:	end square
 // 	bits 12-14:	promotion piece
+// 	bit 15:		castling move
 
 enum {
 	NULL_MOVE = 0
@@ -13,3 +16,4 @@ enum {
 void printMove(uint16_t move);
 uint16_t makeMove(int startSqIndex, int endSqIndex);
 uint16_t makeMove(int startSqIndex, int endSqIndex, int promotionPiece);
+void playMove(Board *board, uint16_t move);

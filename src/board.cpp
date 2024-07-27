@@ -162,6 +162,7 @@ uint64_t whitePieces(Board *board) {
 	return white;
 }
 
+
 uint64_t blackPieces(Board *board) {
 	uint64_t black = 0ull;
 	for (int i = 6; i <= 11; i++) {
