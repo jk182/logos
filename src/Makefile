@@ -1,4 +1,4 @@
-logos: main.o board.o bitboard.o move.o movegen.o
+logos: main.o board.o bitboard.o move.o movegen.o attacks.o
 	clang++ -std=c++20 ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o -o ../out/logos
 
 main.o:
@@ -15,3 +15,6 @@ move.o:
 
 movegen.o:
 	clang++ -std=c++20 -c movegen.cpp -o ../out/movegen.o
+
+attacks.o:
+	clang++ -std=c++20 -c attacks.cpp -o ../out/attacks.o

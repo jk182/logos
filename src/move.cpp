@@ -91,7 +91,7 @@ void playMove(Board *board, uint16_t move) {
 	} else {
 		// Check if castling is legal
 		if (turn) {
-			board->caslting &= 0b1100ull;
+			board->castling &= 0b1100ull;
 			if (endSquare == 1) {
 				// Castling kingside
 				board->pieces[W_KING] ^= 0x000000000000000A;
@@ -100,6 +100,7 @@ void playMove(Board *board, uint16_t move) {
 				// Castling queenside
 				board->pieces[W_KING] ^= 0x0000000000000028;
 				board->pieces[W_ROOK] ^= 0x0000000000000090;
+			}
 		} else {
 			board->castling &= 0b0011ull;
 			if (endSquare == 57) {
