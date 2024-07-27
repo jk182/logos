@@ -3,7 +3,7 @@
 #include "board.h"
 
 
-bool isSquareAttacked(int square, Board board);
+bool isSquareAttacked(Board board, bool turn, int square);
 uint64_t getAttacks(Board board, bool turn);
 uint64_t pawnAttacks(Board board, bool turn);
 uint64_t knightAttacks(Board board, bool turn);
