@@ -35,7 +35,8 @@ void playMove(Board *board, uint16_t move) {
 	int piece;
 	bool turn = board->turn;
 
-	board -> epSquare = -1;
+	board->turn = !turn;
+	board->epSquare = -1;
 	if ((move & (1ull << 15)) == 0) {
 		// move is not castling
 		if (! turn) {
@@ -88,6 +89,28 @@ void playMove(Board *board, uint16_t move) {
 			}
 		}
 	} else {
-
+		// Check if castling is legal
+		if (turn) {
+			board->caslting &= 0b1100ull;
+			if (endSquare == 1) {
+				// Castling kingside
+				board->pieces[W_KING] ^= 0x000000000000000A;
+				board->pieces[W_ROOK] ^= 0x0000000000000005;
+			} else {
+				// Castling queenside
+				board->pieces[W_KING] ^= 0x0000000000000028;
+				board->pieces[W_ROOK] ^= 0x0000000000000090;
+		} else {
+			board->castling &= 0b0011ull;
+			if (endSquare == 57) {
+				// Castling kingside
+				board->pieces[B_KING] ^= 0x0A00000000000000;
+				board->pieces[B_ROOK] ^= 0x0500000000000000;
+			} else {
+				// Castling queenside
+				board->pieces[B_KING] ^= 0x2800000000000000;
+				board->pieces[B_ROOK] ^= 0x9000000000000000;
+			}
+		}
 	}
 }
