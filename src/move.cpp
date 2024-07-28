@@ -27,6 +27,13 @@ uint16_t makeMove(int startSqIndex, int endSqIndex, int promotionPiece) {
 }
 
 
+uint16_t makeCastlingMove(int startSqIndex, int endSqIndex) {
+	uint16_t move = makeMove(startSqIndex, endSqIndex);
+	move |= 1ull << 15;
+	return move;
+}
+
+
 void playMove(Board *board, uint16_t move) {
 	int startSquare = (move & (~(1ull<<15))) & 0x3Full;
 	int endSquare = (move & (~(1ull<<15))) >> 6;

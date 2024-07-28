@@ -1,11 +1,13 @@
+#include "attacks.h"
+#include "bitboard.h"
+#include "board.h"
+#include "move.h"
+#include "movegen.h"
+#include "types.h"
+
 #include <stdint.h>
 #include <iostream>
 
-#include "move.h"
-#include "movegen.h"
-#include "board.h"
-#include "types.h"
-#include "bitboard.h"
 
 
 uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
@@ -321,6 +323,38 @@ uint16_t* generateKingMoves(Board board, uint16_t *moves) {
 		endSquare = popLSB(&movesBB);
 		move = makeMove(square, endSquare);
 		*(moves++) = move;
+	}
+	return moves;
+}
+
+
+uint16_t* generateCastlingMoves(Board board, uint16_t *moves) {
+	if (board.turn && ~isSquareAttacked(board, false, 3)) {
+		if ((board.castling & 0x1) > 0 && (occupiedSquares(&board) & 0x6) == 0) {
+			// Kingside castling is allowed and f1, g1 are empty
+			if (~(isSquareAttacked(board, false, 2) || isSquareAttacked(board, false, 1))) {
+				*(moves++) = makeCastlingMove(3, 1);
+			}
+		}
+		if ((board.castling & 0x2) > 0 && (occupiedSquares(&board) & 0x70) == 0) {
+			// Quenside castling is allowed and b1, c1, d1 are empty
+			if (~(isSquareAttacked(board, false, 4) || isSquareAttacked(board, false, 5))) {
+				*(moves++) = makeCastlingMove(3, 5);
+			}
+		}
+	} else if (~board.turn && ~isSquareAttacked(board, true, 59)) {
+		if ((board.castling & 0x4) > 0 && (occupiedSquares(&board) & 0x0600000000000000) == 0) {
+			// Kingside castling is allowed and f8, g8 are empty
+			if (~(isSquareAttacked(board, true, 57) || isSquareAttacked(board, true, 58))) {
+				*(moves++) = makeCastlingMove(59, 57);
+			}
+		}
+		if ((board.castling & 0x8) > 0 && (occupiedSquares(&board) & 0x7000000000000000) == 0) {
+			// Queenside castling is allowed and b8, c8, d8 are empty
+			if (~(isSquareAttacked(board, true, 60) || isSquareAttacked(board, true, 61))) {
+				*(moves++) = makeCastlingMove(59, 61);
+			}
+		}
 	}
 	return moves;
 }

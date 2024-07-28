@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdint.h>
+
+
 struct Board {
 	uint64_t pieces[12];
 	bool turn;

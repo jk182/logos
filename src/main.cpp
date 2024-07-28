@@ -1,3 +1,4 @@
+#include "attacks.h"
 #include "bitboard.h"
 #include "board.h"
 #include "move.h"
@@ -13,6 +14,7 @@ int main() {
 	clearBoard(&b);
 	boardFromFEN(&b, "1nbqkbn1/rppppppr/p6p/8/3RB3/P6P/RPPP1PPR/1NBQKBN1 w - e2 2 5");
 	printBoard(&b);
+	printBitboard(getAttacks(b, true));
 
 	uint16_t move = 0x0649ull;
 	playMove(&b, move);

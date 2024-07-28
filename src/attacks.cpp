@@ -2,6 +2,7 @@
 #include "board.h"
 #include "types.h"
 
+#include <stdint.h>
 
 uint64_t slidingAttacks(Board board, bool turn, int square, uint64_t mask) {
 	uint64_t pieceBB = 1ull << square;

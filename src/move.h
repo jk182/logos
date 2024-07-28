@@ -16,4 +16,5 @@ enum {
 void printMove(uint16_t move);
 uint16_t makeMove(int startSqIndex, int endSqIndex);
 uint16_t makeMove(int startSqIndex, int endSqIndex, int promotionPiece);
+uint16_t makeCastlingMove(int startSqIndex, int endSqIndex);
 void playMove(Board *board, uint16_t move);

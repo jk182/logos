@@ -2,6 +2,8 @@
 
 #include "board.h"
 
+#include <stdint.h>
+
 
 bool isSquareAttacked(Board board, bool turn, int square);
 uint64_t getAttacks(Board board, bool turn);

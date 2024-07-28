@@ -24,7 +24,7 @@ void printBitboard(uint64_t bb) {
 			if (testBit(bb, rank*8+file)) {
 				std::cout << "1";
 			} else {
-				std::cout << "0";
+				std::cout << ".";
 			}
 		}
 		std::cout << "\n";
