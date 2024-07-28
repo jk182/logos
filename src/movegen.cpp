@@ -9,7 +9,6 @@
 #include <iostream>
 
 
-
 uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 	uint64_t wPieces = whitePieces(&board);
 	uint64_t bPieces = blackPieces(&board);
@@ -356,5 +355,18 @@ uint16_t* generateCastlingMoves(Board board, uint16_t *moves) {
 			}
 		}
 	}
+	return moves;
+}
+
+
+uint16_t* generateAllMoves(Board board, uint16_t *moves) {
+	generatePawnMoves(board, moves);
+	generateKnightMoves(board, moves);
+	generateBishopMoves(board, moves);
+	generateRookMoves(board, moves);
+	generateQueenMoves(board, moves);
+	generateKingMoves(board, moves);
+	generateCastlingMoves(board, moves);
+
 	return moves;
 }
