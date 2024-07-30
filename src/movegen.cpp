@@ -22,7 +22,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 		pawnBB = board.pieces[W_PAWN];
 		
 		// Double pawn moves
-		movesBB ^= (pawnBB & RANK_2) << 16;
+		movesBB = (pawnBB & RANK_2) << 16;
 		movesBB &= ~(wPieces | bPieces);
 		// Make sure that pawns don't jump over pieces on the third rank
 		movesBB &= ~((wPieces | bPieces) & RANK_3) << 8;
@@ -33,7 +33,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 		}
 
 		// Single pawn moves
-		movesBB ^= pawnBB << 8;
+		movesBB = pawnBB << 8;
 		movesBB &= ~(wPieces | bPieces);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -52,7 +52,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 
 		// Pawn captures
 		epBB = board.epSquare > -1 ? 1ull << board.epSquare : 0ull;
-		movesBB ^= (pawnBB & (~H_FILE)) << 7;
+		movesBB = (pawnBB & (~H_FILE)) << 7;
 		movesBB &= (bPieces |epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -66,7 +66,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 				*(moves++) = move;
 			}
 		}
-		movesBB ^= (pawnBB & (~A_FILE)) << 9;
+		movesBB = (pawnBB & (~A_FILE)) << 9;
 		movesBB &= (bPieces | epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -84,7 +84,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 		pawnBB = board.pieces[B_PAWN];
 		
 		// Double pawn moves
-		movesBB ^= (pawnBB & RANK_7) >> 16;
+		movesBB = (pawnBB & RANK_7) >> 16;
 		movesBB &= ~(wPieces | bPieces);
 		// Make sure that pawns don't jump over pieces on the third rank
 		movesBB &= ~((wPieces | bPieces) & RANK_6) >> 8;
@@ -95,7 +95,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 		}
 
 		// Single pawn moves
-		movesBB ^= pawnBB >> 8;
+		movesBB = pawnBB >> 8;
 		movesBB &= ~(wPieces | bPieces);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -114,7 +114,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 
 		// Pawn captures
 		epBB = board.epSquare > -1 ? 1ull << board.epSquare : 0ull;
-		movesBB ^= (pawnBB & (~H_FILE)) >> 9;
+		movesBB = (pawnBB & (~H_FILE)) >> 9;
 		movesBB &= (wPieces | epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -128,7 +128,7 @@ uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 				*(moves++) = move;
 			}
 		}
-		movesBB ^= (pawnBB & (~A_FILE)) >> 7;
+		movesBB = (pawnBB & (~A_FILE)) >> 7;
 		movesBB &= (wPieces | epBB);
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -360,13 +360,33 @@ uint16_t* generateCastlingMoves(Board board, uint16_t *moves) {
 
 
 uint16_t* generateAllMoves(Board board, uint16_t *moves) {
-	generatePawnMoves(board, moves);
-	generateKnightMoves(board, moves);
-	generateBishopMoves(board, moves);
-	generateRookMoves(board, moves);
-	generateQueenMoves(board, moves);
-	generateKingMoves(board, moves);
-	generateCastlingMoves(board, moves);
+	moves = generatePawnMoves(board, moves);
+	moves = generateKnightMoves(board, moves);
+	moves = generateBishopMoves(board, moves);
+	moves = generateRookMoves(board, moves);
+	moves = generateQueenMoves(board, moves);
+	moves = generateKingMoves(board, moves);
+	moves = generateCastlingMoves(board, moves);
 
 	return moves;
+}
+
+
+int perft(int depth, Board *board) {
+	if (depth == 0) {
+		return 1;
+	}
+	int nodes = 0;
+	uint16_t move = 0x0649ull;
+	uint16_t *moves = &move;
+	generateAllMoves(*board, moves);
+
+	while (uint16_t m = *(moves++)) {
+		printMove(m);
+		Board b;
+		boardFromFEN(&b,  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+		playMove(&b, m);
+		nodes += perft(depth-1, &b);
+	}
+	return nodes;
 }

@@ -16,15 +16,13 @@ int main() {
 	printBoard(&b);
 
 	uint16_t move = 0x0649ull;
-	uint16_t *moves = generateAllMoves(b, &move);
+	uint16_t *moves = &move;
 	// generatePawnMoves(&b, moves);
 	// generateBishopMoves(b, moves);
 	// generateQueenMoves(b, moves);
 	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
-	while (uint16_t m = *(moves++)) {
-	 	printMove(m); 
-	}
+	std::cout << perft(1, &b) << "\n";
 	return 0;
 }

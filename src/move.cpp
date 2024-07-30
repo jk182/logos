@@ -35,6 +35,13 @@ uint16_t makeCastlingMove(int startSqIndex, int endSqIndex) {
 
 
 void playMove(Board *board, uint16_t move) {
+	if (move == NULL_MOVE) {
+		if (! board->turn) {
+			board->fullMoveCounter++;
+		}
+		board->turn = ~board->turn;
+		return;
+	}
 	int startSquare = (move & (~(1ull<<15))) & 0x3Full;
 	int endSquare = (move & (~(1ull<<15))) >> 6;
 	uint64_t startBB = 1ull << startSquare;
