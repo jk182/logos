@@ -129,3 +129,30 @@ void playMove(Board *board, uint16_t move) {
 		}
 	}
 }
+
+
+void unmakeMove(Board *board, uint16_t move) {
+	// Unsure how to deal with en-passant and 50 move rule
+	if (move == NULL_MOVE) {
+		if (board->turn) {
+			board->fullMoveCounter--;
+		}
+		board->turn = ~board->turn;
+		return;
+	}
+	// start and end squares are reversed since we unmake the move
+	int startSquare = (move & (~(1ull<<15))) >> 6;
+	int endSquare = (move & (~(1ull<<15))) & 0x3Full;
+	uint64_t startBB = 1ull << startSquare;
+	uint64_t endBB = 1ull << endSquare;
+	int piece;
+	bool turn = board->turn;
+
+	board->turn = !turn;
+	
+	if ((move & (1ull << 15)) == 0) {
+		
+	} else {
+
+	}
+}
