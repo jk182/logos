@@ -18,3 +18,4 @@ void printBoard(Board *board);
 uint64_t whitePieces(Board *board);
 uint64_t blackPieces(Board *board);
 uint64_t occupiedSquares(Board *board);
+bool isLegalPosition(Board board);
