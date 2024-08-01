@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "attcks.h"
+#include "attacks.h"
 #include "board.h"
 #include "bitboard.h"
 #include "types.h"
@@ -181,5 +181,5 @@ uint64_t occupiedSquares(Board *board) {
 bool isLegalPosition(Board board) {
 	uint64_t bb = board.turn ? board.pieces[W_KING] : board.pieces[B_KING];
 	int square = popLSB(&bb);
-	return !isSquareAttacked(Board, !board.turn, square);
+	return !isSquareAttacked(board, !board.turn, square);
 }

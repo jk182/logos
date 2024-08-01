@@ -379,14 +379,18 @@ int perft(int depth, Board *board) {
 	int nodes = 0;
 	uint16_t move = 0x0649ull;
 	uint16_t *moves = &move;
-	generateAllMoves(*board, moves);
+	Board b;
+	clearBoard(&b);
+	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	generateAllMoves(b, moves);
 
 	while (uint16_t m = *(moves++)) {
 		printMove(m);
-		Board b;
-		boardFromFEN(&b,  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 		playMove(&b, m);
-		nodes += perft(depth-1, &b);
+		if (isLegalPosition(b)) {
+			nodes += perft(depth-1, &b);
+		}
+		unmakeMove(&b, m);
 	}
 	return nodes;
 }

@@ -17,6 +17,10 @@ int main() {
 
 	uint16_t move = 0x0649ull;
 	uint16_t *moves = &move;
+	// generateAllMoves(b, moves);
+	// while (uint16_t m = *(moves++)) {
+ 	//	printMove(m);
+	// }
 	// generatePawnMoves(&b, moves);
 	// generateBishopMoves(b, moves);
 	// generateQueenMoves(b, moves);

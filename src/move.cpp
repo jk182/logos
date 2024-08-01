@@ -39,7 +39,7 @@ void playMove(Board *board, uint16_t move) {
 		if (! board->turn) {
 			board->fullMoveCounter++;
 		}
-		board->turn = ~board->turn;
+		board->turn = !board->turn;
 		return;
 	}
 	int startSquare = (move & (~(1ull<<15))) & 0x3Full;
@@ -82,25 +82,27 @@ void playMove(Board *board, uint16_t move) {
 		}
 		board->pieces[piece] ^= endBB;
 		// Handling castling rights
-		if (piece == W_KING) {
-			board->castling &= 0b1100ull;
-		}
-		if (piece == B_KING) {
-			board->castling &= 0b0011ull;
-		}
-		if (piece == W_ROOK) {
-			if (startSquare == 0) {
-				board->castling &= 0b1110ull;
-			} else if (startSquare == 7) {
-				board->castling &= 0b1101ull;
-			}
-		}
-		if (piece == B_ROOK) {
-			if (startSquare == 56) {
-				board->castling &= 0b1011ull;
-			} else if (startSquare == 63) {
-				board->castling &= 0b0111ull;
-			}
+		switch (piece) {
+			case W_KING:
+				board->castling &= 0b1100ull;
+				break;
+			case B_KING:
+				board->castling &= 0b0011ull;
+				break;
+			case W_ROOK:
+				if (startSquare == 0) {
+					board->castling &= 0b1110ull;
+				} else if (startSquare == 7) {
+					board->castling &= 0b1101ull;
+				}
+				break;
+			case B_ROOK:
+				if (startSquare == 56) {
+					board->castling &= 0b1011ull;
+				} else if (startSquare == 63) {
+					board->castling &= 0b0111ull;
+				}
+				break;
 		}
 	} else {
 		// Check if castling is legal
@@ -132,7 +134,8 @@ void playMove(Board *board, uint16_t move) {
 
 
 void unmakeMove(Board *board, uint16_t move) {
-	// Unsure how to deal with en-passant and 50 move rule
+	// Unsure how to deal with en-passant, castling rights and 50 move rule
+	// What about captures?
 	if (move == NULL_MOVE) {
 		if (board->turn) {
 			board->fullMoveCounter--;
@@ -149,9 +152,19 @@ void unmakeMove(Board *board, uint16_t move) {
 	bool turn = board->turn;
 
 	board->turn = !turn;
+	if (turn) {
+		board->fullMoveCounter--;
+	}
 	
 	if ((move & (1ull << 15)) == 0) {
-		
+		for (int i = 0; i < 12; i++) {
+			if ((board->pieces[i] & startBB) != 0) {
+				piece = i;
+				break;
+			}
+		}
+		board->pieces[piece] ^= startBB;
+		board->pieces[piece] ^= endBB;
 	} else {
 
 	}
