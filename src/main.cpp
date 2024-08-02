@@ -16,8 +16,8 @@ int main() {
 	printBoard(&b);
 
 	uint16_t move = 0x0649ull;
-	uint16_t *moves = &move;
-	// generateAllMoves(b, moves);
+	uint16_t moveArr[40];
+	// uint16_t *moves = generateAllMoves(b, moveArr);
 	// while (uint16_t m = *(moves++)) {
  	//	printMove(m);
 	// }
@@ -27,6 +27,6 @@ int main() {
 	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
-	std::cout << perft(1, &b) << "\n";
+	std::cout << perft(4, &b) << "\n";
 	return 0;
 }
