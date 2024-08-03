@@ -9,8 +9,6 @@
 #include <iostream>
 
 
-const uint64_t KING_ATTACKS[64] = {0x0000000000000302, 0x0000000000000705, 0x000000000000e0a, 0x0000000000001c14, 0x0000000000003828, 0x7050, 0xe0a0, 0xc040, 0x30203, 0x70507, 0xe0a0e, 0x1c141c, 0x382838, 0x705070, 0xe0a0e0, 0xc040c0, 0x3020300, 0x7050700, 0xe0a0e00, 0x1c141c00, 0x38283800, 0x70507000, 0xe0a0e000, 0xc040c000, 0x302030000, 0x705070000, 0xe0a0e0000, 0x1c141c0000, 0x3828380000, 0x7050700000, 0xe0a0e00000, 0xc040c00000, 0x30203000000, 0x70507000000, 0xe0a0e000000, 0x1c141c000000, 0x382838000000, 0x705070000000, 0xe0a0e0000000, 0xc040c0000000, 0x3020300000000, 0x7050700000000, 0xe0a0e00000000, 0x1c141c00000000, 0x38283800000000, 0x70507000000000, 0xe0a0e000000000, 0xc040c000000000, 0x302030000000000, 0x705070000000000, 0xe0a0e0000000000, 0x1c141c0000000000, 0x3828380000000000, 0x7050700000000000, 0xe0a0e00000000000, 0xc040c00000000000, 0x203000000000000, 0x507000000000000, 0xa0e000000000000, 0x141c000000000000, 0x2838000000000000, 0x5070000000000000, 0xa0e0000000000000, 0x40c0000000000000};
-
 
 uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 	uint64_t wPieces = whitePieces(&board);
@@ -161,19 +159,7 @@ uint16_t* generateKnightMoves(Board board, uint16_t *moves) {
 	
 	while (knightBB) {
 		square = popLSB(&knightBB);
-		currKnight = 1ull << square;
-
-		movesBB ^= (currKnight & (~(RANK_1|RANK_2|H_FILE))) >> 17;
-		movesBB ^= (currKnight & (~(RANK_1|RANK_2|A_FILE))) >> 15;
-
-		movesBB ^= (currKnight & (~(RANK_1|G_FILE|H_FILE))) >> 10;
-		movesBB ^= (currKnight & (~(RANK_1|A_FILE|B_FILE))) >> 6;
-
-		movesBB ^= (currKnight & (~(RANK_8|G_FILE|H_FILE))) << 6;
-		movesBB ^= (currKnight & (~(RANK_8|A_FILE|B_FILE))) << 10;
-
-		movesBB ^= (currKnight & (~(RANK_7|RANK_8|H_FILE))) << 15;
-		movesBB ^= (currKnight & (~(RANK_7|RANK_8|A_FILE))) << 17;
+		movesBB = KNIGHT_ATTACKS[square];
 	
 		movesBB &= piece==W_KNIGHT ? ~whitePieces(&board) : ~blackPieces(&board);
 
@@ -307,16 +293,6 @@ uint16_t* generateKingMoves(Board board, uint16_t *moves) {
 	
 	uint64_t movesBB = KING_ATTACKS[square];
 
-	// movesBB ^= (king & (~A_FILE)) << 1;
-	// movesBB ^= (king & (~H_FILE)) >> 1;
-	// movesBB ^= (king & (~RANK_1)) >> 8;
-	// movesBB ^= (king & (~RANK_8)) << 8;
-
-	// movesBB ^= (king & (~(A_FILE|RANK_1))) >> 7;
-	// movesBB ^= (king & (~(A_FILE|RANK_8))) << 9;
-	// movesBB ^= (king & (~(H_FILE|RANK_1))) >> 9;
-	// movesBB ^= (king & (~(H_FILE|RANK_8))) << 7;
-
 	// Making sure that pieces of the same colour don't occupy the same square
 	movesBB &= piece==W_KING ? ~whitePieces(&board) : ~blackPieces(&board);
 
@@ -332,29 +308,32 @@ uint16_t* generateKingMoves(Board board, uint16_t *moves) {
 
 
 uint16_t* generateCastlingMoves(Board board, uint16_t *moves) {
-	if (board.turn && ~isSquareAttacked(board, false, 3)) {
-		if ((board.castling & 0x1) > 0 && (occupiedSquares(&board) & 0x6) == 0) {
+	uint64_t occupied = occupiedSquares(&board);
+	uint64_t w_attacks = getAttacks(board, true);
+	uint64_t b_attacks = getAttacks(board, false);
+	if (board.turn && (b_attacks & 1ull << 3) == 0) {
+		if ((board.castling & 0x1) == 1 && (occupied & 0x6) == 0) {
 			// Kingside castling is allowed and f1, g1 are empty
-			if (~(isSquareAttacked(board, false, 2) || isSquareAttacked(board, false, 1))) {
+			if ((b_attacks & 0x6) == 0) {
 				*(moves++) = makeCastlingMove(3, 1);
 			}
 		}
-		if ((board.castling & 0x2) > 0 && (occupiedSquares(&board) & 0x70) == 0) {
+		if ((board.castling & 0x2) == 2 && (occupied & 0x70) == 0) {
 			// Quenside castling is allowed and b1, c1, d1 are empty
-			if (~(isSquareAttacked(board, false, 4) || isSquareAttacked(board, false, 5))) {
+			if ((b_attacks & 0x30) == 0) {
 				*(moves++) = makeCastlingMove(3, 5);
 			}
 		}
-	} else if (~board.turn && ~isSquareAttacked(board, true, 59)) {
-		if ((board.castling & 0x4) > 0 && (occupiedSquares(&board) & 0x0600000000000000) == 0) {
+	} else if (~board.turn && (w_attacks & 1ull << 59) == 0) {
+		if ((board.castling & 0x4) == 4 && (occupied & 0x0600000000000000) == 0) {
 			// Kingside castling is allowed and f8, g8 are empty
-			if (~(isSquareAttacked(board, true, 57) || isSquareAttacked(board, true, 58))) {
+			if ((w_attacks & 0x0600000000000000) == 0) {
 				*(moves++) = makeCastlingMove(59, 57);
 			}
 		}
-		if ((board.castling & 0x8) > 0 && (occupiedSquares(&board) & 0x7000000000000000) == 0) {
+		if ((board.castling & 0x8) == 8 && (occupied & 0x7000000000000000) == 0) {
 			// Queenside castling is allowed and b8, c8, d8 are empty
-			if (~(isSquareAttacked(board, true, 60) || isSquareAttacked(board, true, 61))) {
+			if ((w_attacks & 0x3000000000000000) == 0) {
 				*(moves++) = makeCastlingMove(59, 61);
 			}
 		}
@@ -386,12 +365,13 @@ int perft(int depth, Board *board) {
 	uint16_t *end = generateAllMoves(*board, moves);
 	Undo undo;
 	int limit = end-moves;
+	uint16_t m;
 
 	for (int i = 0; i < limit; i++) {
 		if (i >= 100) {
 			continue;
 		}
-		uint16_t m = *(moves+i);
+		m = *(moves+i);
 		undo = generateUndo(board, m);
 		playMove(board, m);
 		if (isLegalPosition(*board)) {

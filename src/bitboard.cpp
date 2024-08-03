@@ -69,13 +69,14 @@ uint64_t getFile(int square) {
 
 
 uint64_t reverse(uint64_t bb) {
+	if (bb == 0) {
+		return 0;
+	}
 	uint64_t reversed = 0ull;
-	for(int i = 0; i < 64; i++) {
-		reversed <<= 1;
-		if ((bb & 1) == 1) {
-			reversed ^= 1;
-		}
-		bb >>= 1;
+	int index;
+	while (bb) {
+		index = popLSB(&bb);
+		reversed |= 1ull << (63-index);
 	}
 	return reversed;
 }

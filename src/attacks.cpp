@@ -1,8 +1,10 @@
+#include "attacks.h"
 #include "bitboard.h"
 #include "board.h"
 #include "types.h"
 
 #include <stdint.h>
+
 
 uint64_t slidingAttacks(Board board, bool turn, int square, uint64_t mask) {
 	uint64_t pieceBB = 1ull << square;
@@ -46,19 +48,7 @@ uint64_t knightAttacks(Board board, bool turn) {
 
 	while (knights) {
 		square = popLSB(&knights);
-		currKnight = 1ull << square;
-
-		attacks ^= (currKnight & (~(RANK_1|RANK_2|H_FILE))) >> 17;
-		attacks ^= (currKnight & (~(RANK_1|RANK_2|A_FILE))) >> 15;
-
-		attacks ^= (currKnight & (~(RANK_1|G_FILE|H_FILE))) >> 10;
-		attacks ^= (currKnight & (~(RANK_1|A_FILE|B_FILE))) >> 6;
-
-		attacks ^= (currKnight & (~(RANK_8|G_FILE|H_FILE))) << 6;
-		attacks ^= (currKnight & (~(RANK_8|A_FILE|B_FILE))) << 10;
-
-		attacks ^= (currKnight & (~(RANK_7|RANK_8|H_FILE))) << 15;
-		attacks ^= (currKnight & (~(RANK_7|RANK_8|A_FILE))) << 17;
+		attacks ^= KNIGHT_ATTACKS[square];
 	}
 	return attacks;
 }
@@ -139,17 +129,7 @@ uint64_t kingAttacks(Board board, bool turn) {
 	int piece = turn ? W_KING : B_KING;
 	uint64_t king = board.pieces[piece];
 
-	attacks ^= (king & (~A_FILE)) << 1;
-	attacks ^= (king & (~H_FILE)) >> 1;
-	attacks ^= (king & (~RANK_1)) >> 8;
-	attacks ^= (king & (~RANK_8)) << 8;
-
-	attacks ^= (king & (~(A_FILE|RANK_1))) >> 7;
-	attacks ^= (king & (~(A_FILE|RANK_8))) << 9;
-	attacks ^= (king & (~(H_FILE|RANK_1))) >> 9;
-	attacks ^= (king & (~(H_FILE|RANK_8))) << 7;
-
-	return attacks;
+	return KING_ATTACKS[popLSB(&king)];
 }
 
 
