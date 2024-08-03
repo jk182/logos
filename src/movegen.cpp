@@ -9,7 +9,6 @@
 #include <iostream>
 
 
-
 uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 	uint64_t wPieces = whitePieces(&board);
 	uint64_t bPieces = blackPieces(&board);
@@ -179,17 +178,18 @@ uint64_t slidingMoves(Board board, int piece, uint64_t mask) {
 	uint64_t movesBB = 0ull;
 	uint64_t negative = 0ull;
 	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
-	
+	/*	
 	uint64_t occupied = occupiedSquares(&board);
 	uint64_t occMask = occupied & mask;
 
 	movesBB = occMask^(occMask-(pieceBB<<1));
-	movesBB &= mask;
 
 	negative = occMask^reverse(reverse(occMask)-(reverse(pieceBB)<<1));
-	negative &= mask;
 	negative &= (1ull<<piece)-1;
 	movesBB |= negative;
+	movesBB &= mask;
+	*/
+	movesBB = slidingAttacks(board, board.turn, piece, mask);
 
 	movesBB &= ~friendly;
 	return movesBB;

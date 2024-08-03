@@ -69,9 +69,6 @@ uint64_t getFile(int square) {
 
 
 uint64_t reverse(uint64_t bb) {
-	if (bb == 0) {
-		return 0;
-	}
 	uint64_t reversed = 0ull;
 	int index;
 	while (bb) {

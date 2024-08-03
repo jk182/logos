@@ -15,13 +15,12 @@ uint64_t slidingAttacks(Board board, bool turn, int square, uint64_t mask) {
 	uint64_t occMask = occupied & mask;
 
 	attacks = occMask^(occMask-(pieceBB<<1));
-	attacks &= mask;
 
-	negative = occMask^reverse(reverse(occMask)-(reverse(pieceBB)<<1));
-	negative &= mask;
+	negative = occMask^reverse((reverse(occMask)-(reverse(pieceBB)<<1))&reverse(mask));
 	negative &= (1ull<<square)-1;
 	attacks |= negative;
 	attacks &= (~pieceBB);
+	attacks &= mask;
 
 	return attacks;
 }
@@ -29,12 +28,15 @@ uint64_t slidingAttacks(Board board, bool turn, int square, uint64_t mask) {
 
 uint64_t pawnAttacks(Board board, bool turn) {
 	uint64_t attacks = 0ull;
-	int piece = turn ? W_PAWN : B_PAWN;
-	uint64_t pawns = board.pieces[piece];
-
-	attacks |= (pawns & (~A_FILE)) << 9;
-	attacks |= (pawns & (~H_FILE)) << 7;
-
+	if (turn) {
+		uint64_t pawns = board.pieces[W_PAWN];
+		attacks |= (pawns & (~A_FILE)) << 9;
+		attacks |= (pawns & (~H_FILE)) << 7;
+	} else {
+		uint64_t pawns = board.pieces[B_PAWN];
+		attacks |= (pawns & (~A_FILE)) >> 7;
+		attacks |= (pawns & (~H_FILE)) >> 9;
+	}
 	return attacks;
 }
 
@@ -44,7 +46,6 @@ uint64_t knightAttacks(Board board, bool turn) {
 	int piece = turn ? W_KNIGHT : B_KNIGHT;
 	uint64_t knights = board.pieces[piece];
 	int square;
-	uint64_t currKnight;
 
 	while (knights) {
 		square = popLSB(&knights);
