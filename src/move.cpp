@@ -148,9 +148,7 @@ void playMove(Board *board, uint16_t move) {
 }
 
 
-void unmakeMove(Board *board, uint16_t move, Undo *undo) {
-	// Unsure how to deal with en-passant, castling rights and 50 move rule
-	// What about captures?
+void unmakeMove(Board *board, uint16_t move, Undo undo) {
 	if (move == NULL_MOVE) {
 		if (board->turn) {
 			board->fullMoveCounter--;
@@ -167,9 +165,9 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 	bool turn = board->turn;
 
 	board->turn = !turn;
-	board->halfMoveCounter = undo->halfMoveCounter;
-	board->epSquare = undo->epSquare;
-	board->castling = undo->castling;
+	board->halfMoveCounter = undo.halfMoveCounter;
+	board->epSquare = undo.epSquare;
+	board->castling = undo.castling;
 	if (turn) {
 		board->fullMoveCounter--;
 	}
@@ -180,8 +178,8 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 			board->pieces[piece] ^= startBB;
 			int promPiece = ((move >> 12) & 0xF);
 			board->pieces[piece+promPiece] ^= endBB;
-			if (undo->capturedPiece >= 0) {
-				board->pieces[undo->capturedPiece] ^= endBB;
+			if (undo.capturedPiece >= 0) {
+				board->pieces[undo.capturedPiece] ^= endBB;
 			}
 			return;
 		}
@@ -193,6 +191,9 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		}
 		board->pieces[piece] ^= startBB;
 		board->pieces[piece] ^= endBB;
+		if (undo.capturedPiece > -1) {
+			board->pieces[undo.capturedPiece] ^= endBB;
+		}
 	} else {
 		if (board->turn) {
 			board->pieces[W_KING] ^= startBB | endBB;

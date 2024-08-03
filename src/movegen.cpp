@@ -387,14 +387,15 @@ int perft(int depth, Board *board) {
 		if (i >= 100) {
 			continue;
 		}
-		std::cout << i << "\n";
 		uint16_t m = *(moves+i);
 		undo = generateUndo(board, m);
 		playMove(board, m);
 		if (isLegalPosition(*board)) {
 			nodes += perft(depth-1, board);
 		}
-		unmakeMove(board, m, &undo);
+		// printBoard(board);
+		// printMove(m);
+		unmakeMove(board, m, undo);
 	}
 	return nodes;
 }
