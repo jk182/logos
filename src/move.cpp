@@ -194,6 +194,20 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		board->pieces[piece] ^= startBB;
 		board->pieces[piece] ^= endBB;
 	} else {
-
+		if (board->turn) {
+			board->pieces[W_KING] ^= startBB | endBB;
+			if (endSquare == 1) {
+				board->pieces[W_ROOK] ^= 0x5;
+			} else {
+				board->pieces[W_ROOK] ^= 0x90;
+			}
+		} else {
+			board->pieces[B_KING] ^= startBB | endBB;
+			if (endSquare == 57) {
+				board->pieces[B_ROOK] ^= (1ull << 58) | (1ull << 56);
+			} else {
+				board->pieces[B_ROOK] ^= (1ull << 53) | (1ull << 60);
+			}
+		}
 	}
 }
