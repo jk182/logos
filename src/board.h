@@ -9,7 +9,14 @@ struct Board {
 	int halfMoveCounter;
 	int fullMoveCounter;
 	int epSquare;
-	int castling;
+	uint16_t castling;
+};
+
+struct Undo {
+	uint16_t castling;
+	int epSquare;
+	int halfMoveCounter;
+	int capturedPiece;
 };
 
 void boardFromFEN(Board *board, const char *fen);
@@ -19,3 +26,5 @@ uint64_t whitePieces(Board *board);
 uint64_t blackPieces(Board *board);
 uint64_t occupiedSquares(Board *board);
 bool isLegalPosition(Board board);
+int getPieceAtSquare(Board *board, int square);
+Undo generateUndo(Board *board, uint16_t move);

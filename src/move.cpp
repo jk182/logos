@@ -14,6 +14,21 @@ void printMove(uint16_t move) {
 }
 
 
+int getStartSquare(uint16_t move) {
+	return (move & 0x3Full);
+}
+
+
+int getEndSquare(uint16_t move) {
+	return ((move >> 6) & 0x3Full);
+}
+
+
+bool moveIsPromotion(uint16_t move) {
+	return ((move & (0xF << 12)) > 0);
+}
+
+
 uint16_t makeMove(int startSqIndex, int endSqIndex) {
 	uint16_t move = startSqIndex | (endSqIndex << 6);
 	return move;
@@ -42,8 +57,8 @@ void playMove(Board *board, uint16_t move) {
 		board->turn = !board->turn;
 		return;
 	}
-	int startSquare = (move & (~(1ull<<15))) & 0x3Full;
-	int endSquare = (move & (~(1ull<<15))) >> 6;
+	int startSquare = getStartSquare(move);
+	int endSquare = getEndSquare(move);
 	uint64_t startBB = 1ull << startSquare;
 	uint64_t endBB = 1ull << endSquare;
 	int piece;
@@ -133,7 +148,7 @@ void playMove(Board *board, uint16_t move) {
 }
 
 
-void unmakeMove(Board *board, uint16_t move) {
+void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 	// Unsure how to deal with en-passant, castling rights and 50 move rule
 	// What about captures?
 	if (move == NULL_MOVE) {
@@ -144,21 +159,34 @@ void unmakeMove(Board *board, uint16_t move) {
 		return;
 	}
 	// start and end squares are reversed since we unmake the move
-	int startSquare = (move & (~(1ull<<15))) >> 6;
-	int endSquare = (move & (~(1ull<<15))) & 0x3Full;
+	int startSquare = getStartSquare(move);
+	int endSquare = getEndSquare(move);
 	uint64_t startBB = 1ull << startSquare;
 	uint64_t endBB = 1ull << endSquare;
 	int piece;
 	bool turn = board->turn;
 
 	board->turn = !turn;
+	board->halfMoveCounter = undo->halfMoveCounter;
+	board->epSquare = undo->epSquare;
+	board->castling = undo->castling;
 	if (turn) {
 		board->fullMoveCounter--;
 	}
 	
 	if ((move & (1ull << 15)) == 0) {
+		if (moveIsPromotion(move)) {
+			piece = board->turn ? W_PAWN : B_PAWN;
+			board->pieces[piece] ^= startBB;
+			int promPiece = ((move >> 12) & 0xF);
+			board->pieces[piece+promPiece] ^= endBB;
+			if (undo->capturedPiece >= 0) {
+				board->pieces[undo->capturedPiece] ^= endBB;
+			}
+			return;
+		}
 		for (int i = 0; i < 12; i++) {
-			if ((board->pieces[i] & startBB) != 0) {
+			if ((board->pieces[i] & endBB) != 0) {
 				piece = i;
 				break;
 			}

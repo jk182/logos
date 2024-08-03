@@ -4,6 +4,7 @@
 #include "attacks.h"
 #include "board.h"
 #include "bitboard.h"
+#include "move.h"
 #include "types.h"
 
 
@@ -182,4 +183,26 @@ bool isLegalPosition(Board board) {
 	uint64_t bb = board.turn ? board.pieces[W_KING] : board.pieces[B_KING];
 	int square = popLSB(&bb);
 	return !isSquareAttacked(board, !board.turn, square);
+}
+
+
+int getPieceAtSquare(Board *board, int square) {
+	int piece = -1;
+	for (int p = 0; p < 12; p++) {
+		if (testBit(board->pieces[p], square)) {
+			piece = p;
+			break;
+		}
+	}
+	return piece;
+}
+
+
+Undo generateUndo(Board *board, uint16_t move) {
+	Undo undo;
+	undo.castling = board->castling;
+	undo.epSquare = board->epSquare;
+	undo.halfMoveCounter = board->halfMoveCounter;
+	undo.capturedPiece = getPieceAtSquare(board, getEndSquare(move));
+	return undo;
 }

@@ -380,19 +380,21 @@ int perft(int depth, Board *board) {
 	uint16_t moveArr[100];
 	uint16_t *moves = moveArr;
 	uint16_t *end = generateAllMoves(*board, moves);
+	Undo undo;
 	int limit = end-moves;
 
 	for (int i = 0; i < limit; i++) {
 		if (i >= 100) {
 			continue;
 		}
+		std::cout << i << "\n";
 		uint16_t m = *(moves+i);
-		printMove(m);
+		undo = generateUndo(board, m);
 		playMove(board, m);
 		if (isLegalPosition(*board)) {
 			nodes += perft(depth-1, board);
 		}
-		unmakeMove(board, m);
+		unmakeMove(board, m, &undo);
 	}
 	return nodes;
 }
