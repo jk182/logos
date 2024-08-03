@@ -9,6 +9,9 @@
 #include <iostream>
 
 
+const uint64_t KING_ATTACKS[64] = {0x0000000000000302, 0x0000000000000705, 0x000000000000e0a, 0x0000000000001c14, 0x0000000000003828, 0x7050, 0xe0a0, 0xc040, 0x30203, 0x70507, 0xe0a0e, 0x1c141c, 0x382838, 0x705070, 0xe0a0e0, 0xc040c0, 0x3020300, 0x7050700, 0xe0a0e00, 0x1c141c00, 0x38283800, 0x70507000, 0xe0a0e000, 0xc040c000, 0x302030000, 0x705070000, 0xe0a0e0000, 0x1c141c0000, 0x3828380000, 0x7050700000, 0xe0a0e00000, 0xc040c00000, 0x30203000000, 0x70507000000, 0xe0a0e000000, 0x1c141c000000, 0x382838000000, 0x705070000000, 0xe0a0e0000000, 0xc040c0000000, 0x3020300000000, 0x7050700000000, 0xe0a0e00000000, 0x1c141c00000000, 0x38283800000000, 0x70507000000000, 0xe0a0e000000000, 0xc040c000000000, 0x302030000000000, 0x705070000000000, 0xe0a0e0000000000, 0x1c141c0000000000, 0x3828380000000000, 0x7050700000000000, 0xe0a0e00000000000, 0xc040c00000000000, 0x203000000000000, 0x507000000000000, 0xa0e000000000000, 0x141c000000000000, 0x2838000000000000, 0x5070000000000000, 0xa0e0000000000000, 0x40c0000000000000};
+
+
 uint16_t* generatePawnMoves(Board board, uint16_t *moves) {
 	uint64_t wPieces = whitePieces(&board);
 	uint64_t bPieces = blackPieces(&board);
@@ -300,22 +303,23 @@ uint16_t* generateQueenMoves(Board board, uint16_t *moves) {
 uint16_t* generateKingMoves(Board board, uint16_t *moves) {
 	int piece = board.turn ? W_KING : B_KING;
 	uint64_t king = board.pieces[piece];
-	uint64_t movesBB = 0ull;
+	int square = popLSB(&king);
+	
+	uint64_t movesBB = KING_ATTACKS[square];
 
-	movesBB ^= (king & (~A_FILE)) << 1;
-	movesBB ^= (king & (~H_FILE)) >> 1;
-	movesBB ^= (king & (~RANK_1)) >> 8;
-	movesBB ^= (king & (~RANK_8)) << 8;
+	// movesBB ^= (king & (~A_FILE)) << 1;
+	// movesBB ^= (king & (~H_FILE)) >> 1;
+	// movesBB ^= (king & (~RANK_1)) >> 8;
+	// movesBB ^= (king & (~RANK_8)) << 8;
 
-	movesBB ^= (king & (~(A_FILE|RANK_1))) >> 7;
-	movesBB ^= (king & (~(A_FILE|RANK_8))) << 9;
-	movesBB ^= (king & (~(H_FILE|RANK_1))) >> 9;
-	movesBB ^= (king & (~(H_FILE|RANK_8))) << 7;
+	// movesBB ^= (king & (~(A_FILE|RANK_1))) >> 7;
+	// movesBB ^= (king & (~(A_FILE|RANK_8))) << 9;
+	// movesBB ^= (king & (~(H_FILE|RANK_1))) >> 9;
+	// movesBB ^= (king & (~(H_FILE|RANK_8))) << 7;
 
 	// Making sure that pieces of the same colour don't occupy the same square
 	movesBB &= piece==W_KING ? ~whitePieces(&board) : ~blackPieces(&board);
 
-	int square = popLSB(&king);
 	int endSquare;
 	uint16_t move;
 	while (movesBB) {

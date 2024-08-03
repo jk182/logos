@@ -132,6 +132,7 @@ void boardFromFEN(Board *board, const char *fen) {
 	board->fullMoveCounter = counter;
 }
 
+
 void printBoard(Board *board) {
 	char symbols[] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'};
 	char piece;

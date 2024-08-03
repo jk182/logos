@@ -52,13 +52,9 @@ char* getSquareName(int square) {
 
 
 int popLSB(uint64_t *bb) {
-	for (int i = 0; i < 64; i++) {
-		if ((*bb & (1ull << i)) != 0){
-			*bb ^= (1ull << i);
-			return i;
-		}
-	}
-	return -1;
+	auto index = std::countr_zero(*bb);
+	*bb &= *bb - 1;
+	return index;
 }
 
 
