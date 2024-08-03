@@ -180,9 +180,9 @@ uint64_t occupiedSquares(Board *board) {
 
 
 bool isLegalPosition(Board board) {
-	uint64_t bb = board.turn ? board.pieces[W_KING] : board.pieces[B_KING];
+	uint64_t bb = board.turn ? board.pieces[B_KING] : board.pieces[W_KING];
 	int square = popLSB(&bb);
-	return !isSquareAttacked(board, !board.turn, square);
+	return !isSquareAttacked(board, board.turn, square);
 }
 
 

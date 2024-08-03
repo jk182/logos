@@ -27,6 +27,8 @@ int main() {
 	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
-	std::cout << perft(3, &b) << "\n";
+	for (int d = 1; d <= 8; d++) {
+		std::cout << "Depth " << d << " :" << perft(d, &b) << "\n";
+	}
 	return 0;
 }
