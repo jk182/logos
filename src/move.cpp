@@ -49,6 +49,18 @@ uint16_t encodeCastlingMove(int startSqIndex, int endSqIndex) {
 }
 
 
+uint16_t encodeEPMove(int startSqIndex, int endSqIndex) {
+	uint16_t move = encodeMove(startSqIndex, endSqIndex);
+	move |= ENPASSANT;
+	return move;
+}
+
+
+bool isEnPassant(uint16_t move) {
+	return (move & ENPASSANT) == ENPASSANT;
+}
+
+
 void makeMove(Board *board, uint16_t move) {
 	if (move == NULL_MOVE) {
 		if (! board->turn) {
@@ -66,6 +78,18 @@ void makeMove(Board *board, uint16_t move) {
 
 	board->turn = !turn;
 	board->epSquare = -1;
+
+	if (isEnPassant(move)) {
+		piece = board->turn ? B_PAWN : W_PAWN;
+		board->pieces[piece] ^= startBB;
+		board->pieces[piece] ^= endBB;
+		if (turn) {
+			board->pieces[B_PAWN] ^= (endBB >> 8);
+		} else {
+			board->pieces[W_PAWN] ^= (endBB << 8);
+		}
+		return;
+	}
 	if ((move & (1ull << 15)) == 0) {
 		// move is not castling
 		if (! turn) {
