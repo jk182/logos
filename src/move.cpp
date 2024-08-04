@@ -29,27 +29,27 @@ bool moveIsPromotion(uint16_t move) {
 }
 
 
-uint16_t makeMove(int startSqIndex, int endSqIndex) {
+uint16_t encodeMove(int startSqIndex, int endSqIndex) {
 	uint16_t move = startSqIndex | (endSqIndex << 6);
 	return move;
 }
 
 
-uint16_t makeMove(int startSqIndex, int endSqIndex, int promotionPiece) {
-	uint16_t move = makeMove(startSqIndex, endSqIndex);
+uint16_t encodeMove(int startSqIndex, int endSqIndex, int promotionPiece) {
+	uint16_t move = encodeMove(startSqIndex, endSqIndex);
 	move |= promotionPiece << 12;
 	return move;
 }
 
 
-uint16_t makeCastlingMove(int startSqIndex, int endSqIndex) {
-	uint16_t move = makeMove(startSqIndex, endSqIndex);
+uint16_t encodeCastlingMove(int startSqIndex, int endSqIndex) {
+	uint16_t move = encodeMove(startSqIndex, endSqIndex);
 	move |= 1ull << 15;
 	return move;
 }
 
 
-void playMove(Board *board, uint16_t move) {
+void makeMove(Board *board, uint16_t move) {
 	if (move == NULL_MOVE) {
 		if (! board->turn) {
 			board->fullMoveCounter++;
