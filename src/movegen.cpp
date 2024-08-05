@@ -390,14 +390,15 @@ int perft(int depth, Board *board) {
 		undo = generateUndo(board, m);
 		makeMove(board, m);
 		if (isLegalPosition(*board)) {
-			if (depth == 2) {
+			if (depth == 5) {
 				printMove(m);
+				// printBoard(board);
 			}
 			nodes += perft(depth-1, board);
 		}
 		unmakeMove(board, m, &undo);
 	}
-	if (depth == 1) {
+	if (depth == 4) {
 		std::cout << nodes << "\n";
 	}
 	return nodes;

@@ -50,7 +50,7 @@ uint64_t knightAttacks(Board *board, bool turn) {
 
 	while (knights) {
 		square = popLSB(&knights);
-		attacks ^= KNIGHT_ATTACKS[square];
+		attacks |= KNIGHT_ATTACKS[square];
 	}
 	return attacks;
 }
