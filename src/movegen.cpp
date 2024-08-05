@@ -372,9 +372,11 @@ int perft(int depth, Board *board) {
 	if (depth == 0) {
 		return 1;
 	}
+	/*
 	if (isGameOver(board)) {
 		return 0;
 	}
+	*/
 	int nodes = 0;
 	uint16_t moveArr[128];
 	uint16_t *moves = moveArr;
@@ -388,12 +390,9 @@ int perft(int depth, Board *board) {
 		undo = generateUndo(board, m);
 		makeMove(board, m);
 		if (isLegalPosition(*board)) {
-			/*
-			if (depth == 1) {
+			if (depth == 2) {
 				printMove(m);
-				printBoard(board);
 			}
-			*/
 			nodes += perft(depth-1, board);
 		}
 		unmakeMove(board, m, &undo);
