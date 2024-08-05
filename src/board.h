@@ -27,3 +27,4 @@ uint64_t occupiedSquares(Board *board);
 bool isLegalPosition(Board board);
 int getPieceAtSquare(Board *board, int square);
 Undo generateUndo(Board *board, uint16_t move);
+bool isGameOver(Board *board);

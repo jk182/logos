@@ -206,3 +206,20 @@ Undo generateUndo(Board *board, uint16_t move) {
 	undo.capturedPiece = getPieceAtSquare(board, getEndSquare(move));
 	return undo;
 }
+
+
+bool isInsufficientMaterial(Board *board) {
+	for (int piece : {W_PAWN, W_ROOK, W_QUEEN, B_PAWN, B_ROOK, B_QUEEN}) {
+		if (board->pieces[piece] != 0) {
+			return false;
+		}
+	}
+	uint64_t minorPieces = board->pieces[W_KNIGHT] | board->pieces[W_BISHOP] | board->pieces[B_KNIGHT] | board->pieces[B_BISHOP];
+	popLSB(&minorPieces);
+	return (minorPieces == 0);
+}
+
+
+bool isGameOver(Board *board) {
+	return isInsufficientMaterial(board);
+}

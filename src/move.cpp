@@ -10,7 +10,12 @@ void printMove(uint16_t move) {
 	// TODO: add promotion piece
 	char* startSquare = getSquareName(move & 0x3F);
 	char* endSquare = getSquareName((move & 0xFC0) >> 6);
-	std::cout << startSquare << "->" << endSquare << "\n";
+	int promPiece = (move & 0x7000) >> 12;
+	if (promPiece > 0 && promPiece < 5) {
+		std::cout << startSquare << "->" << endSquare << " " << promPiece << "\n";
+	} else {
+		std::cout << startSquare << "->" << endSquare << "\n";
+	}
 }
 
 
@@ -25,8 +30,13 @@ int getEndSquare(uint16_t move) {
 
 
 bool moveIsPromotion(uint16_t move) {
-	int prom = move & (0x7 << 12);
+	int prom = (move & 0x7000) >> 12;
 	return (prom > 0 && prom < 5);
+}
+
+
+int getPromotionPiece(uint16_t move) {
+	return ((move & 0x7000) >> 12);
 }
 
 
@@ -91,6 +101,7 @@ void makeMove(Board *board, uint16_t move) {
 			board->castling &= ~B_KS_CASTLING;
 		}
 	}
+
 	if ((move & REM_QS_CASTLING) != 0) {
 		if (turn) {
 			board->castling &= ~W_QS_CASTLING;
@@ -110,6 +121,8 @@ void makeMove(Board *board, uint16_t move) {
 		}
 		return;
 	}
+
+
 	if ((move & (1ull << 15)) == 0) {
 		// move is not castling
 		if (! turn) {
@@ -138,6 +151,12 @@ void makeMove(Board *board, uint16_t move) {
 					break;
 				}
 			}
+		}
+		if (moveIsPromotion(move)) {
+			board->halfMoveCounter = 0;
+			piece = turn ? W_PAWN : B_PAWN;
+			board->pieces[piece+getPromotionPiece(move)] ^= endBB;
+			return;
 		}
 		board->pieces[piece] ^= endBB;
 		// Handling castling rights
@@ -211,6 +230,16 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 	board->epSquare = isEnPassant(move) ? endSquare : -1;
 	board->castling = undo->castling;
 	
+	if (moveIsPromotion(move)) {
+		piece = board->turn ? W_PAWN : B_PAWN;
+		board->pieces[piece] ^= startBB;
+		board->pieces[piece+getPromotionPiece(move)] ^= endBB;
+		if (undo->capturedPiece >= 0) {
+			board->pieces[undo->capturedPiece] ^= endBB;
+		}
+		return;
+	}
+
 	if ((move & (1ull << 15)) == 0) {
 		if (isEnPassant(move)) {
 			piece = board->turn ? W_PAWN : B_PAWN;
@@ -219,16 +248,6 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 				board->pieces[B_PAWN] ^= (endBB >> 8);
 			} else {
 				board->pieces[W_PAWN] ^= (endBB << 8);
-			}
-			return;
-		}
-		if (moveIsPromotion(move)) {
-			piece = board->turn ? W_PAWN : B_PAWN;
-			board->pieces[piece] ^= startBB;
-			int promPiece = ((move >> 12) & 0xF);
-			board->pieces[piece+promPiece] ^= endBB;
-			if (undo->capturedPiece >= 0) {
-				board->pieces[undo->capturedPiece] ^= endBB;
 			}
 			return;
 		}
