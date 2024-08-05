@@ -133,6 +133,20 @@ void makeMove(Board *board, uint16_t move) {
 			for (int i = (startPiece+6)%12; i <= (endPiece+6)%12; i++) {
 				if ((board->pieces[i] & endBB) != 0) {
 					board->pieces[i] ^= endBB;
+					// Removing castling rights if a rook is captured
+					if (i == W_ROOK) {
+						if (endSquare == 0) {
+							board->castling &= ~W_KS_CASTLING;
+						} else if (endSquare == 7) {
+							board->castling &= ~W_QS_CASTLING;
+						}
+					} else if (i == B_ROOK) {
+						if (endSquare == 56) {
+							board->castling &= ~B_KS_CASTLING;
+						} else if (endSquare == 63) {
+							board->castling &= ~B_QS_CASTLING;
+						}
+					}
 					break;
 				}
 			}
