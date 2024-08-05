@@ -98,22 +98,6 @@ void makeMove(Board *board, uint16_t move) {
 	startPiece = turn ? W_PAWN : B_PAWN;
 	endPiece = turn ? W_KING : B_KING;
 
-	if ((move & REM_KS_CASTLING) != 0) {
-		if (turn) {
-			board->castling &= ~W_KS_CASTLING;
-		} else {
-			board->castling &= ~B_KS_CASTLING;
-		}
-	}
-
-	if ((move & REM_QS_CASTLING) != 0) {
-		if (turn) {
-			board->castling &= ~W_QS_CASTLING;
-		} else {
-			board->castling &= ~B_QS_CASTLING;
-		}
-	}
-
 	if (isEnPassant(move)) {
 		board->halfMoveCounter = 0;
 		piece = turn ? W_PAWN : B_PAWN;
@@ -170,16 +154,16 @@ void makeMove(Board *board, uint16_t move) {
 				break;
 			case W_ROOK:
 				if (startSquare == 0) {
-					board->castling &= 0b1110ull;
+					board->castling &= ~W_KS_CASTLING;
 				} else if (startSquare == 7) {
-					board->castling &= 0b1101ull;
+					board->castling &= ~W_QS_CASTLING;
 				}
 				break;
 			case B_ROOK:
 				if (startSquare == 56) {
-					board->castling &= 0b1011ull;
+					board->castling &= ~B_KS_CASTLING;
 				} else if (startSquare == 63) {
-					board->castling &= 0b0111ull;
+					board->castling &= ~B_QS_CASTLING;
 				}
 				break;
 		}
