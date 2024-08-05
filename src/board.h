@@ -14,7 +14,6 @@ struct Board {
 
 struct Undo {
 	uint16_t castling;
-	int epSquare;
 	int halfMoveCounter;
 	int capturedPiece;
 };

@@ -70,10 +70,8 @@ uint64_t getFile(int square) {
 
 uint64_t reverse(uint64_t bb) {
 	uint64_t reversed = 0ull;
-	int index;
 	while (bb) {
-		index = popLSB(&bb);
-		reversed |= 1ull << (63-index);
+		reversed |= 1ull << (63-popLSB(&bb));
 	}
 	return reversed;
 }

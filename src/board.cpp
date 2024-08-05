@@ -202,7 +202,6 @@ int getPieceAtSquare(Board *board, int square) {
 Undo generateUndo(Board *board, uint16_t move) {
 	Undo undo;
 	undo.castling = board->castling;
-	undo.epSquare = board->epSquare;
 	undo.halfMoveCounter = board->halfMoveCounter;
 	undo.capturedPiece = getPieceAtSquare(board, getEndSquare(move));
 	return undo;

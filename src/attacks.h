@@ -6,14 +6,14 @@
 
 
 bool isSquareAttacked(Board board, bool turn, int square);
-uint64_t slidingAttacks(Board board, bool turn, int square, uint64_t mask);
+uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask);
 uint64_t getAttacks(Board board, bool turn);
-uint64_t pawnAttacks(Board board, bool turn);
-uint64_t knightAttacks(Board board, bool turn);
-uint64_t bishopAttacks(Board board, bool turn);
-uint64_t rookAttacks(Board board, bool turn);
-uint64_t queenAttacks(Board board, bool turn);
-uint64_t kingAttacks(Board board, bool turn);
+uint64_t pawnAttacks(Board *board, bool turn);
+uint64_t knightAttacks(Board *board, bool turn);
+uint64_t bishopAttacks(Board *board, bool turn);
+uint64_t rookAttacks(Board *board, bool turn);
+uint64_t queenAttacks(Board *board, bool turn);
+uint64_t kingAttacks(Board *board, bool turn);
 
 static const uint64_t KNIGHT_ATTACKS[64] = {
 	0x20400, 0x50800, 0xa1100, 0x142200, 0x284400, 0x508800, 0xa01000, 0x402000, 

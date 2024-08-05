@@ -17,6 +17,8 @@ enum {
 	B_KS_CASTLING = 0x4,
 	B_QS_CASTLING = 0x8,
 
+	REM_KS_CASTLING = 0x5000,
+	REM_QS_CASTLING = 0x6000,
 	ENPASSANT = 0x7000
 };
 
@@ -32,4 +34,4 @@ uint16_t encodeCastlingMove(int startSqIndex, int endSqIndex);
 uint16_t encodeEPMove(int startSqInex, int endSqIndex);
 bool isEnPassant(uint16_t move);
 void makeMove(Board *board, uint16_t move);
-void unmakeMove(Board *board, uint16_t move, Undo undo);
+void unmakeMove(Board *board, uint16_t move, Undo *undo);
