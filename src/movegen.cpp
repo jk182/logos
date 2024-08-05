@@ -324,7 +324,7 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 	uint64_t occupied = occupiedSquares(board);
 	uint64_t w_attacks = getAttacks(*board, true);
 	uint64_t b_attacks = getAttacks(*board, false);
-	if (board->turn && (b_attacks & 1ull << 3) == 0) {
+	if (board->turn && (b_attacks & 0x8) == 0) {
 		if ((board->castling & W_KS_CASTLING) == 1 && (occupied & 0x6) == 0) {
 			// Kingside castling is allowed and f1, g1 are empty
 			if ((b_attacks & 0x6) == 0) {

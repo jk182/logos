@@ -7,7 +7,6 @@
 
 
 void printMove(uint16_t move) {
-	// TODO: add promotion piece
 	char* startSquare = getSquareName(move & 0x3F);
 	char* endSquare = getSquareName((move & 0xFC0) >> 6);
 	int promPiece = (move & 0x7000) >> 12;
@@ -54,7 +53,7 @@ uint16_t encodeMove(int startSqIndex, int endSqIndex, int promotionPiece) {
 
 uint16_t encodeCastlingMove(int startSqIndex, int endSqIndex) {
 	uint16_t move = encodeMove(startSqIndex, endSqIndex);
-	move |= 1ull << 15;
+	move |= 0x8000;
 	return move;
 }
 
@@ -71,11 +70,16 @@ bool isEnPassant(uint16_t move) {
 }
 
 
+bool isCastling(uint16_t move) {
+	return (move & 0x8000) == 0x8000;
+}
+
+
 void makeMove(Board *board, uint16_t move) {
+	if (! board->turn) {
+		board->fullMoveCounter++;
+	}
 	if (move == NULL_MOVE) {
-		if (! board->turn) {
-			board->fullMoveCounter++;
-		}
 		board->turn = !board->turn;
 		return;
 	}
@@ -123,11 +127,8 @@ void makeMove(Board *board, uint16_t move) {
 	}
 
 
-	if ((move & (1ull << 15)) == 0) {
+	if (! isCastling(move)) {
 		// move is not castling
-		if (! turn) {
-			board->fullMoveCounter++;
-		}
 		for (int i = startPiece; i <= endPiece; i++) {
 			if ((board->pieces[i] & startBB) != 0) {
 				piece = i;
@@ -240,7 +241,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		return;
 	}
 
-	if ((move & (1ull << 15)) == 0) {
+	if (! isCastling(move)) {
 		if (isEnPassant(move)) {
 			piece = board->turn ? W_PAWN : B_PAWN;
 			board->pieces[piece] ^= startBB ^ endBB;
@@ -262,7 +263,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 			board->pieces[undo->capturedPiece] ^= endBB;
 		}
 	} else {
-		if (board->turn) {
+		if (!turn) {
 			board->pieces[W_KING] ^= startBB | endBB;
 			if (endSquare == 1) {
 				board->pieces[W_ROOK] ^= 0x5;
@@ -274,7 +275,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 			if (endSquare == 57) {
 				board->pieces[B_ROOK] ^= (1ull << 58) | (1ull << 56);
 			} else {
-				board->pieces[B_ROOK] ^= (1ull << 53) | (1ull << 60);
+				board->pieces[B_ROOK] ^= (1ull << 63) | (1ull << 60);
 			}
 		}
 	}
