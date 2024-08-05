@@ -13,7 +13,8 @@ int main() {
 	Board b;
 	clearBoard(&b);
 	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	// boardFromFEN(&b, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+	boardFromFEN(&b, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+	boardFromFEN(&b, "8/Pk6/8/8/8/8/7K/8 b - - 0 1");
 	printBoard(&b);
 
 	uint16_t move = 0x0649ull;
@@ -28,7 +29,7 @@ int main() {
 	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
-	for (int d = 1; d <= 7; d++) {
+	for (int d = 1; d <= 4; d++) {
 		std::cout << "Depth " << d << ": " << perft(d, &b) << "\n";
 	}
 	return 0;

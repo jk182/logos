@@ -253,6 +253,11 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			move = encodeMove(square, endSquare);
+			if (square == 0 || square == 56) {
+				move |= REM_KS_CASTLING;
+			} else if (square == 7 || square == 63) {
+				move |= REM_QS_CASTLING;
+			}
 			*(moves++) = move;
 		}
 	}
@@ -368,7 +373,7 @@ int perft(int depth, Board *board) {
 		return 1;
 	}
 	int nodes = 0;
-	uint16_t moveArr[100];
+	uint16_t moveArr[128];
 	uint16_t *moves = moveArr;
 	uint16_t *end = generateAllMoves(*board, moves);
 	Undo undo;
