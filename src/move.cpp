@@ -130,7 +130,7 @@ void makeMove(Board *board, uint16_t move) {
 		// Detecting captures
 		if ((occupiedSquares(board) & endBB) != 0) {
 			board->halfMoveCounter = 0;
-			for (int i = (startPiece+6)%12; i <= (endPiece+6)%12; i++) {
+			for (int i = 0; i < 12; i++) {
 				if ((board->pieces[i] & endBB) != 0) {
 					board->pieces[i] ^= endBB;
 					// Removing castling rights if a rook is captured
@@ -182,28 +182,26 @@ void makeMove(Board *board, uint16_t move) {
 				break;
 		}
 	} else {
-		if (turn) {
+		if (endSquare == 1) {
 			board->castling &= (B_KS_CASTLING | B_QS_CASTLING);
-			if (endSquare == 1) {
-				// Castling kingside
-				board->pieces[W_KING] ^= 0x000000000000000A;
-				board->pieces[W_ROOK] ^= 0x0000000000000005;
-			} else {
-				// Castling queenside
-				board->pieces[W_KING] ^= 0x0000000000000028;
-				board->pieces[W_ROOK] ^= 0x0000000000000090;
-			}
-		} else {
+			// Castling kingside
+			board->pieces[W_KING] ^= 0x000000000000000A;
+			board->pieces[W_ROOK] ^= 0x0000000000000005;
+		} else if (endSquare == 5) {
+			board->castling &= (B_KS_CASTLING | B_QS_CASTLING);
+			// Castling queenside
+			board->pieces[W_KING] ^= 0x0000000000000028;
+			board->pieces[W_ROOK] ^= 0x0000000000000090;
+		} else if (endSquare == 57) {
 			board->castling &= (W_KS_CASTLING | W_QS_CASTLING);
-			if (endSquare == 57) {
-				// Castling kingside
-				board->pieces[B_KING] ^= 0x0A00000000000000;
-				board->pieces[B_ROOK] ^= 0x0500000000000000;
-			} else {
-				// Castling queenside
-				board->pieces[B_KING] ^= 0x2800000000000000;
-				board->pieces[B_ROOK] ^= 0x9000000000000000;
-			}
+			// Castling kingside
+			board->pieces[B_KING] ^= 0x0A00000000000000;
+			board->pieces[B_ROOK] ^= 0x0500000000000000;
+		} else if (endSquare == 61) {
+			board->castling &= (W_KS_CASTLING | W_QS_CASTLING);
+			// Castling queenside
+			board->pieces[B_KING] ^= 0x2800000000000000;
+			board->pieces[B_ROOK] ^= 0x9000000000000000;
 		}
 	}
 }
@@ -261,20 +259,18 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 			board->pieces[undo->capturedPiece] ^= endBB;
 		}
 	} else {
-		if (!turn) {
+		if (endSquare == 1) {
 			board->pieces[W_KING] ^= startBB | endBB;
-			if (endSquare == 1) {
-				board->pieces[W_ROOK] ^= 0x5;
-			} else {
-				board->pieces[W_ROOK] ^= 0x90;
-			}
-		} else {
+			board->pieces[W_ROOK] ^= 0x5;
+		} else if (endSquare == 5) {
+			board->pieces[W_KING] ^= startBB | endBB;
+			board->pieces[W_ROOK] ^= 0x90;
+		} else if (endSquare == 57) {
 			board->pieces[B_KING] ^= startBB | endBB;
-			if (endSquare == 57) {
-				board->pieces[B_ROOK] ^= (1ull << 58) | (1ull << 56);
-			} else {
-				board->pieces[B_ROOK] ^= (1ull << 63) | (1ull << 60);
-			}
+			board->pieces[B_ROOK] ^= (1ull << 58) | (1ull << 56);
+		} else if (endSquare == 61) {
+			board->pieces[B_KING] ^= startBB | endBB;
+			board->pieces[B_ROOK] ^= (1ull << 63) | (1ull << 60);
 		}
 	}
 }

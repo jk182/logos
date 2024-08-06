@@ -324,7 +324,7 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 	uint64_t occupied = occupiedSquares(board);
 	uint64_t w_attacks = getAttacks(*board, true);
 	uint64_t b_attacks = getAttacks(*board, false);
-	if (board->turn && (b_attacks & 0x8) == 0) {
+	if (board->turn == 1 && (b_attacks & 0x8) == 0) {
 		if ((board->castling & W_KS_CASTLING) == 1 && (occupied & 0x6) == 0) {
 			// Kingside castling is allowed and f1, g1 are empty
 			if ((b_attacks & 0x6) == 0) {
@@ -337,7 +337,7 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 				*(moves++) = encodeCastlingMove(3, 5);
 			}
 		}
-	} else if (~board->turn && (w_attacks & 1ull << 59) == 0) {
+	} else if (board->turn == 0 && (w_attacks & 1ull << 59) == 0) {
 		if ((board->castling & B_KS_CASTLING) == 4 && (occupied & 0x0600000000000000) == 0) {
 			// Kingside castling is allowed and f8, g8 are empty
 			if ((w_attacks & 0x0600000000000000) == 0) {
@@ -390,20 +390,16 @@ int perft(int depth, Board *board) {
 		undo = generateUndo(board, m);
 		makeMove(board, m);
 		if (isLegalPosition(*board)) {
-			/* 
-			if (depth == 2) {
+			if (depth == 4) {
 				printMove(m);
 				// printBoard(board);
 			}
-			*/
 			nodes += perft(depth-1, board);
 		}
 		unmakeMove(board, m, &undo);
 	}
-	/*
-	if (depth == 1) {
+	if (depth == 3) {
 		std::cout << nodes << "\n";
 	}
-	*/
 	return nodes;
 }
