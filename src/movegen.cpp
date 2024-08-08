@@ -21,7 +21,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 	uint64_t epBB;
 	int epSquare = board->epSquare;
 
-	if (board->turn) {
+	if (board->turn == WHITE) {
 		pawnBB = board->pieces[W_PAWN];
 		
 		// Double pawn moves
@@ -324,7 +324,7 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 	uint64_t occupied = occupiedSquares(board);
 	uint64_t w_attacks = getAttacks(*board, true);
 	uint64_t b_attacks = getAttacks(*board, false);
-	if (board->turn == 1 && (b_attacks & 0x8) == 0) {
+	if (board->turn == WHITE && (b_attacks & 0x8) == 0) {
 		if ((board->castling & W_KS_CASTLING) == 1 && (occupied & 0x6) == 0) {
 			// Kingside castling is allowed and f1, g1 are empty
 			if ((b_attacks & 0x6) == 0) {
@@ -337,7 +337,7 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 				*(moves++) = encodeCastlingMove(3, 5);
 			}
 		}
-	} else if (board->turn == 0 && (w_attacks & 1ull << 59) == 0) {
+	} else if (board->turn == BLACK && (w_attacks & 1ull << 59) == 0) {
 		if ((board->castling & B_KS_CASTLING) == 4 && (occupied & 0x0600000000000000) == 0) {
 			// Kingside castling is allowed and f8, g8 are empty
 			if ((w_attacks & 0x0600000000000000) == 0) {
@@ -383,23 +383,27 @@ int perft(int depth, Board *board) {
 	uint16_t *end = generateAllMoves(*board, moves);
 	Undo undo;
 	int limit = end-moves;
-	uint16_t m;
+	uint16_t move;
 
 	for (int i = 0; i < limit; i++) {
-		m = *(moves+i);
-		undo = generateUndo(board, m);
-		makeMove(board, m);
+		move = *(moves+i);
+		undo = generateUndo(board, move);
+		makeMove(board, move);
 		if (isLegalPosition(*board)) {
+			/*
 			if (depth == 4) {
-				printMove(m);
+				printMove(move);
 				// printBoard(board);
 			}
+			*/
 			nodes += perft(depth-1, board);
 		}
-		unmakeMove(board, m, &undo);
+		unmakeMove(board, move, &undo);
 	}
+	/*
 	if (depth == 3) {
 		std::cout << nodes << "\n";
 	}
+	*/
 	return nodes;
 }

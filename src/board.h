@@ -3,6 +3,12 @@
 #include <stdint.h>
 
 
+enum {
+	WHITE = true,
+	BLACK = false
+};
+
+
 struct Board {
 	uint64_t pieces[12];
 	bool turn;
