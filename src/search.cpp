@@ -40,3 +40,15 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		}
 	}
 }
+
+
+int iterativeDeepening(Board *board, int depth) {
+	if (depth == 0 || isGameOver(board)) {
+		return evaluate(board);
+	}
+	int score;
+	for (int d = 0; d <= depth; d++) {
+		score = alphaBeta(board, d, INT_MIN, INT_MAX);
+	}
+	return score;
+}
