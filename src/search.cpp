@@ -28,7 +28,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		move = *(moves+i);
 		undo.capturedPiece = getPieceAtSquare(board, getEndSquare(move));
 		makeMove(board, move);
-		value = alphaBeta(board, depth-1, -beta, -alpha);
+		value = -alphaBeta(board, depth-1, -beta, -alpha);
 		unmakeMove(board, move, &undo);
 		alpha = std::max(alpha, value);
 		if (value > bestScore) {
