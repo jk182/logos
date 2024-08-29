@@ -12,5 +12,7 @@ enum {
 	B_BISHOP = 8,
 	B_ROOK = 9,
 	B_QUEEN = 10,
-	B_KING = 11
+	B_KING = 11,
+
+	PIECES = 12
 };
