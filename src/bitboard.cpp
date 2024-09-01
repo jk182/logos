@@ -53,6 +53,9 @@ char* getSquareName(int square) {
 
 int popLSB(uint64_t *bb) {
 	auto index = std::countr_zero(*bb);
+	if (index == 64) {
+		return -1;
+	}
 	*bb &= *bb - 1;
 	return index;
 }
