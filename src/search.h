@@ -4,3 +4,4 @@
 
 
 int alphaBeta(Board *board, int depth, int alpha, int beta);
+int iterativeDeepening(Board *board, int depth);

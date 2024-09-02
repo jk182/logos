@@ -95,7 +95,6 @@ int countMaterial(Board *board) {
 			}
 			square = popLSB(&bb);
 		}
-		std::cout << p << ": " << currMaterial << "\n";
 		material += currMaterial;
 	}
 	return material;

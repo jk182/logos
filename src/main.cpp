@@ -4,9 +4,11 @@
 #include "evaluation.h"
 #include "move.h"
 #include "movegen.h"
+#include "search.h"
 
-#include <stdint.h>
 #include <iostream>
+#include <limits.h>
+#include <stdint.h>
 
 int main() {
 	uint64_t bb = 0x8040201001020409ull;
@@ -34,5 +36,6 @@ int main() {
 		std::cout << "Depth " << d << ": " << perft(d, &b) << "\n";
 	}
 	std::cout << evaluate(&b) << "\n";
+	std::cout << alphaBeta(&b, 2, INT_MIN, INT_MAX) << "\n";
 	return 0;
 }
