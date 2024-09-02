@@ -8,7 +8,7 @@
 
 
 int alphaBeta(Board *board, int depth, int alpha, int beta) {
-	if (depth == 0 || isGameOver(board)) {
+	if (depth <= 0 || isGameOver(board)) {
 		return evaluate(board);
 	}
 	int value;
@@ -27,7 +27,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			value = std::max(value, alphaBeta(board, depth-1, alpha, beta));
 			alpha = std::max(alpha, value);
 			unmakeMove(board, move, &undo);
-			if (alpha >= beta) {
+			if (value >= beta) {
 				break;
 			}
 		}
@@ -37,14 +37,15 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			move = *(moves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
-			value = std::min(value, alphaBeta( board, depth-1, alpha, beta));
+			value = std::min(value, alphaBeta(board, depth-1, alpha, beta));
 			beta = std::min(beta, value);
 			unmakeMove(board, move, &undo);
-			if (beta <= alpha) {
+			if (value <= alpha) {
 				break;
 			}
 		}
 	}
+	return value;
 }
 
 

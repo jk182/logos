@@ -36,6 +36,6 @@ int main() {
 		std::cout << "Depth " << d << ": " << perft(d, &b) << "\n";
 	}
 	std::cout << evaluate(&b) << "\n";
-	std::cout << alphaBeta(&b, 2, INT_MIN, INT_MAX) << "\n";
+	std::cout << alphaBeta(&b, 4, INT_MIN, INT_MAX) << "\n";
 	return 0;
 }
