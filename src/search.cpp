@@ -59,3 +59,33 @@ int iterativeDeepening(Board *board, int depth) {
 	}
 	return score;
 }
+
+
+uint16_t findBestMove(Board *board, int depth) {
+	uint16_t bestMove;
+
+	uint16_t moveArr[128];
+	uint16_t *moves = moveArr;
+	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t move;
+	int value;
+	int maxValue;
+	Undo undo;
+
+	for (int i = 0; i < end-moves; i++) {
+		move = *(moves+i);
+		undo = generateUndo(board, move);
+		makeMove(board, move);
+		value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
+		unmakeMove(board, move, &undo);
+		if (i == 0) {
+			maxValue = value;
+			bestMove = move;
+		}
+		if (value > maxValue) {
+			maxValue = value;
+			bestMove = move;
+		}
+	}
+	return bestMove;
+}

@@ -37,5 +37,6 @@ int main() {
 	}
 	std::cout << evaluate(&b) << "\n";
 	std::cout << alphaBeta(&b, 4, INT_MIN, INT_MAX) << "\n";
+	printMove(findBestMove(&b, 5));
 	return 0;
 }
