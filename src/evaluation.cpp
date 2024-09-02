@@ -91,7 +91,7 @@ int countMaterial(Board *board) {
 		       	if (p <= W_KING) {
 				currMaterial += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
 			} else {
-				currMaterial -= PIECE_VALUES[p%(PIECES/2)] - PIECE_OFFSETS[p%(PIECES/2)][square];
+				currMaterial -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
 			}
 			square = popLSB(&bb);
 		}
