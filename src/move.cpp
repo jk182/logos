@@ -65,6 +65,15 @@ uint16_t encodeEPMove(int startSqIndex, int endSqIndex) {
 }
 
 
+uint16_t encodeUCIMove(Board *board, char *UCImove) {
+	// TODO: castling and promotion
+	int startSquare = getSquare(UCImove[0], int(UCImove[1]));
+	std::cout << startSquare << "\n";
+	int endSquare = getSquare(UCImove[2], int(UCImove[3]));
+	return encodeMove(startSquare, endSquare);
+}
+
+
 bool isEnPassant(uint16_t move) {
 	return (move & ENPASSANT) == ENPASSANT;
 }
