@@ -41,6 +41,6 @@ int main() {
 	std::cout << alphaBeta(&b, 4, INT_MIN, INT_MAX) << "\n";
 	printMove(findBestMove(&b, 5));
 	*/
-	playGame(&b, 4);
+	playGame(&b, 5);
 	return 0;
 }

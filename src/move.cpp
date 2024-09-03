@@ -67,9 +67,34 @@ uint16_t encodeEPMove(int startSqIndex, int endSqIndex) {
 
 uint16_t encodeUCIMove(Board *board, char *UCImove) {
 	// TODO: castling and promotion
-	int startSquare = getSquare(UCImove[0], int(UCImove[1]));
-	std::cout << startSquare << "\n";
-	int endSquare = getSquare(UCImove[2], int(UCImove[3]));
+	int startSquare = getSquare(UCImove[0], UCImove[1]-'1');
+	int endSquare = getSquare(UCImove[2], UCImove[3]-'1');
+	if (startSquare == 3 && 
+			((endSquare == 1 && (board->castling & W_KS_CASTLING) == W_KS_CASTLING) || endSquare == 5 && (board->castling & W_QS_CASTLING) == W_QS_CASTLING)) {
+		return encodeCastlingMove(startSquare, endSquare);
+	}
+	if (startSquare == 59 && 
+			((endSquare == 57 && (board->castling & B_KS_CASTLING) == B_KS_CASTLING) || endSquare == 61 && (board->castling & B_QS_CASTLING) == B_QS_CASTLING)) {
+		return encodeCastlingMove(startSquare, endSquare);
+	}
+	if (strlen(UCImove) == 5) {
+		int promPiece = 0;
+		switch (UCImove[4]){
+			case 'n':
+				promPiece = 1;
+				break;
+			case 'b':
+				promPiece = 2;
+				break;
+			case 'r':
+				promPiece = 3;
+				break;
+			case 'q':
+				promPiece = 4;
+				break;
+		}
+		return encodeMove(startSquare, endSquare, promPiece);
+	}
 	return encodeMove(startSquare, endSquare);
 }
 

@@ -24,11 +24,15 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			move = *(moves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
-			value = std::max(value, alphaBeta(board, depth-1, alpha, beta));
-			alpha = std::max(alpha, value);
-			unmakeMove(board, move, &undo);
-			if (value >= beta) {
-				break;
+			if (isLegalPosition(*board)) {
+				value = std::max(value, alphaBeta(board, depth-1, alpha, beta));
+				alpha = std::max(alpha, value);
+				unmakeMove(board, move, &undo);
+				if (value >= beta) {
+					break;
+				}
+			} else {
+				unmakeMove(board, move, &undo);
 			}
 		}
 	} else {
@@ -37,11 +41,15 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			move = *(moves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
-			value = std::min(value, alphaBeta(board, depth-1, alpha, beta));
-			beta = std::min(beta, value);
-			unmakeMove(board, move, &undo);
-			if (value <= alpha) {
-				break;
+			if (isLegalPosition(*board)) {
+				value = std::min(value, alphaBeta(board, depth-1, alpha, beta));
+				beta = std::min(beta, value);
+				unmakeMove(board, move, &undo);
+				if (value <= alpha) {
+					break;
+				}
+			} else {
+				unmakeMove(board, move, &undo);
 			}
 		}
 	}
@@ -76,16 +84,18 @@ uint16_t findBestMove(Board *board, int depth) {
 		move = *(moves+i);
 		undo = generateUndo(board, move);
 		makeMove(board, move);
-		value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
+		if (isLegalPosition(*board)) {
+			value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
+			if (i == 0) {
+				maxValue = value;
+				bestMove = move;
+			}
+			if (value > maxValue) {
+				maxValue = value;
+				bestMove = move;
+			}
+		}
 		unmakeMove(board, move, &undo);
-		if (i == 0) {
-			maxValue = value;
-			bestMove = move;
-		}
-		if (value > maxValue) {
-			maxValue = value;
-			bestMove = move;
-		}
 	}
 	return bestMove;
 }
