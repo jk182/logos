@@ -1,5 +1,5 @@
-logos: main.o board.o bitboard.o move.o movegen.o attacks.o evaluation.o search.o
-	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o -o ../out/logos
+logos: main.o board.o bitboard.o move.o movegen.o attacks.o evaluation.o search.o play.o
+	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o -o ../out/logos
 
 main.o:
 	clang++ -std=c++20 -c main.cpp -o ../out/main.o
@@ -24,3 +24,6 @@ evaluation.o:
 
 search.o:
 	clang++ -std=c++20 -g -c search.cpp -o ../out/search.o
+
+play.o:
+	clang++ -std=c++20 -g -c play.cpp -o ../out/play.o

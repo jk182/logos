@@ -4,6 +4,7 @@
 #include "evaluation.h"
 #include "move.h"
 #include "movegen.h"
+#include "play.h"
 #include "search.h"
 
 #include <iostream>
@@ -32,11 +33,14 @@ int main() {
 	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
+	/*
 	for (int d = 1; d <= 3; d++) {
 		std::cout << "Depth " << d << ": " << perft(d, &b) << "\n";
 	}
 	std::cout << evaluate(&b) << "\n";
 	std::cout << alphaBeta(&b, 4, INT_MIN, INT_MAX) << "\n";
 	printMove(findBestMove(&b, 5));
+	*/
+	playGame(&b, 4);
 	return 0;
 }
