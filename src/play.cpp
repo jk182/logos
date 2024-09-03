@@ -12,6 +12,9 @@ void playGame(Board *board, int depth) {
 	while (! isGameOver(board)) {
 		engineMove = findBestMove(board, depth);
 		makeMove(board, engineMove);
+		if (! isLegalPosition(*board)) {
+			std::cout << "ERROR: Illegal Position" << "\n";
+		}
 		printMove(engineMove);
 		printBoard(board);
 		std::cout << "Enter your move:" << "\n";

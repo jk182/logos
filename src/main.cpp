@@ -19,7 +19,7 @@ int main() {
 	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	// boardFromFEN(&b, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R4RK1 b kq - 1 1");
 	// boardFromFEN(&b, "n1n5/1Pk5/8/8/8/8/5Kp1/5N1N b - - 0 1");
-	boardFromFEN(&b, "6k1/2p2pBp/2ppb3/4N3/4P3/P1P5/1r4rP/1K1R3R w - - 2 22");
+	boardFromFEN(&b, "6k1/2p2ppp/2Npb3/1r6/4P3/P1P5/r6P/1K1R3R w - - 1 23");
 	printBoard(&b);
 
 	uint16_t move = 0x0649ull;
@@ -42,7 +42,6 @@ int main() {
 	std::cout << alphaBeta(&b, 4, INT_MIN, INT_MAX) << "\n";
 	printMove(findBestMove(&b, 5));
 	*/
-	// playGame(&b, 5);
-	std::cout << perft(5, &b) << "\n";
+	playGame(&b, 5);
 	return 0;
 }

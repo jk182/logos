@@ -70,6 +70,7 @@ int iterativeDeepening(Board *board, int depth) {
 
 
 uint16_t findBestMove(Board *board, int depth) {
+	// TODO: adjust for side to move
 	uint16_t bestMove;
 
 	uint16_t moveArr[128];
@@ -81,6 +82,10 @@ uint16_t findBestMove(Board *board, int depth) {
 	Undo undo;
 
 	for (int i = 0; i < end-moves; i++) {
+		if (i == 0) {
+			maxValue = -100000;
+			bestMove = NULL_MOVE;
+		}
 		move = *(moves+i);
 		undo = generateUndo(board, move);
 		makeMove(board, move);

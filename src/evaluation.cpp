@@ -102,6 +102,16 @@ int countMaterial(Board *board) {
 
 
 int evaluate(Board *board) {
+	if (isDraw(board)) {
+		return 0;
+	}
+	if (isCheckmate(board)) {
+		if (board->turn) {
+			return -100000;
+		} else {
+			return 100000;
+		}
+	}
 	int material = countMaterial(board);
 	return material;
 }

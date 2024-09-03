@@ -5,6 +5,7 @@
 #include "board.h"
 #include "bitboard.h"
 #include "move.h"
+#include "movegen.h"
 #include "types.h"
 
 
@@ -220,6 +221,43 @@ bool isInsufficientMaterial(Board *board) {
 }
 
 
+bool isDraw(Board *board) {
+	// TODO: add three-fold repetition
+	return (board->halfMoveCounter >= 50) || isInsufficientMaterial(board);
+}
+
+
+bool isCheck(Board *board) {
+	uint64_t bb = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
+	int square = popLSB(&bb);
+	return isSquareAttacked(*board, !board->turn, square);
+}
+
+
+bool isCheckmate(Board *board) {
+	if (!isCheck(board)) {
+		return false;
+	}
+
+	uint16_t moves[128];
+	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t move;
+	Undo undo;
+
+	for (int i = 0; i < end-moves; i++) {
+		move = *(moves+i);
+		undo = generateUndo(board, move);
+		makeMove(board, move);
+		if (isLegalPosition(*board)) {
+			unmakeMove(board, move, &undo);
+			return false;
+		}
+		unmakeMove(board, move, &undo);
+	}
+	return true;
+}
+
+
 bool isGameOver(Board *board) {
-	return isInsufficientMaterial(board);
+	return isDraw(board) || isCheckmate(board);
 }
