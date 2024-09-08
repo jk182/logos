@@ -6,6 +6,7 @@
 #include "movegen.h"
 #include "play.h"
 #include "search.h"
+#include "testMovegen.h"
 
 #include <iostream>
 #include <limits.h>
@@ -42,6 +43,7 @@ int main() {
 	std::cout << alphaBeta(&b, 4, INT_MIN, INT_MAX) << "\n";
 	printMove(findBestMove(&b, 5));
 	*/
-	playGame(&b, 5);
+	// playGame(&b, 5);
+	testMovegen();
 	return 0;
 }
