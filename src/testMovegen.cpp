@@ -24,7 +24,7 @@ void openings() {
 	assert(perft(2, &board) == 2039);
 	assert(perft(3, &board) == 97862);
 	assert(perft(4, &board) == 4085603);
-	// assert(perft(5, &board) == 193690690);
+	assert(perft(5, &board) == 193690690);
 }
 
 
