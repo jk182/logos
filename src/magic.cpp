@@ -1,14 +1,17 @@
 #include <stdint.h>
+#include <iostream>
+
 
 uint64_t* enumerateSubsets(uint64_t set) {
 	uint64_t subsets[16384];
 	int index = 0;
-	uint64_t subset = set;
-	while (subset != 0) {
+	uint64_t subset = 0;
+	do {
 		subsets[index] = subset;
 		index++;
-		subset = (subset-set) && set;
-	}
+		std::cout << subset << "\n";
+		subset = (subset-set) & set;
+	} while (subset != 0);
 	return subsets;
 }
 

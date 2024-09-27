@@ -2,6 +2,7 @@
 #include "bitboard.h"
 #include "board.h"
 #include "evaluation.h"
+#include "magic.h"
 #include "move.h"
 #include "movegen.h"
 #include "play.h"
@@ -44,6 +45,10 @@ int main() {
 	printMove(findBestMove(&b, 5));
 	*/
 	// playGame(&b, 5);
-	testMovegen();
+	// testMovegen();
+	uint64_t *subsets = enumerateSubsets(0xE);
+	while (uint64_t ss = *(subsets++)) {
+		std::cout << ss << "\n";
+	}
 	return 0;
 }
