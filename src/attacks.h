@@ -7,6 +7,7 @@
 
 bool isSquareAttacked(Board board, bool turn, int square);
 uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask);
+uint64_t slidingAttacks(uint64_t occupied, int square, uint64_t mask);
 uint64_t getAttacks(Board board, bool turn);
 uint64_t pawnAttacks(Board *board, bool turn);
 uint64_t knightAttacks(Board *board, bool turn);

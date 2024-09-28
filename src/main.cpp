@@ -46,9 +46,6 @@ int main() {
 	*/
 	// playGame(&b, 5);
 	// testMovegen();
-	uint64_t *subsets = enumerateSubsets(0xE);
-	while (uint64_t ss = *(subsets++)) {
-		std::cout << ss << "\n";
-	}
+	generateRookMagic(0);
 	return 0;
 }
