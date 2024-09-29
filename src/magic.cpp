@@ -7,34 +7,37 @@
 
 
 uint64_t* enumerateSubsets(uint64_t set, int indexBits) {
-	uint64_t subsets[16384];
+	uint64_t* subsets = new uint64_t[2<<indexBits];
 	int index = 0;
 	uint64_t subset = 0;
 	do {
+		subset = (subset-set) & set;
 		subsets[index] = subset;
 		index++;
-		subset = (subset-set) & set;
 	} while (subset != 0);
 	return subsets;
 }
 
 
 uint64_t* makeLookupTable(uint64_t magic, uint64_t mask, int indexBits, int square) {
-	uint64_t table[2<<indexBits];
+	uint64_t *table = new uint64_t[2<<indexBits];
 	uint64_t *subsets = enumerateSubsets(mask, indexBits);
-	uint64_t blockers;
 	uint64_t index;
 	uint64_t attacks;
+	int counter = 0;
 
-	while ((blockers = *(subsets++))) {
+	while (uint64_t blockers = *(subsets++)) {
 		index = (blockers*magic) >> (64-indexBits);
 		attacks = slidingAttacks((blockers | (2<<square)), square, mask);
 		if (table[index] == 0) {
 			table[index] = attacks;
+			counter++;
 		} else if (table[index] != attacks) {
-			return NULL;
+			std::cout << "Test" << "\n";
+			return nullptr;
 		}
 	}
+	std::cout << counter << "\n";
 	return table;
 }
 
@@ -54,7 +57,6 @@ uint64_t generateRookMagic(int square) {
 		magic = dis(gen) * dis(gen) * dis(gen);
 		std::cout << magic << "\n";
 		table = makeLookupTable(magic, mask, 14, square);
-	} while (makeLookupTable(magic, mask, 14, square) != NULL);
-	std::cout << 1 << "\n";
+	} while (table == nullptr);
 	return 0;
 }
