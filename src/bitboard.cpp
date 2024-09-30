@@ -22,9 +22,9 @@ void printBitboard(uint64_t bb) {
 	for (int rank = 7; rank >= 0; rank--) {
 		for (int file = 7; file >= 0; file--) {
 			if (testBit(bb, rank*8+file)) {
-				std::cout << "1";
+				std::cout << "1 ";
 			} else {
-				std::cout << ".";
+				std::cout << ". ";
 			}
 		}
 		std::cout << "\n";
