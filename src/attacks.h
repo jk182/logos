@@ -5,16 +5,11 @@
 #include <stdint.h>
 
 
-bool isSquareAttacked(Board board, bool turn, int square);
-uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask);
-uint64_t slidingAttacks(uint64_t occupied, int square, uint64_t mask);
-uint64_t getAttacks(Board board, bool turn);
-uint64_t pawnAttacks(Board *board, bool turn);
-uint64_t knightAttacks(Board *board, bool turn);
-uint64_t bishopAttacks(Board *board, bool turn);
-uint64_t rookAttacks(Board *board, bool turn);
-uint64_t queenAttacks(Board *board, bool turn);
-uint64_t kingAttacks(Board *board, bool turn);
+struct Magic {
+	uint64_t magic;
+	uint64_t mask;
+	uint64_t *table;
+};
 
 static const uint64_t KNIGHT_ATTACKS[64] = {
 	0x20400, 0x50800, 0xa1100, 0x142200, 0x284400, 0x508800, 0xa01000, 0x402000, 
@@ -35,3 +30,26 @@ static const uint64_t KING_ATTACKS[64] = {
 	0x3020300000000, 0x7050700000000, 0xe0a0e00000000, 0x1c141c00000000, 0x38283800000000, 0x70507000000000, 0xe0a0e000000000, 0xc040c000000000, 
 	0x302030000000000, 0x705070000000000, 0xe0a0e0000000000, 0x1c141c0000000000, 0x3828380000000000, 0x7050700000000000, 0xe0a0e00000000000, 0xc040c00000000000, 
 	0x203000000000000, 0x507000000000000, 0xa0e000000000000, 0x141c000000000000, 0x2838000000000000, 0x5070000000000000, 0xa0e0000000000000, 0x40c0000000000000};
+
+static const uint64_t ROOK_MAGICS[64] = {
+	0x840840201000ull, 0x441211041000ull, 0x4000010600028008ull, 0x400040098014070ull, 0x200060008028c10ull, 0x8000021a0010810ull, 0x54000406001b4488ull, 0x614002225040008aull,
+0x4090a6004000ull, 0x424600c800ull, 0x620000228010024ull, 0x4010000090040550ull, 0x8010000300800820ull, 0x2000021061024080ull, 0x84000180802848ull, 0x642002c000501814ull,
+0x405400c00400ull, 0x800010082032ull, 0x3c00800012080a5ull, 0x4200005562900ull, 0x1080000500c20ull, 0x2080000920020ull, 0x5002400020ull, 0x4000005a20008300ull,
+0x1000530200400ull, 0x440100000202e00ull, 0x4442800010208ull, 0x1811001000020840ull, 0x90000c8200018804ull, 0x1020000ca00ull, 0x4160210080000000ull, 0x600800022010040ull,
+0x120020289000ull, 0x8000044002840080ull, 0x8001080446000200ull, 0x405204001c00ull, 0x409a000210ull, 0x80200400c0ull, 0x4000004130200024ull, 0x20001002a400420ull,
+0x818440090001000ull, 0xc00080041c00ull, 0x100248041200ull, 0x2000048010110800ull, 0x84006140020ull, 0x1000004400060200ull, 0x8004426100048008ull, 0x800000230081004cull,
+0x8004708020401a00ull, 0x42c2040020200ull, 0x40109002100ull, 0x2882894216000600ull, 0x8460001300200ull, 0x50000486100ull, 0x406280c10a022400ull, 0x280201000090ull,
+0x68080102042ull, 0x704018226002ull, 0x44020d40202ull, 0x420008d00822ull, 0x2000044508008402ull, 0x1800080304004482ull, 0x4100000000000000ull, 0x800004080a02d06ull};
+
+
+bool isSquareAttacked(Board board, bool turn, int square);
+uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask);
+uint64_t slidingAttacks(uint64_t occupied, int square, uint64_t mask);
+uint64_t getAttacks(Board board, bool turn);
+uint64_t pawnAttacks(Board *board, bool turn);
+uint64_t knightAttacks(Board *board, bool turn);
+uint64_t bishopAttacks(Board *board, bool turn);
+uint64_t rookAttacks(Board *board, bool turn);
+uint64_t queenAttacks(Board *board, bool turn);
+uint64_t kingAttacks(Board *board, bool turn);
+void initSlidingAttacks();

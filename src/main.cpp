@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 int main() {
+	initSlidingAttacks();
 	// uint64_t bb = 0x8040201001020409ull;
 	// printBitboard(bb);
 	/*
@@ -45,7 +46,7 @@ int main() {
 	printMove(findBestMove(&b, 5));
 	*/
 	// playGame(&b, 5);
-	// testMovegen();
-	generateRookMagic(0);
+	testMovegen();
+	// generateAllMagics();
 	return 0;
 }

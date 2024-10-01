@@ -35,7 +35,6 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 			table[index] = attacks;
 			counter++;
 		} else if (table[index] != attacks) {
-			std::cout << "Test" << "\n";
 			return nullptr;
 		} /* else {
 			printBitboard(blockers);
@@ -44,7 +43,7 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 		}
 		*/
 	}
-	std::cout << counter << "\n";
+	// std::cout << counter << "\n";
 	return table;
 }
 
@@ -62,11 +61,14 @@ uint64_t generateRookMagic(int square) {
 
 	do {
 		magic = dis(gen) & dis(gen) & dis(gen);
-		std::cout << magic << "\n";
 		table = makeLookupTable(magic, file, rank, 14, square);
 	} while (table == nullptr);
-	printBitboard(0x0101000000000000);
-	printBitboard(slidingAttacks(0x0101000000000001, 0, 0x0101010101010101));
-	printBitboard((magic*0x0101000000000000) >> 50);
-	return 0;
+	return magic;
+}
+
+
+void generateAllMagics() {
+	for (int square = 0; square < 64; square++) {
+		std::cout << std::hex << generateRookMagic(square) << "\n";
+	}
 }

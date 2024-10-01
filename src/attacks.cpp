@@ -1,10 +1,12 @@
 #include "attacks.h"
 #include "bitboard.h"
 #include "board.h"
+#include "magic.h"
 #include "types.h"
 
 #include <stdint.h>
 
+Magic ROOK_TABLES[64];
 
 uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask) {
 	uint64_t pieceBB = 1ull << square;
@@ -102,7 +104,7 @@ uint64_t rookAttacks(Board *board, bool turn) {
 	uint64_t file;
 	uint64_t rank;
 	int square;
-
+	/*
 	while (rookBB) {
 		square = popLSB(&rookBB);
 		file = getFile(square);
@@ -111,7 +113,17 @@ uint64_t rookAttacks(Board *board, bool turn) {
 		attacks |= slidingAttacks(board, turn, square, file);
 		attacks |= slidingAttacks(board, turn, square, rank);
 	}
-
+	*/
+	Magic table;
+	uint64_t occupied;
+	while (rookBB) {
+		square = popLSB(&rookBB);
+		file = getFile(square);
+		rank = getRank(square);
+		table = ROOK_TABLES[square];
+		occupied = occupiedSquares(board);
+		attacks |= table.table[((occupied & (file | rank)) * ROOK_MAGICS[square]) >> (64-14)];
+	}
 	return attacks;
 }
 
@@ -143,7 +155,6 @@ uint64_t queenAttacks(Board *board, bool turn) {
 }
 
 
-
 uint64_t kingAttacks(Board *board, bool turn) {
 	int piece = turn ? W_KING : B_KING;
 	uint64_t king = board->pieces[piece];
@@ -163,6 +174,19 @@ uint64_t getAttacks(Board board, bool turn) {
 	attacks |= kingAttacks(&board, turn);
 
 	return attacks;
+}
+
+
+void initSlidingAttacks() {
+	uint64_t file;
+	uint64_t rank;
+	for (int square = 0; square < 64; square++) {
+		ROOK_TABLES[square].magic = ROOK_MAGICS[square];
+		file = getFile(square);
+		rank = getRank(square);
+		ROOK_TABLES[square].mask = file ^ rank;
+		ROOK_TABLES[square].table = makeLookupTable(ROOK_MAGICS[square], file, rank, 14, square);
+	}
 }
 
 
