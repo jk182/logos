@@ -101,10 +101,10 @@ uint64_t rookAttacks(Board *board, bool turn) {
 	int piece = turn ? W_ROOK : B_ROOK;
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t attacks = 0ull;
-	uint64_t file;
-	uint64_t rank;
 	int square;
 	/*
+	uint64_t file;
+	uint64_t rank;
 	while (rookBB) {
 		square = popLSB(&rookBB);
 		file = getFile(square);
@@ -118,11 +118,9 @@ uint64_t rookAttacks(Board *board, bool turn) {
 	uint64_t occupied;
 	while (rookBB) {
 		square = popLSB(&rookBB);
-		file = getFile(square);
-		rank = getRank(square);
 		table = ROOK_TABLES[square];
 		occupied = occupiedSquares(board);
-		attacks |= table.table[((occupied & (file | rank)) * ROOK_MAGICS[square]) >> (64-14)];
+		attacks |= table.table[((occupied & table.mask) * ROOK_MAGICS[square]) >> (64-14)];
 	}
 	return attacks;
 }
