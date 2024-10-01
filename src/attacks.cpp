@@ -120,7 +120,7 @@ uint64_t rookAttacks(Board *board, bool turn) {
 		square = popLSB(&rookBB);
 		table = ROOK_TABLES[square];
 		occupied = occupiedSquares(board);
-		attacks |= table.table[((occupied & table.mask) * ROOK_MAGICS[square]) >> (64-14)];
+		attacks |= table.table[((occupied & table.mask) * ROOK_MAGICS[square]) >> (64-15)];
 	}
 	return attacks;
 }
@@ -183,7 +183,7 @@ void initSlidingAttacks() {
 		file = getFile(square);
 		rank = getRank(square);
 		ROOK_TABLES[square].mask = file ^ rank;
-		ROOK_TABLES[square].table = makeLookupTable(ROOK_MAGICS[square], file, rank, 14, square);
+		ROOK_TABLES[square].table = makeLookupTable(ROOK_MAGICS[square], file, rank, 15, square);
 	}
 }
 

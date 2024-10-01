@@ -61,7 +61,7 @@ uint64_t generateRookMagic(int square) {
 
 	do {
 		magic = dis(gen) & dis(gen) & dis(gen);
-		table = makeLookupTable(magic, file, rank, 14, square);
+		table = makeLookupTable(magic, file, rank, 15, square);
 	} while (table == nullptr);
 	return magic;
 }
@@ -69,6 +69,6 @@ uint64_t generateRookMagic(int square) {
 
 void generateAllMagics() {
 	for (int square = 0; square < 64; square++) {
-		std::cout << std::hex << generateRookMagic(square) << "\n";
+		std::cout << "0x" << std::hex << generateRookMagic(square) << "ull, \n";
 	}
 }
