@@ -48,6 +48,24 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 }
 
 
+uint64_t generateBishopMagic(int square) {
+	uint64_t *table;
+	uint64_t diagonal = getDiagonal(square);
+	uint64_t antidiagonal = getAntidiagonal(square);
+	uint64_t magic;
+
+	std::random_device rd;
+	std::mt19937_64 gen(rd());
+	std::uniform_int_distribution<uint64_t> dis;
+
+	do {
+		magic = dis(gen) & dis(gen) & dis(gen);
+		table = makeLookupTable(magic, diagonal, antidiagonal, 15, square);
+	} while (table == nullptr);
+	return magic;
+}
+
+
 uint64_t generateRookMagic(int square) {
 	uint64_t *table;
 	uint64_t file = getFile(square);
@@ -68,6 +86,7 @@ uint64_t generateRookMagic(int square) {
 
 void generateAllMagics() {
 	for (int square = 0; square < 64; square++) {
-		std::cout << "0x" << std::hex << generateRookMagic(square) << "ull, \n";
+		std::cout << "0x" << std::hex << generateBishopMagic(square) << "ull, \n";
+		// std::cout << "0x" << std::hex << generateRookMagic(square) << "ull, \n";
 	}
 }

@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+Magic BISHOP_TABLES[64];
 Magic ROOK_TABLES[64];
 
 uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask) {
@@ -80,10 +81,10 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 	int piece = turn ? W_BISHOP : B_BISHOP;
 	uint64_t bishopBB = board->pieces[piece];
 	uint64_t attacks = 0ull;
-	uint64_t diagonal;
-	uint64_t antidiagonal;
 	int square;
 
+	uint64_t diagonal;
+	uint64_t antidiagonal;
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
 		diagonal = getDiagonal(square);
@@ -92,7 +93,16 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 		attacks |= slidingAttacks(board, turn, square, diagonal);
 		attacks |= slidingAttacks(board, turn, square, antidiagonal);
 	}
-
+	/*
+	Magic table;
+	uint64_t occupied;
+	while (bishopBB) {
+		square = popLSB(&bishopBB);
+		table = BISHOP_TABLES[square];
+		occupied = occupiedSquares(board);
+		attacks |= table.table[((occupied & table.mask) * BISHOP_MAGICS[square]) >> (64-15)];
+	}
+	*/
 	return attacks;
 }
 
@@ -178,7 +188,15 @@ uint64_t getAttacks(Board board, bool turn) {
 void initSlidingAttacks() {
 	uint64_t file;
 	uint64_t rank;
+	uint64_t diag;
+	uint64_t antidiag;
 	for (int square = 0; square < 64; square++) {
+		BISHOP_TABLES[square].magic = BISHOP_MAGICS[square];
+		diag = getDiagonal(square);
+		antidiag = getAntidiagonal(square);
+		BISHOP_TABLES[square].mask = diag ^ antidiag;
+		BISHOP_TABLES[square].table = makeLookupTable(BISHOP_MAGICS[square], diag, antidiag, 15, square);
+
 		ROOK_TABLES[square].magic = ROOK_MAGICS[square];
 		file = getFile(square);
 		rank = getRank(square);
