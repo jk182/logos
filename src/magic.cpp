@@ -29,8 +29,8 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 
 	while (uint64_t blockers = *(subsets++)) {
 		index = (blockers*magic) >> (64-indexBits);
-		attacks = slidingAttacks((blockers | (2<<square)), square, direction1);
-		attacks |= slidingAttacks((blockers | (2<<square)), square, direction2);
+		attacks = slidingAttacks(blockers, square, direction1);
+		attacks |= slidingAttacks(blockers, square, direction2);
 		if (table[index] == 0) {
 			table[index] = attacks;
 			counter++;
@@ -52,7 +52,6 @@ uint64_t generateRookMagic(int square) {
 	uint64_t *table;
 	uint64_t file = getFile(square);
 	uint64_t rank = getRank(square);
-	uint64_t mask = file ^ rank;
 	uint64_t magic;
 	
 	std::random_device rd;

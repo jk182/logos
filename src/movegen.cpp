@@ -391,7 +391,7 @@ int perft(int depth, Board *board) {
 		makeMove(board, move);
 		if (isLegalPosition(*board)) {
 			/*
-			if (depth == 4) {
+			if (depth == 2) {
 				printMove(move);
 				// printBoard(board);
 			}
@@ -401,7 +401,7 @@ int perft(int depth, Board *board) {
 		unmakeMove(board, move, &undo);
 	}
 	/*
-	if (depth == 3) {
+	if (depth == 1) {
 		std::cout << nodes << "\n";
 	}
 	*/

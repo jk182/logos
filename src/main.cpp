@@ -22,6 +22,11 @@ int main() {
 	clearBoard(&b);
 	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	boardFromFEN(&b, "6k1/2p2ppp/2Npb3/1r6/4P3/P1P5/r6P/1K1R3R w - - 1 23");
+	boardFromFEN(&b, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+	*/
+	// printBitboard(rookAttacks(&b, false));
+	// std::cout << perft(5, &b) << "\n";
+	/*
 	printBoard(&b);
 
 	uint16_t move = 0x0649ull;
