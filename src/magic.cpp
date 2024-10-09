@@ -90,3 +90,36 @@ void generateAllMagics() {
 		// std::cout << "0x" << std::hex << generateRookMagic(square) << "ull, \n";
 	}
 }
+
+
+void testMagics() {
+	uint64_t bishopMask;
+	uint64_t rookMask;
+	uint64_t *subsets;
+	uint64_t *table;
+	int bishopMistakes = 0;
+	int rookMistakes = 0;
+	int indexBits = 15;
+
+	for (int square = 0; square < 64; square++) {
+		bishopMask = getDiagonal(square) ^ getAntidiagonal(square);
+		subsets = enumerateSubsets(bishopMask, indexBits);
+		table = makeLookupTable(BISHOP_MAGICS[square], getDiagonal(square), getAntidiagonal(square), indexBits, square);
+		while (uint64_t blockers = *(subsets++)) {
+			if ((slidingAttacks(blockers, square, getDiagonal(square)) | slidingAttacks(blockers, square, getAntidiagonal(square))) != table[(blockers*BISHOP_MAGICS[square]) >> (64-indexBits)]) {
+				bishopMistakes++;
+			}
+		}
+
+		rookMask = getFile(square) ^ getRank(square);
+		subsets = enumerateSubsets(rookMask, indexBits);
+		table = makeLookupTable(ROOK_MAGICS[square], getFile(square), getRank(square), indexBits, square);
+		while (uint64_t blockers = *(subsets++)) {
+			if ((slidingAttacks(blockers, square, getFile(square)) | slidingAttacks(blockers, square, getRank(square))) != table[(blockers*ROOK_MAGICS[square]) >> (64-indexBits)]) {
+				rookMistakes++;
+			}
+		}
+	}
+	std::cout << bishopMistakes << "\n";
+	std::cout << rookMistakes << "\n";
+}

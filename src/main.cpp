@@ -51,7 +51,8 @@ int main() {
 	printMove(findBestMove(&b, 5));
 	*/
 	// playGame(&b, 5);
-	testMovegen();
 	// generateAllMagics();
+	testMagics();
+	testMovegen();
 	return 0;
 }

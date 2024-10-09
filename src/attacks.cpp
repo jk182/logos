@@ -83,6 +83,7 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 	uint64_t attacks = 0ull;
 	int square;
 
+	/*
 	uint64_t diagonal;
 	uint64_t antidiagonal;
 	while (bishopBB) {
@@ -93,16 +94,15 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 		attacks |= slidingAttacks(board, turn, square, diagonal);
 		attacks |= slidingAttacks(board, turn, square, antidiagonal);
 	}
-	/*
+	*/
 	Magic table;
 	uint64_t occupied;
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
 		table = BISHOP_TABLES[square];
 		occupied = occupiedSquares(board);
-		attacks |= table.table[((occupied & table.mask) * BISHOP_MAGICS[square]) >> (64-15)];
+		attacks = table.table[((occupied & table.mask) * BISHOP_MAGICS[square]) >> (64-15)];
 	}
-	*/
 	return attacks;
 }
 
@@ -130,7 +130,7 @@ uint64_t rookAttacks(Board *board, bool turn) {
 		square = popLSB(&rookBB);
 		table = ROOK_TABLES[square];
 		occupied = occupiedSquares(board);
-		attacks |= table.table[((occupied & table.mask) * ROOK_MAGICS[square]) >> (64-15)];
+		attacks = table.table[((occupied & table.mask) * ROOK_MAGICS[square]) >> (64-15)];
 	}
 	return attacks;
 }
