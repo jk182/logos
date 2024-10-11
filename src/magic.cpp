@@ -63,7 +63,7 @@ uint64_t generateBishopMagic(int square) {
 
 	do {
 		magic = dis(gen) & dis(gen) & dis(gen);
-		table = makeLookupTable(magic, diagonal, antidiagonal, 15, square);
+		table = makeLookupTable(magic, diagonal, antidiagonal, 12, square);
 	} while (table == nullptr);
 	return magic;
 }
@@ -81,7 +81,7 @@ uint64_t generateRookMagic(int square) {
 
 	do {
 		magic = dis(gen) & dis(gen) & dis(gen);
-		table = makeLookupTable(magic, file, rank, 15, square);
+		table = makeLookupTable(magic, file, rank, 12, square);
 	} while (table == nullptr);
 	return magic;
 }
@@ -106,13 +106,12 @@ void testMagics() {
 	uint64_t *table;
 	int bishopMistakes = 0;
 	int rookMistakes = 0;
-	int indexBits = 15;
+	int indexBits = 12;
 	uint64_t edges;
 	uint64_t bishopMagic;
 	uint64_t rookMagic;
 
 	for (int square = 0; square < 64; square++) {
-		edges = ((A_FILE | H_FILE) & ~getDiagonal(square)) | ((RANK_1 | RANK_1) & ~getAntidiagonal(square));
 		bishopMask = getDiagonal(square) ^ getAntidiagonal(square);
 		subsets = enumerateSubsets(bishopMask & ~EDGES, indexBits);
 		bishopMagic = generateBishopMagic(square);

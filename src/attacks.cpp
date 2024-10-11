@@ -89,18 +89,6 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 	uint64_t attacks = 0ull;
 	int square;
 
-	/*
-	uint64_t diagonal;
-	uint64_t antidiagonal;
-	while (bishopBB) {
-		square = popLSB(&bishopBB);
-		diagonal = getDiagonal(square);
-		antidiagonal = getAntidiagonal(square);
-
-		attacks |= slidingAttacks(board, turn, square, diagonal);
-		attacks |= slidingAttacks(board, turn, square, antidiagonal);
-	}
-	*/
 	uint64_t occupied = occupiedSquares(board);
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
@@ -122,18 +110,6 @@ uint64_t rookAttacks(Board *board, bool turn) {
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t attacks = 0ull;
 	int square;
-	/*
-	uint64_t file;
-	uint64_t rank;
-	while (rookBB) {
-		square = popLSB(&rookBB);
-		file = getFile(square);
-		rank = getRank(square);
-
-		attacks |= slidingAttacks(board, turn, square, file);
-		attacks |= slidingAttacks(board, turn, square, rank);
-	}
-	*/
 	uint64_t occupied = occupiedSquares(board);
 	while (rookBB) {
 		square = popLSB(&rookBB);
@@ -154,13 +130,6 @@ uint64_t queenAttacks(Board *board, bool turn) {
 		square = popLSB(&queenBB);
 		attacks |= bishopAttacks(occupied, square);
 		attacks |= rookAttacks(occupied, square);
-
-		/*
-		attacks |= slidingAttacks(board, turn, square, file);
-		attacks |= slidingAttacks(board, turn, square, rank);
-		attacks |= slidingAttacks(board, turn, square, diagonal);
-		attacks |= slidingAttacks(board, turn, square, antidiagonal);
-		*/
 	}
 
 	return attacks;
@@ -198,14 +167,14 @@ void initSlidingAttacks() {
 		BISHOP_TABLES[square].magic = BISHOP_MAGICS[square];
 		diag = getDiagonal(square);
 		antidiag = getAntidiagonal(square);
-		BISHOP_TABLES[square].index = 15;
+		BISHOP_TABLES[square].index = 12;
 		BISHOP_TABLES[square].mask = diag ^ antidiag;
 		BISHOP_TABLES[square].table = makeLookupTable(BISHOP_MAGICS[square], diag, antidiag, BISHOP_TABLES[square].index, square);
 
 		ROOK_TABLES[square].magic = ROOK_MAGICS[square];
 		file = getFile(square);
 		rank = getRank(square);
-		ROOK_TABLES[square].index = 15;
+		ROOK_TABLES[square].index = 12;
 		ROOK_TABLES[square].mask = file ^ rank;
 		ROOK_TABLES[square].table = makeLookupTable(ROOK_MAGICS[square], file, rank, ROOK_TABLES[square].index, square);
 	}
