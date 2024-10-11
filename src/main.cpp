@@ -18,14 +18,19 @@ int main() {
 	// uint64_t bb = 0x8040201001020409ull;
 	// printBitboard(bb);
 	/*
-	Board b;
-	clearBoard(&b);
 	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	boardFromFEN(&b, "6k1/2p2ppp/2Npb3/1r6/4P3/P1P5/r6P/1K1R3R w - - 1 23");
-	boardFromFEN(&b, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
 	*/
 	// printBitboard(rookAttacks(&b, false));
-	// std::cout << perft(5, &b) << "\n";
+	/*
+	Board b;
+	clearBoard(&b);
+	boardFromFEN(&b, "rnbqkbnr/pppp1ppp/8/4p3/8/1P6/P1PPPPPP/RNBQKBNR w KQkq - 0 2");
+	printBitboard(bishopAttacks(&b, true));
+	boardFromFEN(&b, "rnbqkbnr/pppp1ppp/8/4p3/8/BP6/P1PPPPPP/RN1QKBNR b KQkq - 1 2");
+	printBitboard(bishopAttacks(&b, true));
+	*/
+	// std::cout << perft(2, &b) << "\n";
 	/*
 	printBoard(&b);
 
@@ -52,7 +57,10 @@ int main() {
 	*/
 	// playGame(&b, 5);
 	// generateAllMagics();
-	testMagics();
+	// testMagics();
 	testMovegen();
+	uint64_t edges = A_FILE | H_FILE | RANK_1 | RANK_8;
+	// uint64_t *subsets = enumerateSubsets((C_FILE ^ RANK_5) & ~edges, 15);
+	// generateRookMagic(53);
 	return 0;
 }

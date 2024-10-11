@@ -7,7 +7,7 @@
 
 
 uint64_t* enumerateSubsets(uint64_t set, int indexBits) {
-	uint64_t* subsets = new uint64_t[2<<indexBits];
+	uint64_t* subsets = new uint64_t[1 << indexBits];
 	int index = 0;
 	uint64_t subset = 0;
 	do {
@@ -21,13 +21,16 @@ uint64_t* enumerateSubsets(uint64_t set, int indexBits) {
 
 uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t direction2, int indexBits, int square) {
 	// Directions are either the file and rank of a rook or the two diagonals of a bishop
-	uint64_t *table = new uint64_t[2<<indexBits];
-	uint64_t *subsets = enumerateSubsets(direction1 ^ direction2, indexBits);
+	uint64_t *table = new uint64_t[1 << indexBits];
+	uint64_t edges = ((A_FILE | H_FILE) & ~direction1) | ((RANK_1 | RANK_8) & ~direction2);
+	uint64_t *subsets = enumerateSubsets((direction1 ^ direction2) & ~edges, indexBits);
 	uint64_t index;
 	uint64_t attacks;
 	int counter = 0;
+	uint64_t blockers = 0;
 
-	while (uint64_t blockers = *(subsets++)) {
+	do {
+		blockers = (blockers | edges) & (direction1 ^ direction2);
 		index = (blockers*magic) >> (64-indexBits);
 		attacks = slidingAttacks(blockers, square, direction1);
 		attacks |= slidingAttacks(blockers, square, direction2);
@@ -42,7 +45,7 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 			std::cout << table[index] << " " << attacks << "\n";
 		}
 		*/
-	}
+	} while ((blockers = *(subsets++)));
 	// std::cout << counter << "\n";
 	return table;
 }
@@ -85,9 +88,13 @@ uint64_t generateRookMagic(int square) {
 
 
 void generateAllMagics() {
+	std::cout << "BISHOP MAGICS:" << "\n";
 	for (int square = 0; square < 64; square++) {
 		std::cout << "0x" << std::hex << generateBishopMagic(square) << "ull, \n";
-		// std::cout << "0x" << std::hex << generateRookMagic(square) << "ull, \n";
+	}
+	std::cout << "ROOK MAGICS:" << "\n";
+	for (int square = 0; square < 64; square++) {
+		std::cout << "0x" << std::hex << generateRookMagic(square) << "ull, \n";
 	}
 }
 
@@ -100,26 +107,33 @@ void testMagics() {
 	int bishopMistakes = 0;
 	int rookMistakes = 0;
 	int indexBits = 15;
+	uint64_t edges;
+	uint64_t bishopMagic;
+	uint64_t rookMagic;
 
 	for (int square = 0; square < 64; square++) {
+		edges = ((A_FILE | H_FILE) & ~getDiagonal(square)) | ((RANK_1 | RANK_1) & ~getAntidiagonal(square));
 		bishopMask = getDiagonal(square) ^ getAntidiagonal(square);
-		subsets = enumerateSubsets(bishopMask, indexBits);
-		table = makeLookupTable(BISHOP_MAGICS[square], getDiagonal(square), getAntidiagonal(square), indexBits, square);
+		subsets = enumerateSubsets(bishopMask & ~EDGES, indexBits);
+		bishopMagic = generateBishopMagic(square);
+		table = makeLookupTable(bishopMagic, getDiagonal(square), getAntidiagonal(square), indexBits, square);
 		while (uint64_t blockers = *(subsets++)) {
-			if ((slidingAttacks(blockers, square, getDiagonal(square)) | slidingAttacks(blockers, square, getAntidiagonal(square))) != table[(blockers*BISHOP_MAGICS[square]) >> (64-indexBits)]) {
+			if ((slidingAttacks(blockers, square, getDiagonal(square)) | slidingAttacks(blockers, square, getAntidiagonal(square))) != table[(((blockers | EDGES) & bishopMask) * bishopMagic) >> (64-indexBits)]) {
 				bishopMistakes++;
 			}
 		}
-
+		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
 		rookMask = getFile(square) ^ getRank(square);
-		subsets = enumerateSubsets(rookMask, indexBits);
-		table = makeLookupTable(ROOK_MAGICS[square], getFile(square), getRank(square), indexBits, square);
+		subsets = enumerateSubsets(rookMask & ~edges, indexBits);
+		rookMagic = generateRookMagic(square);
+		table = makeLookupTable(rookMagic, getFile(square), getRank(square), indexBits, square);
 		while (uint64_t blockers = *(subsets++)) {
-			if ((slidingAttacks(blockers, square, getFile(square)) | slidingAttacks(blockers, square, getRank(square))) != table[(blockers*ROOK_MAGICS[square]) >> (64-indexBits)]) {
+			blockers = (blockers | edges) & rookMask;
+			if ((slidingAttacks(blockers, square, getFile(square)) | slidingAttacks(blockers, square, getRank(square))) != table[(blockers * rookMagic) >> (64-indexBits)]) {
 				rookMistakes++;
 			}
 		}
 	}
-	std::cout << bishopMistakes << "\n";
-	std::cout << rookMistakes << "\n";
+	std::cout << "Number of Bishop mistakes: " << bishopMistakes << "\n";
+	std::cout << "Number of Rook mistakes:   " << rookMistakes << "\n";
 }
