@@ -77,6 +77,12 @@ uint64_t knightAttacks(Board *board, bool turn) {
 }
 
 
+uint64_t bishopAttacks(uint64_t occupied, int square) {
+	Magic table = BISHOP_TABLES[square];
+	return table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)];
+}
+
+
 uint64_t bishopAttacks(Board *board, bool turn) {
 	int piece = turn ? W_BISHOP : B_BISHOP;
 	uint64_t bishopBB = board->pieces[piece];
@@ -95,14 +101,19 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 		attacks |= slidingAttacks(board, turn, square, antidiagonal);
 	}
 	*/
-	Magic table;
 	uint64_t occupied = occupiedSquares(board);
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
-		table = BISHOP_TABLES[square];
-		attacks |= table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)];
+		attacks |= bishopAttacks(occupied, square);
 	}
 	return attacks;
+}
+
+
+uint64_t rookAttacks(uint64_t occupied, int square) {
+	Magic table = ROOK_TABLES[square];
+	uint64_t edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
+	return table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)];
 }
 
 
@@ -123,14 +134,10 @@ uint64_t rookAttacks(Board *board, bool turn) {
 		attacks |= slidingAttacks(board, turn, square, rank);
 	}
 	*/
-	Magic table;
-	uint64_t edges;
 	uint64_t occupied = occupiedSquares(board);
 	while (rookBB) {
 		square = popLSB(&rookBB);
-		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
-		table = ROOK_TABLES[square];
-		attacks |= table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)];
+		attacks |= rookAttacks(occupied, square);
 	}
 	return attacks;
 }
@@ -140,27 +147,13 @@ uint64_t queenAttacks(Board *board, bool turn) {
 	int piece = turn ? W_QUEEN : B_QUEEN;
 	uint64_t queenBB = board->pieces[piece];
 	uint64_t attacks = 0ull;
-	uint64_t file;
-	uint64_t rank;
-	uint64_t diagonal;
-	uint64_t antidiagonal;
 	int square;
 	uint64_t occupied = occupiedSquares(board);
-	Magic table;
-	uint64_t edges;
 
 	while (queenBB) {
 		square = popLSB(&queenBB);
-		file = getFile(square);
-		rank = getRank(square);
-		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
-		table = ROOK_TABLES[square];
-		attacks |= table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)];
-
-		diagonal = getDiagonal(square);
-		antidiagonal = getAntidiagonal(square);
-		table = BISHOP_TABLES[square];
-		attacks |= table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)];
+		attacks |= bishopAttacks(occupied, square);
+		attacks |= rookAttacks(occupied, square);
 
 		/*
 		attacks |= slidingAttacks(board, turn, square, file);

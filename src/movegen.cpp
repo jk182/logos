@@ -207,21 +207,16 @@ uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
 uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
 	int piece = board->turn ? W_BISHOP : B_BISHOP;
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t occupied = occupiedSquares(board);
 	uint64_t bishopBB = board->pieces[piece];
 	uint64_t movesBB;
-	uint64_t diagonal;
-	uint64_t antidiagonal;
 	uint16_t move;
 	int square;
 	int endSquare;
 	
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
-		diagonal = getDiagonal(square);
-		antidiagonal = getAntidiagonal(square);
-		movesBB = slidingMoves(board, square, diagonal);
-		movesBB |= slidingMoves(board, square, antidiagonal);
-
+		movesBB = bishopAttacks(occupied, square) & ~friendly;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			move = encodeMove(square, endSquare);
@@ -235,20 +230,16 @@ uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
 uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 	int piece = board->turn ? W_ROOK : B_ROOK;
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t occupied = occupiedSquares(board);
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t movesBB;
-	uint64_t rank;
-	uint64_t file;
 	uint16_t move;
 	int square;
 	int endSquare;
 
 	while (rookBB) {
 		square = popLSB(&rookBB);
-		rank = getRank(square);
-		file = getFile(square);
-		movesBB = slidingMoves(board, square, file);
-		movesBB |= slidingMoves(board, square, rank);
+		movesBB = rookAttacks(occupied, square) & ~friendly;
 
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
@@ -268,26 +259,18 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 uint16_t* generateQueenMoves(Board *board, uint16_t *moves) {
 	int piece = board->turn ? W_QUEEN : B_QUEEN;
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t occupied = occupiedSquares(board);
 	uint64_t queenBB = board->pieces[piece];
 	uint64_t movesBB;
-	uint64_t rank;
-	uint64_t file;
-	uint64_t diagonal;
-	uint64_t antidiagonal;
 	uint16_t move;
 	int square;
 	int endSquare;
 
 	while (queenBB) {
 		square = popLSB(&queenBB);
-		rank = getRank(square);
-		file = getFile(square);
-		diagonal = getDiagonal(square);
-		antidiagonal = getAntidiagonal(square);
-		movesBB = slidingMoves(board, square, file);
-		movesBB |= slidingMoves(board, square, rank);
-		movesBB |= slidingMoves(board, square, diagonal);
-		movesBB |= slidingMoves(board, square, antidiagonal);
+		movesBB = bishopAttacks(occupied, square);
+		movesBB |= rookAttacks(occupied, square);
+		movesBB &= ~friendly;
 
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
