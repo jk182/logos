@@ -9,6 +9,7 @@ struct Magic {
 	uint64_t magic;
 	uint64_t mask;
 	uint64_t *table;
+	int index;
 };
 
 static const uint64_t KNIGHT_ATTACKS[64] = {

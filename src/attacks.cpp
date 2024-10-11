@@ -100,7 +100,7 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
 		table = BISHOP_TABLES[square];
-		attacks |= table.table[(((occupied | EDGES) & table.mask) * BISHOP_MAGICS[square]) >> (64-15)];
+		attacks |= table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)];
 	}
 	return attacks;
 }
@@ -130,7 +130,7 @@ uint64_t rookAttacks(Board *board, bool turn) {
 		square = popLSB(&rookBB);
 		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
 		table = ROOK_TABLES[square];
-		attacks |= table.table[(((occupied | edges) & table.mask) * ROOK_MAGICS[square]) >> (64-15)];
+		attacks |= table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)];
 	}
 	return attacks;
 }
@@ -145,18 +145,29 @@ uint64_t queenAttacks(Board *board, bool turn) {
 	uint64_t diagonal;
 	uint64_t antidiagonal;
 	int square;
+	uint64_t occupied = occupiedSquares(board);
+	Magic table;
+	uint64_t edges;
 
 	while (queenBB) {
 		square = popLSB(&queenBB);
 		file = getFile(square);
 		rank = getRank(square);
+		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
+		table = ROOK_TABLES[square];
+		attacks |= table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)];
+
 		diagonal = getDiagonal(square);
 		antidiagonal = getAntidiagonal(square);
+		table = BISHOP_TABLES[square];
+		attacks |= table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)];
 
+		/*
 		attacks |= slidingAttacks(board, turn, square, file);
 		attacks |= slidingAttacks(board, turn, square, rank);
 		attacks |= slidingAttacks(board, turn, square, diagonal);
 		attacks |= slidingAttacks(board, turn, square, antidiagonal);
+		*/
 	}
 
 	return attacks;
@@ -194,14 +205,16 @@ void initSlidingAttacks() {
 		BISHOP_TABLES[square].magic = BISHOP_MAGICS[square];
 		diag = getDiagonal(square);
 		antidiag = getAntidiagonal(square);
+		BISHOP_TABLES[square].index = 15;
 		BISHOP_TABLES[square].mask = diag ^ antidiag;
-		BISHOP_TABLES[square].table = makeLookupTable(BISHOP_MAGICS[square], diag, antidiag, 15, square);
+		BISHOP_TABLES[square].table = makeLookupTable(BISHOP_MAGICS[square], diag, antidiag, BISHOP_TABLES[square].index, square);
 
 		ROOK_TABLES[square].magic = ROOK_MAGICS[square];
 		file = getFile(square);
 		rank = getRank(square);
+		ROOK_TABLES[square].index = 15;
 		ROOK_TABLES[square].mask = file ^ rank;
-		ROOK_TABLES[square].table = makeLookupTable(ROOK_MAGICS[square], file, rank, 15, square);
+		ROOK_TABLES[square].table = makeLookupTable(ROOK_MAGICS[square], file, rank, ROOK_TABLES[square].index, square);
 	}
 }
 
