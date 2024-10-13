@@ -22,14 +22,6 @@ int main() {
 	boardFromFEN(&b, "6k1/2p2ppp/2Npb3/1r6/4P3/P1P5/r6P/1K1R3R w - - 1 23");
 	*/
 	// printBitboard(rookAttacks(&b, false));
-	/*
-	Board b;
-	clearBoard(&b);
-	boardFromFEN(&b, "rnbqkbnr/pppp1ppp/8/4p3/8/1P6/P1PPPPPP/RNBQKBNR w KQkq - 0 2");
-	printBitboard(bishopAttacks(&b, true));
-	boardFromFEN(&b, "rnbqkbnr/pppp1ppp/8/4p3/8/BP6/P1PPPPPP/RN1QKBNR b KQkq - 1 2");
-	printBitboard(bishopAttacks(&b, true));
-	*/
 	// std::cout << perft(2, &b) << "\n";
 	/*
 	printBoard(&b);
@@ -41,10 +33,6 @@ int main() {
 	// while (uint16_t m = *(moves++)) {
  	//	printMove(m);
 	// }
-	// generatePawnMoves(&b, moves);
-	// generateBishopMoves(b, moves);
-	// generateQueenMoves(b, moves);
-	// generateRookMoves(&b, moves);
 	// uint16_t *kMoves = generateKingMoves(&b, moves);
 	// generatePawnMoves(&b, generateKnightMoves(&b, kMoves));
 	/*
@@ -58,9 +46,13 @@ int main() {
 	// playGame(&b, 5);
 	// generateAllMagics();
 	// testMagics();
-	testMovegen();
-	uint64_t edges = A_FILE | H_FILE | RANK_1 | RANK_8;
-	// uint64_t *subsets = enumerateSubsets((C_FILE ^ RANK_5) & ~edges, 15);
-	// generateRookMagic(53);
+	// testMovegen();
+	
+	Board b;
+	clearBoard(&b);
+	boardFromFEN(&b, "r1bqk2r/2p1bppp/p1np1n2/1p2p3/4P3/1B3N2/PPPP1PPP/RNBQR1K1 w kq - 0 8");
+	std::cout << alphaBeta(&b, 5, INT_MIN, INT_MAX) << "\n";
+	boardFromFEN(&b, "3k4/3q4/8/8/8/3Q4/3K4/8 w - - 0 1");
+	std::cout << alphaBeta(&b, 1, INT_MIN, INT_MAX) << "\n";
 	return 0;
 }

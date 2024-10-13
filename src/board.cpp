@@ -144,7 +144,7 @@ void printBoard(Board *board) {
 				piece = symbols[i];
 			} 
 		}
-		std::cout << piece;
+		std::cout << piece << " ";
 		if (square%8 == 0) {
 			std::cout << "\n";
 		}

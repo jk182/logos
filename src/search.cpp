@@ -1,15 +1,29 @@
-#include <limits.h>
-#include <algorithm>
-
 #include "board.h"
 #include "evaluation.h"
 #include "move.h"
 #include "movegen.h"
+#include "search.h"
+
+#include <algorithm>
+#include <iostream>
+#include <limits.h>
+
+
+int qsearch(Board *board, int alpha, int beta) {
+	if (isCheck(board)) {
+		// printBoard(board);
+		return alphaBeta(board, 1, alpha, beta);
+	}
+	return evaluate(board);
+}
 
 
 int alphaBeta(Board *board, int depth, int alpha, int beta) {
-	if (depth <= 0 || isGameOver(board)) {
+	if (isGameOver(board)) {
 		return evaluate(board);
+	}
+	if (depth <= 0) {
+		return qsearch(board, alpha, beta);
 	}
 	int value;
 	uint16_t moveArr[128];

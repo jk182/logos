@@ -26,8 +26,7 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 	uint64_t *subsets = enumerateSubsets((direction1 ^ direction2) & ~edges, indexBits);
 	uint64_t index;
 	uint64_t attacks;
-	int counter = 0;
-	uint64_t blockers = 0;
+	uint64_t blockers;
 
 	do {
 		blockers = (blockers | edges) & (direction1 ^ direction2);
@@ -36,17 +35,10 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 		attacks |= slidingAttacks(blockers, square, direction2);
 		if (table[index] == 0) {
 			table[index] = attacks;
-			counter++;
 		} else if (table[index] != attacks) {
 			return nullptr;
-		} /* else {
-			printBitboard(blockers);
-			printBitboard(attacks);
-			std::cout << table[index] << " " << attacks << "\n";
 		}
-		*/
 	} while ((blockers = *(subsets++)));
-	// std::cout << counter << "\n";
 	return table;
 }
 
