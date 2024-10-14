@@ -1,3 +1,4 @@
+#include "bitboard.h"
 #include "board.h"
 #include "evaluation.h"
 #include "move.h"
@@ -9,10 +10,57 @@
 #include <limits.h>
 
 
-int qsearch(Board *board, int alpha, int beta) {
+int qsearch(Board *board, int depth, int alpha, int beta) {
+	if (depth <= 0) {
+		return evaluate(board);
+	}
 	if (isCheck(board)) {
 		// printBoard(board);
 		return alphaBeta(board, 1, alpha, beta);
+	}
+	uint16_t moveArr[MAX_MOVES];
+	uint16_t *moves = moveArr;
+	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
+	uint16_t move;
+	Undo undo;
+	int value;
+
+	if (board->turn == WHITE) {
+		for (int i = 0; i < endMove-moves; i++) {
+			move = *(moves+i);
+			if (isCapture(board, move)) {
+				undo = generateUndo(board, move);
+				makeMove(board, move);
+				if (isLegalPosition(*board)) {
+					value = qsearch(board, depth-1, alpha, beta);
+					alpha = std::max(alpha, value);
+					unmakeMove(board, move, &undo);
+					if (value >= beta) {
+						return beta;
+					}
+				} else {
+					unmakeMove(board, move, &undo);
+				}
+			}
+		}
+	} else {
+		for (int i = 0; i < endMove-moves; i++) {
+			move = *(moves+i);
+			if (isCapture(board, move)) {
+				undo = generateUndo(board, move);
+				makeMove(board, move);
+				if (isLegalPosition(*board)) {
+					value = qsearch(board, depth-1, alpha, beta);
+					alpha = std::min(beta, value);
+					unmakeMove(board, move, &undo);
+					if (value <= alpha) {
+						return alpha;
+					}
+				} else {
+					unmakeMove(board, move, &undo);
+				}
+			}
+		}
 	}
 	return evaluate(board);
 }
@@ -23,10 +71,10 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		return evaluate(board);
 	}
 	if (depth <= 0) {
-		return qsearch(board, alpha, beta);
+		return qsearch(board, 2, alpha, beta);
 	}
 	int value;
-	uint16_t moveArr[128];
+	uint16_t moveArr[MAX_MOVES];
 	uint16_t *moves = moveArr;
 	uint16_t *end = generateAllMoves(*board, moves);
 	uint16_t move;
@@ -87,7 +135,7 @@ uint16_t findBestMove(Board *board, int depth) {
 	// TODO: adjust for side to move
 	uint16_t bestMove;
 
-	uint16_t moveArr[128];
+	uint16_t moveArr[MAX_MOVES];
 	uint16_t *moves = moveArr;
 	uint16_t *end = generateAllMoves(*board, moves);
 	uint16_t move;

@@ -22,6 +22,10 @@ enum {
 	ENPASSANT = 0x7000
 };
 
+enum {
+	MAX_MOVES = 128
+};
+
 
 
 void printMove(uint16_t move);

@@ -7,7 +7,7 @@
 
 
 uint64_t* enumerateSubsets(uint64_t set, int indexBits) {
-	uint64_t* subsets = new uint64_t[1 << indexBits];
+	uint64_t* subsets = new uint64_t[1ull << indexBits];
 	int index = 0;
 	uint64_t subset = 0;
 	do {
@@ -21,7 +21,7 @@ uint64_t* enumerateSubsets(uint64_t set, int indexBits) {
 
 uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t direction2, int indexBits, int square) {
 	// Directions are either the file and rank of a rook or the two diagonals of a bishop
-	uint64_t *table = new uint64_t[1 << indexBits];
+	uint64_t *table = new uint64_t[1ull << indexBits];
 	uint64_t edges = ((A_FILE | H_FILE) & ~direction1) | ((RANK_1 | RANK_8) & ~direction2);
 	uint64_t *subsets = enumerateSubsets((direction1 ^ direction2) & ~edges, indexBits);
 	uint64_t index;

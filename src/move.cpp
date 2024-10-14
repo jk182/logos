@@ -100,7 +100,7 @@ uint16_t encodeUCIMove(Board *board, char *UCImove) {
 
 
 bool isCapture(Board *board, uint16_t move) {
-	return (occupiedSquares(board) & (1 << getEndSquare(move))) != 0;
+	return (occupiedSquares(board) & (1ull << getEndSquare(move))) != 0;
 }
 
 
