@@ -133,6 +133,7 @@ void makeMove(Board *board, uint16_t move) {
 
 	board->turn = !turn;
 	board->epSquare = -1;
+	board->halfMoveCounter++;
 
 	startPiece = turn ? W_PAWN : B_PAWN;
 	endPiece = turn ? W_KING : B_KING;
@@ -167,7 +168,7 @@ void makeMove(Board *board, uint16_t move) {
 		}
 		board->pieces[piece] ^= startBB;
 		// Detecting captures
-		if ((occupiedSquares(board) & endBB) != 0) {
+		if (isCapture(board, move)) {
 			board->halfMoveCounter = 0;
 			for (int i = 0; i < 12; i++) {
 				if ((board->pieces[i] & endBB) != 0) {
