@@ -99,6 +99,11 @@ uint16_t encodeUCIMove(Board *board, char *UCImove) {
 }
 
 
+bool isCapture(Board *board, uint16_t move) {
+	return (occupiedSquares(board) & (1 << getEndSquare(move))) != 0;
+}
+
+
 bool isEnPassant(uint16_t move) {
 	return (move & ENPASSANT) == ENPASSANT;
 }
