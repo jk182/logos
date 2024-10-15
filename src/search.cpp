@@ -18,51 +18,60 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		// printBoard(board);
 		return alphaBeta(board, 1, alpha, beta);
 	}
+	int standingPat = evaluate(board);
+
+	if (board->turn == WHITE) {
+		if (standingPat >= beta) {
+			return beta;
+		}
+		if (standingPat > alpha) {
+			alpha = standingPat;
+		}
+	} else {
+		if (standingPat <= alpha) {
+			return alpha;
+		}
+		if (standingPat < beta) {
+			beta = standingPat;
+		}
+	}
+
 	uint16_t moveArr[MAX_MOVES];
 	uint16_t *moves = moveArr;
 	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
 	uint16_t move;
 	Undo undo;
-	int value;
+	int score;
 
-	if (board->turn == WHITE) {
-		for (int i = 0; i < endMove-moves; i++) {
-			move = *(moves+i);
-			if (isCapture(board, move)) {
-				undo = generateUndo(board, move);
-				makeMove(board, move);
-				if (isLegalPosition(*board)) {
-					value = qsearch(board, depth-1, alpha, beta);
-					alpha = std::max(alpha, value);
-					unmakeMove(board, move, &undo);
-					if (value >= beta) {
+	for (int i = 0; i < endMove-moves; i++) {
+		move = *(moves+i);
+		if (isCapture(board, move)) {
+			undo = generateUndo(board, move);
+			makeMove(board, move);
+			if (isLegalPosition(*board)) {
+				score = qsearch(board, depth-1, alpha, beta);
+				if (board->turn != WHITE) {	// Reverse side to move since a move was made
+					if (score >= beta) {
 						return beta;
 					}
-				} else {
-					unmakeMove(board, move, &undo);
-				}
-			}
-		}
-	} else {
-		for (int i = 0; i < endMove-moves; i++) {
-			move = *(moves+i);
-			if (isCapture(board, move)) {
-				undo = generateUndo(board, move);
-				makeMove(board, move);
-				if (isLegalPosition(*board)) {
-					value = qsearch(board, depth-1, alpha, beta);
-					alpha = std::min(beta, value);
-					unmakeMove(board, move, &undo);
-					if (value <= alpha) {
-						return alpha;
+					if (score > alpha) {
+						alpha = score;
 					}
 				} else {
-					unmakeMove(board, move, &undo);
+					if (score <= alpha) {
+						return alpha;
+					}
+					if (score < beta) {
+						beta = score;
+					}
 				}
+				unmakeMove(board, move, &undo);
+			} else {
+				unmakeMove(board, move, &undo);
 			}
 		}
 	}
-	return evaluate(board);
+	return board->turn==WHITE ? alpha : beta;
 }
 
 
