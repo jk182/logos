@@ -50,6 +50,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 			makeMove(board, move);
 			if (isLegalPosition(*board)) {
 				score = qsearch(board, depth-1, alpha, beta);
+				unmakeMove(board, move, &undo);
 				if (board->turn != WHITE) {	// Reverse side to move since a move was made
 					if (score >= beta) {
 						return beta;
@@ -65,13 +66,12 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 						beta = score;
 					}
 				}
-				unmakeMove(board, move, &undo);
 			} else {
 				unmakeMove(board, move, &undo);
 			}
 		}
 	}
-	return board->turn==WHITE ? alpha : beta;
+	return board->turn!=WHITE ? alpha : beta;
 }
 
 

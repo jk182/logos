@@ -50,11 +50,11 @@ int main() {
 	Board b;
 	clearBoard(&b);
 	boardFromFEN(&b, "r1bqk2r/2p1bppp/p1np1n2/1p2p3/4P3/1B3N2/PPPP1PPP/RNBQR1K1 w kq - 0 8");
-	// boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	// playGame(&b, 5);
+	std::cout << alphaBeta(&b, 5, INT_MIN, INT_MAX) << "\n";
+	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	playGame(&b, 5);
 	// printMove(0b110010010110);
 	// std::cout << isCapture(&b, 0b110010010110) << "\n";
-	std::cout << alphaBeta(&b, 5, INT_MIN, INT_MAX) << "\n";
 	// boardFromFEN(&b, "3k4/3q4/8/8/8/3Q4/3K4/8 w - - 0 1");
 	// std::cout << alphaBeta(&b, 1, INT_MIN, INT_MAX) << "\n";
 	return 0;
