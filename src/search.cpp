@@ -36,8 +36,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		}
 	}
 
-	uint16_t moveArr[MAX_MOVES];
-	uint16_t *moves = moveArr;
+	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
 	uint16_t move;
 	Undo undo;
@@ -83,16 +82,16 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		return qsearch(board, 2, alpha, beta);
 	}
 	int value;
-	uint16_t moveArr[MAX_MOVES];
-	uint16_t *moves = moveArr;
+	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *orderedMoves = moveOrdering(board, moves);
 	uint16_t move;
 	Undo undo;
 
 	if (board->turn == WHITE) {
 		value = INT_MIN;
 		for (int i = 0; i < end-moves; i++) {
-			move = *(moves+i);
+			move = *(orderedMoves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
 			if (isLegalPosition(*board)) {
@@ -109,7 +108,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	} else {
 		value = INT_MAX;
 		for (int i = 0; i < end-moves; i++) {
-			move = *(moves+i);
+			move = *(orderedMoves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
 			if (isLegalPosition(*board)) {

@@ -351,6 +351,26 @@ uint16_t* generateAllMoves(Board board, uint16_t *moves) {
 }
 
 
+uint16_t* moveOrdering(Board *board, uint16_t *moves) {
+	uint16_t *orderedMoves = new uint16_t[MAX_MOVES];
+	int index = 0;
+	int moveIndex = 0;
+
+	while (uint16_t move = *(moves+moveIndex)) {
+		*(orderedMoves+moveIndex) = move;
+		if (isCapture(board, move)) {
+			if ((getPieceAtSquare(board, getStartSquare(move)) % 6) < (getPieceAtSquare(board, getEndSquare(move)) % 6)) {
+				*(orderedMoves+index) = move;
+				*(orderedMoves+moveIndex) = *(moves+index);
+				index++;
+			}
+		}
+		moveIndex++;
+	}
+	return orderedMoves;
+}
+
+
 int perft(int depth, Board *board) {
 	if (depth == 0) {
 		return 1;
@@ -361,7 +381,7 @@ int perft(int depth, Board *board) {
 	}
 	*/
 	int nodes = 0;
-	uint16_t moveArr[128];
+	uint16_t moveArr[MAX_MOVES];
 	uint16_t *moves = moveArr;
 	uint16_t *end = generateAllMoves(*board, moves);
 	Undo undo;
