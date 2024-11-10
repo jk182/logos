@@ -140,33 +140,40 @@ int iterativeDeepening(Board *board, int depth) {
 
 
 uint16_t findBestMove(Board *board, int depth) {
-	// TODO: adjust for side to move
 	uint16_t bestMove;
 
-	uint16_t moveArr[MAX_MOVES];
-	uint16_t *moves = moveArr;
+	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *orderedMoves = moveOrdering(board, moves);
 	uint16_t move;
+	bool side = board->turn;
 	int value;
-	int maxValue;
+	int bestValue;
 	Undo undo;
 
 	for (int i = 0; i < end-moves; i++) {
 		if (i == 0) {
-			maxValue = -100000;
+			if (side == WHITE) {
+				bestValue = -100000;
+			} else {
+				bestValue = 100000;
+			}
 			bestMove = NULL_MOVE;
 		}
-		move = *(moves+i);
+		move = *(orderedMoves+i);
 		undo = generateUndo(board, move);
 		makeMove(board, move);
 		if (isLegalPosition(*board)) {
 			value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
 			if (i == 0) {
-				maxValue = value;
+				bestValue = value;
 				bestMove = move;
 			}
-			if (value > maxValue) {
-				maxValue = value;
+			if (side == WHITE && value > bestValue) {
+				bestValue = value;
+				bestMove = move;
+			} else if (side == BLACK && value < bestValue) {
+				bestValue = value;
 				bestMove = move;
 			}
 		}
