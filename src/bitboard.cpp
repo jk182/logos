@@ -13,7 +13,7 @@ const uint64_t ANTIDIAGONALS[15] = {ADIAG_1, ADIAG_2, ADIAG_3, ADIAG_4, ADIAG_5,
 
 
 bool testBit(uint64_t bb, int i) {
-	assert(i >= 0 && i < 64);
+	// assert(i >= 0 && i < 64);
 	return bb & (1ull << i);
 }
 

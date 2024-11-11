@@ -65,13 +65,10 @@ uint64_t pawnAttacks(Board *board, bool turn) {
 
 uint64_t knightAttacks(Board *board, bool turn) {
 	uint64_t attacks = 0ull;
-	int piece = turn ? W_KNIGHT : B_KNIGHT;
-	uint64_t knights = board->pieces[piece];
-	int square;
+	uint64_t knights = board->pieces[turn ? W_KNIGHT : B_KNIGHT];
 
 	while (knights) {
-		square = popLSB(&knights);
-		attacks |= KNIGHT_ATTACKS[square];
+		attacks |= KNIGHT_ATTACKS[popLSB(&knights)];
 	}
 	return attacks;
 }
@@ -87,12 +84,10 @@ uint64_t bishopAttacks(Board *board, bool turn) {
 	int piece = turn ? W_BISHOP : B_BISHOP;
 	uint64_t bishopBB = board->pieces[piece];
 	uint64_t attacks = 0ull;
-	int square;
 
 	uint64_t occupied = occupiedSquares(board);
 	while (bishopBB) {
-		square = popLSB(&bishopBB);
-		attacks |= bishopAttacks(occupied, square);
+		attacks |= bishopAttacks(occupied, popLSB(&bishopBB));
 	}
 	return attacks;
 }
@@ -109,11 +104,10 @@ uint64_t rookAttacks(Board *board, bool turn) {
 	int piece = turn ? W_ROOK : B_ROOK;
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t attacks = 0ull;
-	int square;
 	uint64_t occupied = occupiedSquares(board);
+
 	while (rookBB) {
-		square = popLSB(&rookBB);
-		attacks |= rookAttacks(occupied, square);
+		attacks |= rookAttacks(occupied, popLSB(&rookBB));
 	}
 	return attacks;
 }

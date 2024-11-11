@@ -139,8 +139,13 @@ void makeMove(Board *board, uint16_t move) {
 	if (! board->turn) {
 		board->fullMoveCounter++;
 	}
+
+	bool turn = board->turn;
+	board->turn = !turn;
+	board->epSquare = -1;
+	board->halfMoveCounter++;
+
 	if (move == NULL_MOVE) {
-		board->turn = !board->turn;
 		return;
 	}
 	int startSquare = getStartSquare(move);
@@ -148,16 +153,7 @@ void makeMove(Board *board, uint16_t move) {
 	uint64_t startBB = 1ull << startSquare;
 	uint64_t endBB = 1ull << endSquare;
 	int piece;
-	int startPiece;
-	int endPiece;
-	bool turn = board->turn;
 
-	board->turn = !turn;
-	board->epSquare = -1;
-	board->halfMoveCounter++;
-
-	startPiece = turn ? W_PAWN : B_PAWN;
-	endPiece = turn ? W_KING : B_KING;
 
 	if (isEnPassant(move)) {
 		board->halfMoveCounter = 0;
@@ -173,7 +169,8 @@ void makeMove(Board *board, uint16_t move) {
 
 
 	if (! isCastling(move)) {
-		// move is not castling
+		int startPiece = turn ? W_PAWN : B_PAWN;
+		int endPiece = turn ? W_KING : B_KING;
 		for (int i = startPiece; i <= endPiece; i++) {
 			if ((board->pieces[i] & startBB) != 0) {
 				piece = i;
@@ -191,24 +188,19 @@ void makeMove(Board *board, uint16_t move) {
 		// Detecting captures
 		if (isCapture(board, move)) {
 			board->halfMoveCounter = 0;
-			for (int i = 0; i < 12; i++) {
-				if ((board->pieces[i] & endBB) != 0) {
-					board->pieces[i] ^= endBB;
-					// Removing castling rights if a rook is captured
-					if (i == W_ROOK) {
-						if (endSquare == 0) {
-							board->castling &= ~W_KS_CASTLING;
-						} else if (endSquare == 7) {
-							board->castling &= ~W_QS_CASTLING;
-						}
-					} else if (i == B_ROOK) {
-						if (endSquare == 56) {
-							board->castling &= ~B_KS_CASTLING;
-						} else if (endSquare == 63) {
-							board->castling &= ~B_QS_CASTLING;
-						}
-					}
-					break;
+			int capturedPiece = getPieceAtSquare(board, endSquare);
+			board->pieces[capturedPiece] ^= endBB;
+			if (capturedPiece == W_ROOK) {
+				if (endSquare == 0) {
+					board->castling &= ~W_KS_CASTLING;
+				} else if (endSquare == 7) {
+					board->castling &= ~W_QS_CASTLING;
+				}
+			} else if (capturedPiece == B_ROOK) {
+				if (endSquare == 56) {
+					board->castling &= ~B_KS_CASTLING;
+				} else if (endSquare == 63) {
+					board->castling &= ~B_QS_CASTLING;
 				}
 			}
 		}
@@ -242,6 +234,7 @@ void makeMove(Board *board, uint16_t move) {
 				}
 				break;
 		}
+		return;
 	} else {
 		if (endSquare == 1) {
 			board->castling &= (B_KS_CASTLING | B_QS_CASTLING);
@@ -309,12 +302,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 			}
 			return;
 		}
-		for (int i = 0; i < 12; i++) {
-			if ((board->pieces[i] & endBB) != 0) {
-				piece = i;
-				break;
-			}
-		}
+		piece = getPieceAtSquare(board, endSquare);
 		board->pieces[piece] ^= startBB ^ endBB;
 		if (undo->capturedPiece > -1) {
 			board->pieces[undo->capturedPiece] ^= endBB;

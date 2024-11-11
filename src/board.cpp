@@ -210,7 +210,7 @@ Undo generateUndo(Board *board, uint16_t move) {
 
 
 bool isInsufficientMaterial(Board *board) {
-	for (int piece : {W_PAWN, W_ROOK, W_QUEEN, B_PAWN, B_ROOK, B_QUEEN}) {
+	for (int piece : {W_PAWN, B_PAWN, W_ROOK, B_ROOK, W_QUEEN, B_QUEEN}) {
 		if (board->pieces[piece] != 0) {
 			return false;
 		}
