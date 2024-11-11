@@ -66,7 +66,6 @@ uint16_t encodeEPMove(int startSqIndex, int endSqIndex) {
 
 
 uint16_t encodeUCIMove(Board *board, char *UCImove) {
-	// TODO: castling and promotion
 	int startSquare = getSquare(UCImove[0], UCImove[1]-'1');
 	int endSquare = getSquare(UCImove[2], UCImove[3]-'1');
 	if (startSquare == 3 && 
@@ -96,6 +95,28 @@ uint16_t encodeUCIMove(Board *board, char *UCImove) {
 		return encodeMove(startSquare, endSquare, promPiece);
 	}
 	return encodeMove(startSquare, endSquare);
+}
+
+
+char* decodeMoveToUCI(uint16_t move) {
+	char* startSquare = getSquareName(getStartSquare(move));
+	char* endSquare = getSquareName(getEndSquare(move));
+	char* out = strcat(startSquare, endSquare);
+	int promPiece = (move & 0x7000) >> 12;
+	if (promPiece > 0 && promPiece < 5) {
+		char* name;
+		if (promPiece == 1) {
+			name = "n";
+		} else if (promPiece == 2) {
+			name = "b";
+		} else if (promPiece == 3) {
+			name = "r";
+		} else if (promPiece == 4) {
+			name = "q";
+		}
+		out = strcat(out, name);
+	}
+	return out;
 }
 
 
