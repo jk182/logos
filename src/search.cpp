@@ -154,9 +154,9 @@ uint16_t findBestMove(Board *board, int depth) {
 	for (int i = 0; i < end-moves; i++) {
 		if (i == 0) {
 			if (side == WHITE) {
-				bestValue = -100000;
+				bestValue = -10000000;
 			} else {
-				bestValue = 100000;
+				bestValue = 10000000;
 			}
 			bestMove = NULL_MOVE;
 		}
@@ -165,6 +165,9 @@ uint16_t findBestMove(Board *board, int depth) {
 		makeMove(board, move);
 		if (isLegalPosition(*board)) {
 			value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
+			if (bestMove == NULL_MOVE) {
+				bestMove = move;
+			}
 			if (i == 0) {
 				bestValue = value;
 				bestMove = move;
