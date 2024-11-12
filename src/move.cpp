@@ -45,23 +45,17 @@ uint16_t encodeMove(int startSqIndex, int endSqIndex) {
 
 
 uint16_t encodeMove(int startSqIndex, int endSqIndex, int promotionPiece) {
-	uint16_t move = encodeMove(startSqIndex, endSqIndex);
-	move |= promotionPiece << 12;
-	return move;
+	return encodeMove(startSqIndex, endSqIndex) | (promotionPiece << 12);
 }
 
 
 uint16_t encodeCastlingMove(int startSqIndex, int endSqIndex) {
-	uint16_t move = encodeMove(startSqIndex, endSqIndex);
-	move |= 0x8000;
-	return move;
+	return encodeMove(startSqIndex, endSqIndex) | 0x8000;
 }
 
 
 uint16_t encodeEPMove(int startSqIndex, int endSqIndex) {
-	uint16_t move = encodeMove(startSqIndex, endSqIndex);
-	move |= ENPASSANT;
-	return move;
+	return encodeMove(startSqIndex, endSqIndex) | ENPASSANT;
 }
 
 

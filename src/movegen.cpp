@@ -25,31 +25,26 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		pawnBB = board->pieces[W_PAWN];
 		
 		// Double pawn moves
-		movesBB = (pawnBB & RANK_2) << 16;
-		movesBB &= empty;
+		movesBB = ((pawnBB & RANK_2) << 16) & empty;
 		// Make sure that pawns don't jump over pieces on the third rank
 		movesBB &= ~(occupied & RANK_3) << 8;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
-			move = encodeMove(endSquare-16, endSquare);
-			*(moves++) = move;
+			*(moves++) = encodeMove(endSquare-16, endSquare);
 		}
 
 		// Single pawn moves
-		movesBB = pawnBB << 8;
-		movesBB &= empty;
+		movesBB = (pawnBB << 8) & empty;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare >= 56) {
 				// Adding the promoting pieces
 				// N=1, B=2, R=3, Q=4
 				for (int p = 1; p <= 4; p++) {
-					move = encodeMove(endSquare-8, endSquare, p);
-					*(moves++) = move;
+					*(moves++) = encodeMove(endSquare-8, endSquare, p);
 				}
 			} else {
-				move = encodeMove(endSquare-8, endSquare);
-				*(moves++) = move;
+				*(moves++) = encodeMove(endSquare-8, endSquare);
 			}
 		}
 
@@ -57,8 +52,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		epBB = epSquare > -1 ? 1ull << epSquare : 0ull;
 		movesBB = (pawnBB & (~H_FILE)) << 7;
 		if ((movesBB & epBB) != 0) {
-			move = encodeEPMove(epSquare-7, epSquare);
-			*(moves++) = move;
+			*(moves++) = encodeEPMove(epSquare-7, epSquare);
 		}
 		movesBB &= bPieces;
 		while (movesBB) {
@@ -66,61 +60,51 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 			if (endSquare >= 56) {
 				// Pawn promotions
 				for (int p = 1; p <= 4; p++) {
-					move = encodeMove(endSquare-7, endSquare, p);
-					*(moves++) = move;
+					*(moves++) = encodeMove(endSquare-7, endSquare, p);
 				}
 			} else {
-				move = encodeMove(endSquare-7, endSquare);
-				*(moves++) = move;
+				*(moves++) = encodeMove(endSquare-7, endSquare);
 			}
 		}
 		movesBB = (pawnBB & (~A_FILE)) << 9;
 		if ((movesBB & epBB) != 0) {
-			move = encodeEPMove(epSquare-9, epSquare);
-			*(moves++) = move;
+			*(moves++) = encodeEPMove(epSquare-9, epSquare);
 		}
 		movesBB &= bPieces;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare >= 56) {
 				for (int p = 1; p <= 4; p++) {
-					move = encodeMove(endSquare-9, endSquare, p);
-					*(moves++) = move;
+					*(moves++) = encodeMove(endSquare-9, endSquare, p);
 				}
 			} else {
-				move = encodeMove(endSquare-9, endSquare);
-				*(moves++) = move;
+				*(moves++) = encodeMove(endSquare-9, endSquare);
 			}
 		}
 	} else {
 		pawnBB = board->pieces[B_PAWN];
 		
 		// Double pawn moves
-		movesBB = (pawnBB & RANK_7) >> 16;
-		movesBB &= empty;
+		movesBB = ((pawnBB & RANK_7) >> 16) & empty;
 		// Make sure that pawns don't jump over pieces on the third rank
 		movesBB &= ~(occupied & RANK_6) >> 8;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
-			move = encodeMove(endSquare+16, endSquare);
-			*(moves++) = move;
+			*(moves++) = encodeMove(endSquare+16, endSquare);
 		}
 
 		// Single pawn moves
-		movesBB = pawnBB >> 8;
-		movesBB &= empty;
+		movesBB = (pawnBB >> 8) & empty;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare <= 7) {
 				// Adding the promoting pieces
 				// N=1, B=2, R=3, Q=4
 				for (int p = 1; p <= 4; p++) {
-					move = encodeMove(endSquare+8, endSquare, p);
-					*(moves++) = move;
+					*(moves++) = encodeMove(endSquare+8, endSquare, p);
 				}
 			} else {
-				move = encodeMove(endSquare+8, endSquare);
-				*(moves++) = move;
+				*(moves++) = encodeMove(endSquare+8, endSquare);
 			}
 		}
 
@@ -128,38 +112,32 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 		epBB = epSquare > -1 ? 1ull << epSquare : 0ull;
 		movesBB = (pawnBB & (~H_FILE)) >> 9;
 		if ((movesBB & epBB) != 0) {
-			move = encodeEPMove(epSquare+9, epSquare);
-			*(moves++) = move;
+			*(moves++) = encodeEPMove(epSquare+9, epSquare);
 		}
 		movesBB &= wPieces;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare <= 7) {
 				for (int p = 1; p <= 4; p++) {
-					move = encodeMove(endSquare+9, endSquare, p);
-					*(moves++) = move;
+					*(moves++) = encodeMove(endSquare+9, endSquare, p);
 				}
 			} else {
-				move = encodeMove(endSquare+9, endSquare);
-				*(moves++) = move;
+				*(moves++) = encodeMove(endSquare+9, endSquare);
 			}
 		}
 		movesBB = (pawnBB & (~A_FILE)) >> 7;
 		if ((movesBB & epBB) != 0) {
-			move = encodeEPMove(epSquare+7, epSquare);
-			*(moves++) = move;
+			*(moves++) = encodeEPMove(epSquare+7, epSquare);
 		}
 		movesBB &= wPieces;
 		while (movesBB) {
 			endSquare = popLSB(&movesBB);
 			if (endSquare <= 7) {
 				for (int p = 1; p <= 4; p++) {
-					move = encodeMove(endSquare+7, endSquare, p);
-					*(moves++) = move;
+					*(moves++) = encodeMove(endSquare+7, endSquare, p);
 				}
 			} else {
-				move = encodeMove(endSquare+7, endSquare);
-				*(moves++) = move;
+				*(moves++) = encodeMove(endSquare+7, endSquare);
 			}
 		}
 	}
@@ -172,9 +150,7 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 	uint64_t knightBB = board->pieces[piece];
 	uint64_t movesBB;
 	int square;
-	int endSquare;
 	uint64_t currKnight;
-	uint16_t move;
 	
 	while (knightBB) {
 		square = popLSB(&knightBB);
@@ -183,9 +159,7 @@ uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
 		movesBB &= piece==W_KNIGHT ? ~whitePieces(board) : ~blackPieces(board);
 
 		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			move = encodeMove(square, endSquare);
-			*(moves++) = move;
+			*(moves++) = encodeMove(square, popLSB(&movesBB));
 		}
 	}
 	return moves;
@@ -210,17 +184,13 @@ uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
 	uint64_t occupied = occupiedSquares(board);
 	uint64_t bishopBB = board->pieces[piece];
 	uint64_t movesBB;
-	uint16_t move;
 	int square;
-	int endSquare;
 	
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
 		movesBB = bishopAttacks(occupied, square) & ~friendly;
 		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			move = encodeMove(square, endSquare);
-			*(moves++) = move;
+			*(moves++) = encodeMove(square, popLSB(&movesBB));
 		}
 	}
 	return moves;
@@ -235,15 +205,13 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 	uint64_t movesBB;
 	uint16_t move;
 	int square;
-	int endSquare;
 
 	while (rookBB) {
 		square = popLSB(&rookBB);
 		movesBB = rookAttacks(occupied, square) & ~friendly;
 
 		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			move = encodeMove(square, endSquare);
+			move = encodeMove(square, popLSB(&movesBB));
 			if (square == 0 || square == 56) {
 				move |= REM_KS_CASTLING;
 			} else if (square == 7 || square == 63) {
@@ -262,9 +230,7 @@ uint16_t* generateQueenMoves(Board *board, uint16_t *moves) {
 	uint64_t occupied = occupiedSquares(board);
 	uint64_t queenBB = board->pieces[piece];
 	uint64_t movesBB;
-	uint16_t move;
 	int square;
-	int endSquare;
 
 	while (queenBB) {
 		square = popLSB(&queenBB);
@@ -273,9 +239,7 @@ uint16_t* generateQueenMoves(Board *board, uint16_t *moves) {
 		movesBB &= ~friendly;
 
 		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			move = encodeMove(square, endSquare);
-			*(moves++) = move;
+			*(moves++) = encodeMove(square, popLSB(&movesBB));
 		}
 	}
 	return moves;
@@ -292,12 +256,8 @@ uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
 	// Making sure that pieces of the same colour don't occupy the same square
 	movesBB &= piece==W_KING ? ~whitePieces(board) : ~blackPieces(board);
 
-	int endSquare;
-	uint16_t move;
 	while (movesBB) {
-		endSquare = popLSB(&movesBB);
-		move = encodeMove(square, endSquare);
-		*(moves++) = move;
+		*(moves++) = encodeMove(square, popLSB(&movesBB));
 	}
 	return moves;
 }
