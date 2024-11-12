@@ -1,8 +1,11 @@
+#include "bitboard.h"
+
 #include <assert.h>
+#include <bit>
 #include <iostream>
 #include <stdint.h>
+#include <string.h>
 
-#include "bitboard.h"
 
 // Note that the squares are indexed h1=0, g1=2, ..., b8=62, a8=63
 

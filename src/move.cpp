@@ -1,9 +1,10 @@
-#include <iostream>
-
 #include "move.h"
 #include "board.h"
 #include "bitboard.h"
 #include "types.h"
+
+#include <iostream>
+#include <string.h>
 
 
 void printMove(uint16_t move) {
@@ -98,17 +99,15 @@ char* decodeMoveToUCI(uint16_t move) {
 	char* out = strcat(startSquare, endSquare);
 	int promPiece = (move & 0x7000) >> 12;
 	if (promPiece > 0 && promPiece < 5) {
-		char* name;
 		if (promPiece == 1) {
-			name = "n";
+			out = strcat(out, "n");
 		} else if (promPiece == 2) {
-			name = "b";
+			out = strcat(out, "b");
 		} else if (promPiece == 3) {
-			name = "r";
+			out = strcat(out, "r");
 		} else if (promPiece == 4) {
-			name = "q";
+			out = strcat(out, "q");
 		}
-		out = strcat(out, name);
 	}
 	return out;
 }
@@ -260,7 +259,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		board->fullMoveCounter--;
 	}
 	if (move == NULL_MOVE) {
-		board->turn = ~board->turn;
+		board->turn = !board->turn;
 		return;
 	}
 	int startSquare = getStartSquare(move);

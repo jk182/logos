@@ -1,12 +1,13 @@
-#include <stdint.h>
-#include <iostream>
-
 #include "attacks.h"
 #include "board.h"
 #include "bitboard.h"
 #include "move.h"
 #include "movegen.h"
 #include "types.h"
+
+#include <iostream>
+#include <stdint.h>
+#include <string.h>
 
 
 void clearBoard(Board *board) {
@@ -193,7 +194,7 @@ int getPieceAtSquare(Board *board, int square) {
 	for (int p = 0; p < 12; p++) {
 		if (testBit(board->pieces[p], square)) {
 			piece = p;
-			break;
+			return piece;
 		}
 	}
 	return piece;
@@ -229,8 +230,7 @@ bool isDraw(Board *board) {
 
 bool isCheck(Board *board) {
 	uint64_t bb = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
-	int square = popLSB(&bb);
-	return isSquareAttacked(board, !board->turn, square);
+	return isSquareAttacked(board, !board->turn, popLSB(&bb));
 }
 
 
