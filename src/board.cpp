@@ -181,10 +181,10 @@ uint64_t occupiedSquares(Board *board) {
 }
 
 
-bool isLegalPosition(Board board) {
-	uint64_t bb = board.turn ? board.pieces[B_KING] : board.pieces[W_KING];
+bool isLegalPosition(Board *board) {
+	uint64_t bb = board->turn ? board->pieces[B_KING] : board->pieces[W_KING];
 	int square = popLSB(&bb);
-	return !isSquareAttacked(board, board.turn, square);
+	return !isSquareAttacked(board, board->turn, square);
 }
 
 
@@ -230,7 +230,7 @@ bool isDraw(Board *board) {
 bool isCheck(Board *board) {
 	uint64_t bb = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
 	int square = popLSB(&bb);
-	return isSquareAttacked(*board, !board->turn, square);
+	return isSquareAttacked(board, !board->turn, square);
 }
 
 
@@ -248,7 +248,7 @@ bool isCheckmate(Board *board) {
 		move = *(moves+i);
 		undo = generateUndo(board, move);
 		makeMove(board, move);
-		if (isLegalPosition(*board)) {
+		if (isLegalPosition(board)) {
 			unmakeMove(board, move, &undo);
 			return false;
 		}

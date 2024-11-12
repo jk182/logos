@@ -30,7 +30,7 @@ void printBoard(Board *board);
 uint64_t whitePieces(Board *board);
 uint64_t blackPieces(Board *board);
 uint64_t occupiedSquares(Board *board);
-bool isLegalPosition(Board board);
+bool isLegalPosition(Board *board);
 int getPieceAtSquare(Board *board, int square);
 Undo generateUndo(Board *board, uint16_t move);
 bool isDraw(Board *board);

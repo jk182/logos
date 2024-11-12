@@ -47,7 +47,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		if (isCapture(board, move)) {
 			undo = generateUndo(board, move);
 			makeMove(board, move);
-			if (isLegalPosition(*board)) {
+			if (isLegalPosition(board)) {
 				score = qsearch(board, depth-1, alpha, beta);
 				unmakeMove(board, move, &undo);
 				if (board->turn != WHITE) {	// Reverse side to move since a move was made
@@ -75,11 +75,11 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 
 
 int alphaBeta(Board *board, int depth, int alpha, int beta) {
-	if (isGameOver(board)) {
-		return evaluate(board);
-	}
 	if (depth <= 0) {
 		return qsearch(board, 2, alpha, beta);
+	}
+	if (isGameOver(board)) {
+		return evaluate(board);
 	}
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -94,7 +94,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			move = *(orderedMoves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
-			if (isLegalPosition(*board)) {
+			if (isLegalPosition(board)) {
 				value = std::max(value, alphaBeta(board, depth-1, alpha, beta));
 				alpha = std::max(alpha, value);
 				unmakeMove(board, move, &undo);
@@ -111,7 +111,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			move = *(orderedMoves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
-			if (isLegalPosition(*board)) {
+			if (isLegalPosition(board)) {
 				value = std::min(value, alphaBeta(board, depth-1, alpha, beta));
 				beta = std::min(beta, value);
 				unmakeMove(board, move, &undo);
@@ -163,7 +163,7 @@ uint16_t findBestMove(Board *board, int depth) {
 		move = *(orderedMoves+i);
 		undo = generateUndo(board, move);
 		makeMove(board, move);
-		if (isLegalPosition(*board)) {
+		if (isLegalPosition(board)) {
 			value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;

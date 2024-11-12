@@ -175,6 +175,6 @@ void initSlidingAttacks() {
 }
 
 
-bool isSquareAttacked(Board board, bool turn, int square) {
-	return (getAttacks(board, turn) & (1ull<<square)) != 0;
+bool isSquareAttacked(Board *board, bool turn, int square) {
+	return (getAttacks(*board, turn) & (1ull<<square)) != 0;
 }

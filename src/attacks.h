@@ -52,7 +52,7 @@ static const uint64_t ROOK_MAGICS[64] = {0x8080006034400080ull, 0x22011032000854
 
 
 
-bool isSquareAttacked(Board board, bool turn, int square);
+bool isSquareAttacked(Board *board, bool turn, int square);
 uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask);
 uint64_t slidingAttacks(uint64_t occupied, int square, uint64_t mask);
 uint64_t getAttacks(Board board, bool turn);
