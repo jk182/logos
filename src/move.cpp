@@ -154,7 +154,6 @@ void makeMove(Board *board, uint16_t move) {
 	uint64_t endBB = 1ull << endSquare;
 	int piece;
 
-
 	if (isEnPassant(move)) {
 		board->halfMoveCounter = 0;
 		piece = turn ? W_PAWN : B_PAWN;
@@ -190,6 +189,7 @@ void makeMove(Board *board, uint16_t move) {
 			board->halfMoveCounter = 0;
 			int capturedPiece = getPieceAtSquare(board, endSquare);
 			board->pieces[capturedPiece] ^= endBB;
+
 			if (capturedPiece == W_ROOK) {
 				if (endSquare == 0) {
 					board->castling &= ~W_KS_CASTLING;

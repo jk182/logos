@@ -81,8 +81,7 @@ uint64_t bishopAttacks(uint64_t occupied, int square) {
 
 
 uint64_t bishopAttacks(Board *board, bool turn) {
-	int piece = turn ? W_BISHOP : B_BISHOP;
-	uint64_t bishopBB = board->pieces[piece];
+	uint64_t bishopBB = board->pieces[turn ? W_BISHOP : B_BISHOP];
 	uint64_t attacks = 0ull;
 
 	uint64_t occupied = occupiedSquares(board);
@@ -101,8 +100,7 @@ uint64_t rookAttacks(uint64_t occupied, int square) {
 
 
 uint64_t rookAttacks(Board *board, bool turn) {
-	int piece = turn ? W_ROOK : B_ROOK;
-	uint64_t rookBB = board->pieces[piece];
+	uint64_t rookBB = board->pieces[turn ? W_ROOK : B_ROOK];
 	uint64_t attacks = 0ull;
 	uint64_t occupied = occupiedSquares(board);
 
@@ -114,8 +112,7 @@ uint64_t rookAttacks(Board *board, bool turn) {
 
 
 uint64_t queenAttacks(Board *board, bool turn) {
-	int piece = turn ? W_QUEEN : B_QUEEN;
-	uint64_t queenBB = board->pieces[piece];
+	uint64_t queenBB = board->pieces[turn ? W_QUEEN : B_QUEEN];
 	uint64_t attacks = 0ull;
 	int square;
 	uint64_t occupied = occupiedSquares(board);
@@ -131,8 +128,7 @@ uint64_t queenAttacks(Board *board, bool turn) {
 
 
 uint64_t kingAttacks(Board *board, bool turn) {
-	int piece = turn ? W_KING : B_KING;
-	uint64_t king = board->pieces[piece];
+	uint64_t king = board->pieces[turn ? W_KING : B_KING];
 
 	return KING_ATTACKS[popLSB(&king)];
 }
