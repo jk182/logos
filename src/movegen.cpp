@@ -264,36 +264,34 @@ uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
 
 
 uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
-	uint64_t occupied = occupiedSquares(board);
-	uint64_t w_attacks = getAttacks(*board, true);
-	uint64_t b_attacks = getAttacks(*board, false);
-	if (board->turn == WHITE && (b_attacks & 0x8) == 0) {
-		if ((board->castling & W_KS_CASTLING) == 1 && (occupied & 0x6) == 0) {
-			// Kingside castling is allowed and f1, g1 are empty
-			if ((b_attacks & 0x6) == 0) {
+	if (board->turn == WHITE && ((board->castling & (W_KS_CASTLING | W_QS_CASTLING)) != 0)) {
+		uint64_t occupied = occupiedSquares(board);
+		uint64_t b_attacks = getAttacks(*board, false);
+		if ((board->castling & W_KS_CASTLING) == W_KS_CASTLING && (occupied & 0x6) == 0) {
+			if ((b_attacks & 0xE) == 0) {
 				*(moves++) = encodeCastlingMove(3, 1);
 			}
-		}
-		if ((board->castling & W_QS_CASTLING) == 2 && (occupied & 0x70) == 0) {
-			// Quenside castling is allowed and b1, c1, d1 are empty
-			if ((b_attacks & 0x30) == 0) {
+		} 
+		if ((board->castling & W_QS_CASTLING) == W_QS_CASTLING && (occupied & 0x70) == 0) {
+			if ((b_attacks & 0x38) == 0) {
 				*(moves++) = encodeCastlingMove(3, 5);
 			}
 		}
-	} else if (board->turn == BLACK && (w_attacks & 1ull << 59) == 0) {
-		if ((board->castling & B_KS_CASTLING) == 4 && (occupied & 0x0600000000000000) == 0) {
-			// Kingside castling is allowed and f8, g8 are empty
-			if ((w_attacks & 0x0600000000000000) == 0) {
+	} else if (board->turn == BLACK && ((board->castling & (B_KS_CASTLING | B_QS_CASTLING)) != 0)) {
+		uint64_t occupied = occupiedSquares(board);
+		uint64_t w_attacks = getAttacks(*board, true);
+		if ((board->castling & B_KS_CASTLING) == B_KS_CASTLING && (occupied & 0x0600000000000000) == 0) {
+			if ((w_attacks & 0x0E00000000000000) == 0) {
 				*(moves++) = encodeCastlingMove(59, 57);
 			}
 		}
-		if ((board->castling & B_QS_CASTLING) == 8 && (occupied & 0x7000000000000000) == 0) {
-			// Queenside castling is allowed and b8, c8, d8 are empty
-			if ((w_attacks & 0x3000000000000000) == 0) {
+	       	if ((board->castling & B_QS_CASTLING) == B_QS_CASTLING && (occupied & 0x7000000000000000) == 0) {
+			if ((w_attacks & 0x3800000000000000) == 0) {
 				*(moves++) = encodeCastlingMove(59, 61);
 			}
 		}
 	}
+	
 	return moves;
 }
 
