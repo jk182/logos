@@ -178,10 +178,8 @@ uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
 }
 
 
-uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
+uint16_t* generateBishopMoves(Board *board, uint16_t *moves, uint64_t friendly, uint64_t occupied)  {
 	int piece = board->turn ? W_BISHOP : B_BISHOP;
-	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
-	uint64_t occupied = occupiedSquares(board);
 	uint64_t bishopBB = board->pieces[piece];
 	uint64_t movesBB;
 	int square;
@@ -197,10 +195,8 @@ uint16_t* generateBishopMoves(Board *board, uint16_t *moves)  {
 }
 
 
-uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
+uint16_t* generateRookMoves(Board *board, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
 	int piece = board->turn ? W_ROOK : B_ROOK;
-	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
-	uint64_t occupied = occupiedSquares(board);
 	uint64_t rookBB = board->pieces[piece];
 	uint64_t movesBB;
 	uint16_t move;
@@ -224,10 +220,8 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint16_t* generateQueenMoves(Board *board, uint16_t *moves) {
+uint16_t* generateQueenMoves(Board *board, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
 	int piece = board->turn ? W_QUEEN : B_QUEEN;
-	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
-	uint64_t occupied = occupiedSquares(board);
 	uint64_t queenBB = board->pieces[piece];
 	uint64_t movesBB;
 	int square;
@@ -263,9 +257,8 @@ uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
+uint16_t* generateCastlingMoves(Board *board, uint16_t *moves, uint64_t occupied) {
 	if (board->turn == WHITE && ((board->castling & (W_KS_CASTLING | W_QS_CASTLING)) != 0)) {
-		uint64_t occupied = occupiedSquares(board);
 		uint64_t b_attacks = getAttacks(*board, false);
 		if ((board->castling & W_KS_CASTLING) == W_KS_CASTLING && (occupied & 0x6) == 0) {
 			if ((b_attacks & 0xE) == 0) {
@@ -278,7 +271,6 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 			}
 		}
 	} else if (board->turn == BLACK && ((board->castling & (B_KS_CASTLING | B_QS_CASTLING)) != 0)) {
-		uint64_t occupied = occupiedSquares(board);
 		uint64_t w_attacks = getAttacks(*board, true);
 		if ((board->castling & B_KS_CASTLING) == B_KS_CASTLING && (occupied & 0x0600000000000000) == 0) {
 			if ((w_attacks & 0x0E00000000000000) == 0) {
@@ -297,13 +289,15 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves) {
 
 
 uint16_t* generateAllMoves(Board board, uint16_t *moves) {
+	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
+	uint64_t occupied = occupiedSquares(&board);
 	moves = generatePawnMoves(&board, moves);
 	moves = generateKnightMoves(&board, moves);
-	moves = generateBishopMoves(&board, moves);
-	moves = generateRookMoves(&board, moves);
-	moves = generateQueenMoves(&board, moves);
+	moves = generateBishopMoves(&board, moves, friendly, occupied);
+	moves = generateRookMoves(&board, moves, friendly, occupied);
+	moves = generateQueenMoves(&board, moves, friendly, occupied);
 	moves = generateKingMoves(&board, moves);
-	moves = generateCastlingMoves(&board, moves);
+	moves = generateCastlingMoves(&board, moves, occupied);
 
 	return moves;
 }
@@ -339,8 +333,7 @@ int perft(int depth, Board *board) {
 	}
 	*/
 	int nodes = 0;
-	uint16_t moveArr[MAX_MOVES];
-	uint16_t *moves = moveArr;
+	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
 	Undo undo;
 	int limit = end-moves;

@@ -61,7 +61,8 @@ int popLSB(uint64_t *bb) {
 		return -1;
 	}
 	*/
-	assert(*bb);
+	// assert(*bb);
+	if (*bb == 0) return -1;
 	int index = __builtin_ctzll(*bb);
 	*bb &= *bb - 1;
 	return index;
