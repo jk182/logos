@@ -145,19 +145,16 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint16_t* generateKnightMoves(Board *board, uint16_t *moves) {
+uint16_t* generateKnightMoves(Board *board, uint16_t *moves, uint64_t friendly) {
 	int piece = board->turn ? W_KNIGHT : B_KNIGHT;
 	uint64_t knightBB = board->pieces[piece];
 	uint64_t movesBB;
 	int square;
-	uint64_t currKnight;
 	
 	while (knightBB) {
 		square = popLSB(&knightBB);
-		movesBB = KNIGHT_ATTACKS[square];
+		movesBB = KNIGHT_ATTACKS[square] & ~friendly;
 	
-		movesBB &= piece==W_KNIGHT ? ~whitePieces(board) : ~blackPieces(board);
-
 		while (movesBB) {
 			*(moves++) = encodeMove(square, popLSB(&movesBB));
 		}
@@ -240,15 +237,12 @@ uint16_t* generateQueenMoves(Board *board, uint16_t *moves, uint64_t friendly, u
 }
 
 
-uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
+uint16_t* generateKingMoves(Board *board, uint16_t *moves, uint64_t friendly) {
 	int piece = board->turn ? W_KING : B_KING;
 	uint64_t king = board->pieces[piece];
 	int square = popLSB(&king);
 	
-	uint64_t movesBB = KING_ATTACKS[square];
-
-	// Making sure that pieces of the same colour don't occupy the same square
-	movesBB &= piece==W_KING ? ~whitePieces(board) : ~blackPieces(board);
+	uint64_t movesBB = KING_ATTACKS[square] & ~friendly;
 
 	while (movesBB) {
 		*(moves++) = encodeMove(square, popLSB(&movesBB));
@@ -292,11 +286,11 @@ uint16_t* generateAllMoves(Board board, uint16_t *moves) {
 	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
 	uint64_t occupied = occupiedSquares(&board);
 	moves = generatePawnMoves(&board, moves);
-	moves = generateKnightMoves(&board, moves);
+	moves = generateKnightMoves(&board, moves, friendly);
 	moves = generateBishopMoves(&board, moves, friendly, occupied);
 	moves = generateRookMoves(&board, moves, friendly, occupied);
 	moves = generateQueenMoves(&board, moves, friendly, occupied);
-	moves = generateKingMoves(&board, moves);
+	moves = generateKingMoves(&board, moves, friendly);
 	moves = generateCastlingMoves(&board, moves, occupied);
 
 	return moves;

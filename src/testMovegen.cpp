@@ -87,5 +87,5 @@ void testMovegen() {
 	openings();
 	pawnEndings();
 	promotions();
-	std::cout << "All test completed!" << "\n";
+	std::cout << "All tests completed!" << "\n";
 }
