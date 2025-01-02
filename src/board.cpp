@@ -261,3 +261,9 @@ bool isCheckmate(Board *board) {
 bool isGameOver(Board *board) {
 	return isDraw(board) || isCheckmate(board);
 }
+
+
+bool isLegalMove(Board board, uint16_t move) {
+	makeMove(&board, move);
+	return isLegalPosition(&board);
+}

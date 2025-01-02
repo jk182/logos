@@ -9,7 +9,7 @@
 Magic BISHOP_TABLES[64];
 Magic ROOK_TABLES[64];
 
-uint64_t slidingAttacks(Board *board, bool turn, int square, uint64_t mask) {
+uint64_t slidingAttacks(Board *board, int square, uint64_t mask) {
 	uint64_t pieceBB = 1ull << square;
 	uint64_t attacks;
 	uint64_t negative;

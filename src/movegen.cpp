@@ -167,7 +167,7 @@ uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
 	uint64_t movesBB;
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
 
-	movesBB = slidingAttacks(board, board->turn, piece, mask);
+	movesBB = slidingAttacks(board, piece, mask);
 
 	movesBB &= ~friendly;
 	return movesBB;

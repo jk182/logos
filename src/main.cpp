@@ -45,12 +45,13 @@ int main() {
 	*/
 	// generateAllMagics();
 	// testMagics();
-	testMovegen();
+	// testMovegen();
 	
-	// Board b;
+	Board b;
 	// clearBoard(&b);
-	// boardFromFEN(&b, "6k1/p1p2pp1/2pq4/R2b4/7p/P1Q2P1P/6r1/5RK1 w - - 0 27");
-	// printMove(findBestMove(&b, 5));
+	boardFromFEN(&b, "6k1/p4pp1/P1p1p1p1/3p4/8/3Qn3/2P2qPP/1N1K4 w - - 1 25");
+	printBoard(&b);
+	printMove(findBestMove(&b, 5));
 	// std::cout << alphaBeta(&b, 7, INT_MIN, INT_MAX) << "\n";
 	// boardFromFEN(&b, "2rq1rk1/3nb1pp/p1ppbn2/1p2pp2/2P2P2/1PNPP1P1/PB1QN1BP/R4R1K b - - 1 13");
 	// std::cout << alphaBeta(&b, 7, INT_MIN, INT_MAX) << "\n";

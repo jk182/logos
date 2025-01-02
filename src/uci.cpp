@@ -32,6 +32,19 @@ int main() {
 			changePosition(command, &board);
 		} else if (command.starts_with("go")) {
 			uint16_t move = searchPosition(command, &board);
+			if (! isLegalMove(board, move)) {
+				std::cerr << "Illegal move: ";
+				printMove(move);
+				uint16_t *moves = new uint16_t[MAX_MOVES];
+				uint16_t *end = generateAllMoves(board, moves);
+				int limit = end-moves;
+				for (int i = 0; i < limit; i++) {
+					move = *(moves+i);
+					if (isLegalMove(board, move)) {
+						break;
+					}
+				}
+			} 
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		}
 	}
