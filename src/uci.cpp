@@ -67,7 +67,7 @@ void changePosition(std::string command, Board* board) {
 
 
 uint16_t searchPosition(std::string command, Board* board) {
-	std::size_t space = command.find(" ");
+	// std::size_t space = command.find(" ");
 	int depth = 5;
 	return findBestMove(board, depth);
 }

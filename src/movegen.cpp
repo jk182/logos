@@ -17,7 +17,6 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 	uint64_t movesBB;
 	uint64_t pawnBB;
 	int endSquare;
-	uint16_t move;
 	uint64_t epBB;
 	int epSquare = board->epSquare;
 

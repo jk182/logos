@@ -26,8 +26,21 @@ uint64_t* makeLookupTable(uint64_t magic, uint64_t direction1, uint64_t directio
 	uint64_t *subsets = enumerateSubsets((direction1 ^ direction2) & ~edges, indexBits);
 	uint64_t index;
 	uint64_t attacks;
-	uint64_t blockers;
+	uint64_t blockers = 0;
 
+	/*
+	while ((blockers = *(subsets++))) {
+		blockers = (blockers | edges) & (direction1 ^ direction2);
+		index = (blockers*magic) >> (64-indexBits);
+		attacks = slidingAttacks(blockers, square, direction1);
+		attacks |= slidingAttacks(blockers, square, direction2);
+		if (table[index] == 0) {
+			table[index] = attacks;
+		} else if (table[index] != attacks) {
+			return nullptr;
+		}
+	}
+	*/
 	do {
 		blockers = (blockers | edges) & (direction1 ^ direction2);
 		index = (blockers*magic) >> (64-indexBits);
