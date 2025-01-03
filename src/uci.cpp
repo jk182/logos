@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <string.h>
+#include <vector>
 
 
 int main() {
@@ -32,19 +33,6 @@ int main() {
 			changePosition(command, &board);
 		} else if (command.starts_with("go")) {
 			uint16_t move = searchPosition(command, &board);
-			if (! isLegalMove(board, move)) {
-				std::cerr << "Illegal move: ";
-				printMove(move);
-				uint16_t *moves = new uint16_t[MAX_MOVES];
-				uint16_t *end = generateAllMoves(board, moves);
-				int limit = end-moves;
-				for (int i = 0; i < limit; i++) {
-					move = *(moves+i);
-					if (isLegalMove(board, move)) {
-						break;
-					}
-				}
-			} 
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		}
 	}
@@ -80,7 +68,46 @@ void changePosition(std::string command, Board* board) {
 
 
 uint16_t searchPosition(std::string command, Board* board) {
-	// std::size_t space = command.find(" ");
-	int depth = 5;
-	return findBestMove(board, depth);
+	int depth = -1;
+	int time = -1;
+	std::stringstream stream(command);
+	std::string c;
+	std::vector<std::string> vec;
+	while (stream >> c) {
+		vec.push_back(c);
+	}
+	for (int i = 0; i < vec.size(); i++) {
+		if (vec[i] == "depth") {
+			depth = std::stoi(vec[i+1]);
+		} else if ((vec[i] == "wtime" && board->turn) || (vec[i] == "btime" && !board->turn)) {
+			time = std::stoi(vec[i+1]);
+		}
+	}
+	if (depth < 0) {
+		if (time > 180000) {
+			depth = 5;
+		} else if (time > 60000) {
+			depth = 4;
+		} else if (time > 0) {
+			depth = 3;
+		} else {
+			depth = 5;
+		}
+	}
+		
+	uint16_t move = findBestMove(board, depth);
+	if (! isLegalMove(*board, move)) {
+		std::cerr << "Illegal move: ";
+		printMove(move);
+		uint16_t *moves = new uint16_t[MAX_MOVES];
+		uint16_t *end = generateAllMoves(*board, moves);
+		int limit = end-moves;
+		for (int i = 0; i < limit; i++) {
+			move = *(moves+i);
+			if (isLegalMove(*board, move)) {
+				break;
+			}
+		}
+	} 
+	return move;
 }

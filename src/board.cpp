@@ -264,6 +264,17 @@ bool isGameOver(Board *board) {
 
 
 bool isLegalMove(Board board, uint16_t move) {
-	makeMove(&board, move);
-	return isLegalPosition(&board);
+	uint16_t *moves = new uint16_t[MAX_MOVES];
+	uint16_t *end = generateAllMoves(board, moves);
+	for (int i = 0; i < end-moves; i++) {
+		if (move == *(moves+i)) {
+			makeMove(&board, move);
+			if (isLegalPosition(&board)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	return false;
 }
