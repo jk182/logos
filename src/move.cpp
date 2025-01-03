@@ -60,15 +60,15 @@ uint16_t encodeEPMove(int startSqIndex, int endSqIndex) {
 }
 
 
-uint16_t encodeUCIMove(Board *board, char *UCImove) {
+uint16_t encodeUCIMove(Board board, char *UCImove) {
 	int startSquare = getSquare(UCImove[0], UCImove[1]-'1');
 	int endSquare = getSquare(UCImove[2], UCImove[3]-'1');
 	if (startSquare == 3 && 
-			((endSquare == 1 && (board->castling & W_KS_CASTLING) == W_KS_CASTLING) || (endSquare == 5 && (board->castling & W_QS_CASTLING) == W_QS_CASTLING))) {
+			((endSquare == 1 && (board.castling & W_KS_CASTLING) == W_KS_CASTLING) || (endSquare == 5 && (board.castling & W_QS_CASTLING) == W_QS_CASTLING))) {
 		return encodeCastlingMove(startSquare, endSquare);
 	}
 	if (startSquare == 59 && 
-			((endSquare == 57 && (board->castling & B_KS_CASTLING) == B_KS_CASTLING) || (endSquare == 61 && (board->castling & B_QS_CASTLING) == B_QS_CASTLING))) {
+			((endSquare == 57 && (board.castling & B_KS_CASTLING) == B_KS_CASTLING) || (endSquare == 61 && (board.castling & B_QS_CASTLING) == B_QS_CASTLING))) {
 		return encodeCastlingMove(startSquare, endSquare);
 	}
 	if (strlen(UCImove) == 5) {

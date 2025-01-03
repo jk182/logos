@@ -32,7 +32,7 @@ int main() {
 		} else if (command.starts_with("position")) {
 			changePosition(command, &board);
 		} else if (command.starts_with("go")) {
-			uint16_t move = searchPosition(command, &board);
+			uint16_t move = searchPosition(command, board);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		} else if (command.starts_with("debug")) {
 			printBoard(&board);
@@ -62,14 +62,14 @@ void changePosition(std::string command, Board* board) {
 			if (s == "startpos" || s == "moves") {
 				continue;
 			}
-			move = encodeUCIMove(board, s.data());
+			move = encodeUCIMove(*board, s.data());
 			makeMove(board, move);
 		}
 	}
 }
 
 
-uint16_t searchPosition(std::string command, Board* board) {
+uint16_t searchPosition(std::string command, Board board) {
 	int depth = -1;
 	int time = -1;
 	std::stringstream stream(command);
@@ -81,7 +81,7 @@ uint16_t searchPosition(std::string command, Board* board) {
 	for (int i = 0; i < vec.size(); i++) {
 		if (vec[i] == "depth") {
 			depth = std::stoi(vec[i+1]);
-		} else if ((vec[i] == "wtime" && board->turn) || (vec[i] == "btime" && !board->turn)) {
+		} else if ((vec[i] == "wtime" && board.turn) || (vec[i] == "btime" && !board.turn)) {
 			time = std::stoi(vec[i+1]);
 		}
 	}
@@ -97,20 +97,20 @@ uint16_t searchPosition(std::string command, Board* board) {
 		}
 	}
 		
-	uint16_t move = findBestMove(board, depth);
-	if (! isLegalMove(*board, move)) {
-		printBoard(board);
+	uint16_t move = findBestMove(&board, depth);
+	if (! isLegalMove(board, move)) {
+		printBoard(&board);
 		printMove(move);
-		uint16_t newMove = findBestMove(board, depth-1);
-		if (isLegalMove(*board, newMove)) {
+		uint16_t newMove = findBestMove(&board, depth-1);
+		if (isLegalMove(board, newMove)) {
 			return newMove;
 		}
 		uint16_t *moves = new uint16_t[MAX_MOVES];
-		uint16_t *end = generateAllMoves(*board, moves);
+		uint16_t *end = generateAllMoves(board, moves);
 		int limit = end-moves;
 		for (int i = 0; i < limit; i++) {
 			move = *(moves+i);
-			if (isLegalMove(*board, move)) {
+			if (isLegalMove(board, move)) {
 				break;
 			}
 		}

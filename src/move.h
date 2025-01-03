@@ -36,7 +36,7 @@ uint16_t encodeMove(int startSqIndex, int endSqIndex);
 uint16_t encodeMove(int startSqIndex, int endSqIndex, int promotionPiece);
 uint16_t encodeCastlingMove(int startSqIndex, int endSqIndex);
 uint16_t encodeEPMove(int startSqInex, int endSqIndex);
-uint16_t encodeUCIMove(Board *board, char *UCImove);
+uint16_t encodeUCIMove(Board board, char *UCImove);
 char* decodeMoveToUCI(uint16_t move);
 bool isEnPassant(uint16_t move);
 bool isCapture(Board *board, uint16_t move);

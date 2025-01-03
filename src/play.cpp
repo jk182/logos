@@ -20,7 +20,7 @@ void playGame(Board *board, int depth) {
 		std::cout << "Enter your move:" << "\n";
 		std::cin >> UCIstr;
 		UCI = UCIstr.data();
-		userMove = encodeUCIMove(board, UCI);
+		userMove = encodeUCIMove(*board, UCI);
 		makeMove(board, userMove);
 		printMove(userMove);
 	}	
