@@ -84,9 +84,9 @@ uint16_t searchPosition(std::string command, Board* board) {
 		}
 	}
 	if (depth < 0) {
-		if (time > 180000) {
+		if (time > 90000) {
 			depth = 5;
-		} else if (time > 60000) {
+		} else if (time > 30000) {
 			depth = 4;
 		} else if (time > 0) {
 			depth = 3;
