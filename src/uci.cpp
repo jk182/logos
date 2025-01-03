@@ -34,6 +34,8 @@ int main() {
 		} else if (command.starts_with("go")) {
 			uint16_t move = searchPosition(command, &board);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
+		} else if (command.starts_with("debug")) {
+			printBoard(&board);
 		}
 	}
 	return 0;
