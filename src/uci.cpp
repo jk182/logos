@@ -99,6 +99,10 @@ uint16_t searchPosition(std::string command, Board* board) {
 	if (! isLegalMove(*board, move)) {
 		printBoard(board);
 		printMove(move);
+		uint16_t newMove = findBestMove(board, depth-1);
+		if (isLegalMove(*board, newMove)) {
+			return newMove;
+		}
 		uint16_t *moves = new uint16_t[MAX_MOVES];
 		uint16_t *end = generateAllMoves(*board, moves);
 		int limit = end-moves;
