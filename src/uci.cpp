@@ -84,7 +84,7 @@ uint16_t searchPosition(std::string command, Board* board) {
 		}
 	}
 	if (depth < 0) {
-		if (time > 90000) {
+		if (time > 60000) {
 			depth = 5;
 		} else if (time > 30000) {
 			depth = 4;
@@ -97,7 +97,7 @@ uint16_t searchPosition(std::string command, Board* board) {
 		
 	uint16_t move = findBestMove(board, depth);
 	if (! isLegalMove(*board, move)) {
-		std::cerr << "Illegal move: ";
+		printBoard(board);
 		printMove(move);
 		uint16_t *moves = new uint16_t[MAX_MOVES];
 		uint16_t *end = generateAllMoves(*board, moves);
