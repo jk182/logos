@@ -85,11 +85,12 @@ uint16_t searchPosition(std::string command, Board board) {
 	while (stream >> c) {
 		vec.push_back(c);
 	}
-	for (std::size_t i = 0; i < vec.size(); i++) {
-		if (vec[i] == "depth") {
-			depth = std::stoi(vec[i+1]);
-		} else if ((vec[i] == "wtime" && board.turn) || (vec[i] == "btime" && !board.turn)) {
-			time = std::stoi(vec[i+1]);
+	for (std::size_t word = 0; word < vec.size(); word++) {
+		if (vec[word] == "depth") {
+			depth = std::stoi(vec[word+1]);
+		} 
+		if ((vec[word] == "wtime" && board.turn == WHITE) || (vec[word] == "btime" && board.turn == BLACK)) {
+			time = std::stoi(vec[word+1]);
 		}
 	}
 	if (depth < 0) {
@@ -104,9 +105,7 @@ uint16_t searchPosition(std::string command, Board board) {
 		}
 	}
 		
-	std::cout << depth << "\n";
 	uint16_t move = findBestMove(&board, depth);
-	printMove(move);
 	if (! isLegalMove(board, move)) {
 		printBoard(&board);
 		std::cout << "ILLEGAL MOVE!\n";
@@ -124,6 +123,5 @@ uint16_t searchPosition(std::string command, Board board) {
 			}
 		}
 	} 
-	std::cout << "TEST\n";
 	return move;
 }

@@ -39,13 +39,14 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
 	int limit = endMove-moves;
-	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
+	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	Undo undo;
 	int score;
 
 	for (int i = 0; i < limit; i++) {
-		move = *(orderedMoves+i);
+		// move = *(orderedMoves+i);
+		move = *(moves+i);
 		if (isCapture(board, move)) {
 			undo = generateUndo(board, move);
 			makeMove(board, move);
