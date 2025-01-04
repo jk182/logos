@@ -271,6 +271,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 	uint64_t startBB = 1ull << startSquare;
 	uint64_t endBB = 1ull << endSquare;
 	int piece;
+	int capturedPiece = undo->capturedPiece;
 	bool turn = board->turn;
 
 	board->turn = !turn;
@@ -282,8 +283,8 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		piece = board->turn ? W_PAWN : B_PAWN;
 		board->pieces[piece] ^= startBB;
 		board->pieces[piece+getPromotionPiece(move)] ^= endBB;
-		if (undo->capturedPiece >= 0) {
-			board->pieces[undo->capturedPiece] ^= endBB;
+		if (capturedPiece >= 0) {
+			board->pieces[capturedPiece] ^= endBB;
 		}
 		return;
 	}
@@ -301,8 +302,8 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		}
 		piece = getPieceAtSquare(board, endSquare);
 		board->pieces[piece] ^= startBB ^ endBB;
-		if (undo->capturedPiece > -1) {
-			board->pieces[undo->capturedPiece] ^= endBB;
+		if (capturedPiece > -1) {
+			board->pieces[capturedPiece] ^= endBB;
 		}
 	} else {
 		if (endSquare == 1) {

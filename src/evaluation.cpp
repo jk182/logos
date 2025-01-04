@@ -80,23 +80,20 @@ const int *PIECE_OFFSETS[6] = {
 
 int countMaterial(Board *board) {
 	int material = 0;
-	int currMaterial;
 	uint64_t bb;
 	int square;
 	
 	for (int p = 0; p < PIECES; p++) {
-		currMaterial = 0;
 		bb = board->pieces[p];
 		square = popLSB(&bb);
 		while (square >= 0) {
 		       	if (p <= W_KING) {
-				currMaterial += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
+				material += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
 			} else {
-				currMaterial -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
+				material -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
 			}
 			square = popLSB(&bb);
 		}
-		material += currMaterial;
 	}
 	return material;
 }
@@ -113,6 +110,5 @@ int evaluate(Board *board) {
 			return MATE_SCORE;
 		}
 	}
-	int material = countMaterial(board);
-	return material;
+	return countMaterial(board);
 }

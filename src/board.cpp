@@ -190,14 +190,12 @@ bool isLegalPosition(Board *board) {
 
 
 int getPieceAtSquare(Board *board, int square) {
-	int piece = -1;
 	for (int p = 0; p < 12; p++) {
 		if (testBit(board->pieces[p], square)) {
-			piece = p;
-			return piece;
+			return p;
 		}
 	}
-	return piece;
+	return -1;
 }
 
 
@@ -239,7 +237,7 @@ bool isCheckmate(Board *board) {
 		return false;
 	}
 
-	uint16_t moves[128];
+	uint16_t moves[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
 	uint16_t move;
 	Undo undo;

@@ -20,9 +20,12 @@ int main() {
 	testMovegen();
 	
 	// Board b;
-	// boardFromFEN(&b, "2k4r/1pprb1q1/3p4/p2P1Q2/8/2N4p/PPP1BPPP/R4RK1 w - - 0 22");
+ 	// boardFromFEN(&b, "rnb1k1nr/pppp2pp/3q4/8/1b6/P3PN2/1PPB1PPP/RN1QKB1R b KQkq - 0 8");
 	// printBoard(&b);
 	// printMove(findBestMove(&b, 4));
-	// printMove(findBestMove(&b, 5));
+	// uint16_t move = findBestMove(&b, 6);
+	// printMove(move);
+	// makeMove(&b, move);
+	// printMove(findBestMove(&b, 4));
 	return 0;
 }

@@ -18,7 +18,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		// printBoard(board);
 		return alphaBeta(board, 1, alpha, beta);
 	}
-	/*
+
 	int standingPat = evaluate(board);
 	if (board->turn == WHITE) {
 		if (standingPat >= beta) {
@@ -35,7 +35,6 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 			beta = standingPat;
 		}
 	}
-	*/
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
 	int limit = endMove-moves;
@@ -79,7 +78,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 
 int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	if (depth <= 0) {
-		return qsearch(board, 1, alpha, beta);
+		return qsearch(board, 2, alpha, beta);
 	}
 	if (isGameOver(board)) {
 		return evaluate(board);
@@ -159,15 +158,6 @@ uint16_t findBestMove(Board *board, int depth) {
 	Undo undo;
 
 	for (int i = 0; i < limit; i++) {
-		/*
-		if (i == 0) {
-			if (side == WHITE) {
-				bestValue = -10000000;
-			} else {
-				bestValue = 10000000;
-			}
-		}
-		*/
 		move = *(moves+i);
 		undo = generateUndo(board, move);
 		// printMove(move);
@@ -179,12 +169,6 @@ uint16_t findBestMove(Board *board, int depth) {
 				bestMove = move;
 				bestValue = value;
 			}
-			/*
-			if (i == 0) {
-				bestValue = value;
-				bestMove = move;
-			}
-			*/
 			if (side == WHITE && value > bestValue) {
 				bestValue = value;
 				bestMove = move;
