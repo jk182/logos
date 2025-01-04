@@ -78,7 +78,7 @@ uint16_t searchPosition(std::string command, Board board) {
 	while (stream >> c) {
 		vec.push_back(c);
 	}
-	for (int i = 0; i < vec.size(); i++) {
+	for (std::size_t i = 0; i < vec.size(); i++) {
 		if (vec[i] == "depth") {
 			depth = std::stoi(vec[i+1]);
 		} else if ((vec[i] == "wtime" && board.turn) || (vec[i] == "btime" && !board.turn)) {

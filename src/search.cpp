@@ -11,15 +11,15 @@
 
 
 int qsearch(Board *board, int depth, int alpha, int beta) {
-	if (depth <= 0) {
+	if (depth <= 0 || isGameOver(board)) {
 		return evaluate(board);
 	}
 	if (isCheck(board)) {
 		// printBoard(board);
 		return alphaBeta(board, 1, alpha, beta);
 	}
+	/*
 	int standingPat = evaluate(board);
-
 	if (board->turn == WHITE) {
 		if (standingPat >= beta) {
 			return beta;
@@ -35,15 +35,16 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 			beta = standingPat;
 		}
 	}
-
+	*/
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
+	uint16_t *orderedMoves = moveOrdering(board, moves);
 	uint16_t move;
 	Undo undo;
 	int score;
 
 	for (int i = 0; i < endMove-moves; i++) {
-		move = *(moves+i);
+		move = *(orderedMoves+i);
 		if (isCapture(board, move)) {
 			undo = generateUndo(board, move);
 			makeMove(board, move);
@@ -76,7 +77,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 
 int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	if (depth <= 0) {
-		return qsearch(board, 0, alpha, beta);
+		return qsearch(board, 1, alpha, beta);
 	}
 	if (isGameOver(board)) {
 		return evaluate(board);
