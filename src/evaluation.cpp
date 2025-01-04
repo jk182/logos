@@ -1,5 +1,6 @@
 #include "bitboard.h"
 #include "board.h"
+#include "evaluation.h"
 #include "types.h"
 
 #include <iostream>
@@ -107,9 +108,9 @@ int evaluate(Board *board) {
 	}
 	if (isCheckmate(board)) {
 		if (board->turn) {
-			return -100000;
+			return -MATE_SCORE;
 		} else {
-			return 100000;
+			return MATE_SCORE;
 		}
 	}
 	int material = countMaterial(board);

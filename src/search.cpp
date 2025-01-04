@@ -38,12 +38,13 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 	*/
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
-	uint16_t *orderedMoves = moveOrdering(board, moves);
+	int limit = endMove-moves;
+	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	Undo undo;
 	int score;
 
-	for (int i = 0; i < endMove-moves; i++) {
+	for (int i = 0; i < limit; i++) {
 		move = *(orderedMoves+i);
 		if (isCapture(board, move)) {
 			undo = generateUndo(board, move);
@@ -85,14 +86,16 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
-	uint16_t *orderedMoves = moveOrdering(board, moves);
+	int limit = end-moves;
+	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	Undo undo;
 
 	if (board->turn == WHITE) {
-		value = INT_MIN;
-		for (int i = 0; i < end-moves; i++) {
-			move = *(orderedMoves+i);
+		value = -MATE_SCORE;
+		for (int i = 0; i < limit; i++) {
+			// move = *(orderedMoves+i);
+			move = *(moves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
 			if (isLegalPosition(board)) {
@@ -107,9 +110,10 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			}
 		}
 	} else {
-		value = INT_MAX;
-		for (int i = 0; i < end-moves; i++) {
-			move = *(orderedMoves+i);
+		value = MATE_SCORE;
+		for (int i = 0; i < limit; i++) {
+			// move = *(orderedMoves+i);
+			move = *(moves+i);
 			undo = generateUndo(board, move);
 			makeMove(board, move);
 			if (isLegalPosition(board)) {
@@ -134,45 +138,52 @@ int iterativeDeepening(Board *board, int depth) {
 	}
 	int score;
 	for (int d = 0; d <= depth; d++) {
-		score = alphaBeta(board, d, INT_MIN, INT_MAX);
+		score = alphaBeta(board, d, -MATE_SCORE, MATE_SCORE);
 	}
 	return score;
 }
 
 
 uint16_t findBestMove(Board *board, int depth) {
-	uint16_t bestMove;
+	uint16_t bestMove = NULL_MOVE;
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
-	uint16_t *orderedMoves = moveOrdering(board, moves);
+	int limit = end-moves;
+	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	bool side = board->turn;
 	int value;
 	int bestValue;
 	Undo undo;
 
-	for (int i = 0; i < end-moves; i++) {
+	for (int i = 0; i < limit; i++) {
+		/*
 		if (i == 0) {
 			if (side == WHITE) {
 				bestValue = -10000000;
 			} else {
 				bestValue = 10000000;
 			}
-			bestMove = NULL_MOVE;
 		}
-		move = *(orderedMoves+i);
+		*/
+		move = *(moves+i);
 		undo = generateUndo(board, move);
+		// printMove(move);
 		makeMove(board, move);
 		if (isLegalPosition(board)) {
-			value = alphaBeta(board, depth-1, INT_MIN, INT_MAX);
+			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
+			// std::cout << value << " " << bestValue << "\n";
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
+				bestValue = value;
 			}
+			/*
 			if (i == 0) {
 				bestValue = value;
 				bestMove = move;
 			}
+			*/
 			if (side == WHITE && value > bestValue) {
 				bestValue = value;
 				bestMove = move;
@@ -183,5 +194,6 @@ uint16_t findBestMove(Board *board, int depth) {
 		}
 		unmakeMove(board, move, &undo);
 	}
+	std::cout << bestValue << "\n";
 	return bestMove;
 }

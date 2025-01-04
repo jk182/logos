@@ -8,6 +8,10 @@
 
 
 void printMove(uint16_t move) {
+	if (move == NULL_MOVE) {
+		std::cout << "0000\n";
+		return;
+	}
 	char* startSquare = getSquareName(move & 0x3F);
 	char* endSquare = getSquareName((move & 0xFC0) >> 6);
 	int promPiece = (move & 0x7000) >> 12;

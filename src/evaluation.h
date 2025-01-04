@@ -10,4 +10,8 @@ enum {
 	QUEEN_VALUE = 900
 };
 
+enum {
+	MATE_SCORE = 100000
+};
+
 int evaluate(Board *board);

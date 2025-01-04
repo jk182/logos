@@ -296,21 +296,22 @@ uint16_t* generateAllMoves(Board board, uint16_t *moves) {
 }
 
 
-uint16_t* moveOrdering(Board *board, uint16_t *moves) {
-	uint16_t *orderedMoves = new uint16_t[MAX_MOVES];
+uint16_t* moveOrdering(Board *board, uint16_t *moves, int limit) {
+	uint16_t *orderedMoves = new uint16_t[limit];
 	int index = 0;
-	int moveIndex = 0;
+	uint16_t move;
 
-	while (uint16_t move = *(moves+moveIndex)) {
-		*(orderedMoves+moveIndex) = move;
+	for (int i = 0; i < limit; i++) {
+		move = *(moves+i);
 		if (isCapture(board, move)) {
 			if ((getPieceAtSquare(board, getStartSquare(move)) % 6) < (getPieceAtSquare(board, getEndSquare(move)) % 6)) {
 				*(orderedMoves+index) = move;
-				*(orderedMoves+moveIndex) = *(moves+index);
+				*(orderedMoves+i) = *(moves+index);
 				index++;
 			}
+		} else {
+			*(orderedMoves+i) = move;
 		}
-		moveIndex++;
 	}
 	return orderedMoves;
 }

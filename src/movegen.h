@@ -10,5 +10,5 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves);
 uint16_t* generateQueenMoves(Board *board, uint16_t *moves);
 uint16_t* generateKingMoves(Board *board, uint16_t *moves);
 uint16_t* generateAllMoves(Board board, uint16_t *moves);
-uint16_t* moveOrdering(Board *board, uint16_t *moves);
+uint16_t* moveOrdering(Board *board, uint16_t *moves, int limit);
 int perft(int depth, Board *board);
