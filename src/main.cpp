@@ -17,14 +17,14 @@ int main() {
 	initSlidingAttacks();
 	// generateAllMagics();
 	// testMagics();
-	testMovegen();
+	// testMovegen();
 	
-	// Board b;
- 	// boardFromFEN(&b, "rnb1k1nr/pppp2pp/3q4/8/1b6/P3PN2/1PPB1PPP/RN1QKB1R b KQkq - 0 8");
+	Board b;
+ 	boardFromFEN(&b, "r1bqk2r/pppp2pp/2n2n2/1Nb5/5B2/8/PPP1PPPP/R2QKBNR b KQkq - 5 6");
 	// printBoard(&b);
 	// printMove(findBestMove(&b, 4));
-	// uint16_t move = findBestMove(&b, 6);
-	// printMove(move);
+	uint16_t move = findBestMove(&b, 5);
+	printMove(move);
 	// makeMove(&b, move);
 	// printMove(findBestMove(&b, 4));
 	return 0;

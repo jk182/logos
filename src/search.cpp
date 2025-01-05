@@ -78,7 +78,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 
 int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	if (depth <= 0) {
-		return qsearch(board, 2, alpha, beta);
+		return qsearch(board, 1, alpha, beta);
 	}
 	if (isGameOver(board)) {
 		return evaluate(board);
