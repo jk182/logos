@@ -220,9 +220,33 @@ bool isInsufficientMaterial(Board *board) {
 }
 
 
+bool isStalemate(Board *board) {
+	if (isCheck(board)) {
+		return false;
+	}
+
+	uint16_t moves[MAX_MOVES];
+	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t move;
+	Undo undo;
+
+	for (int i = 0; i < end-moves; i++) {
+		move = *(moves+i);
+		undo = generateUndo(board, move);
+		makeMove(board, move);
+		if (isLegalPosition(board)) {
+			unmakeMove(board, move, &undo);
+			return false;
+		}
+		unmakeMove(board, move, &undo);
+	}
+	return true;
+}
+
+
 bool isDraw(Board *board) {
 	// TODO: add three-fold repetition
-	return (board->halfMoveCounter >= 50) || isInsufficientMaterial(board);
+	return (board->halfMoveCounter >= 50) || isInsufficientMaterial(board) || isStalemate(board);
 }
 
 
