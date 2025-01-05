@@ -81,6 +81,10 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		return qsearch(board, 1, alpha, beta);
 	}
 	if (isGameOver(board)) {
+		if (isCheckmate(board)) {
+			int factor = board->turn ? 1 : -1;
+			return evaluate(board)-depth*factor;
+		}
 		return evaluate(board);
 	}
 	int value;
@@ -153,6 +157,7 @@ uint16_t findBestMove(Board *board, int depth) {
 	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	bool side = board->turn;
+	int factor = side==WHITE ? 1 : -1;
 	int value;
 	int bestValue;
 	Undo undo;
@@ -170,12 +175,14 @@ uint16_t findBestMove(Board *board, int depth) {
 				bestMove = move;
 				bestValue = value;
 			}
-			if (side == WHITE && value > bestValue) {
+			if (value * factor > bestValue * factor) {
 				bestValue = value;
 				bestMove = move;
-			} else if (side == BLACK && value < bestValue) {
-				bestValue = value;
-				bestMove = move;
+			} else if (value == bestValue) {
+				int random = std::rand() % 2;
+				if (random == 0) {
+					bestMove = move;
+				}
 			}
 		}
 		unmakeMove(board, move, &undo);
