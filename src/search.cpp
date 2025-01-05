@@ -80,12 +80,12 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	if (depth <= 0) {
 		return qsearch(board, 1, alpha, beta);
 	}
-	if (isGameOver(board)) {
-		if (isCheckmate(board)) {
-			int factor = board->turn ? 1 : -1;
-			return evaluate(board)-depth*factor;
-		}
-		return evaluate(board);
+	if (isCheckmate(board)) {
+		int factor = board->turn ? 1 : -1;
+		return evaluate(board)-depth*factor;
+	}
+	if (isDraw(board)) {
+		return 0;
 	}
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -179,9 +179,28 @@ uint16_t findBestMove(Board *board, int depth) {
 				bestValue = value;
 				bestMove = move;
 			} else if (value == bestValue) {
+				if (isCheck(board)) {
+					int random = std::rand() % 5;
+					if (random < 3) {
+						bestMove = move;
+					}
+				} else {
+					int random = std::rand() % 2;
+					if (random == 0) {
+						bestMove = move;
+					}
+				}
+			} else if (value*factor > 1000) {
 				int random = std::rand() % 2;
 				if (random == 0) {
 					bestMove = move;
+					bestValue = value;
+				}
+			} else if (value*factor > 500) {
+				int random = std::rand() % 3;
+				if (random == 0) {
+					bestMove = move;
+					bestValue = value;
 				}
 			}
 		}
