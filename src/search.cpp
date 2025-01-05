@@ -15,7 +15,6 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		return evaluate(board);
 	}
 	if (isCheck(board)) {
-		// printBoard(board);
 		return alphaBeta(board, 1, alpha, beta);
 	}
 
@@ -72,7 +71,8 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 			}
 		}
 	}
-	return board->turn!=WHITE ? alpha : beta;
+	return standingPat;
+	// return board->turn!=WHITE ? alpha : beta;
 }
 
 
@@ -164,6 +164,7 @@ uint16_t findBestMove(Board *board, int depth) {
 		makeMove(board, move);
 		if (isLegalPosition(board)) {
 			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
+			// printBoard(board);
 			// std::cout << value << " " << bestValue << "\n";
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
