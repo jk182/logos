@@ -68,11 +68,11 @@ void changePosition(std::string command, Board* board) {
 				continue;
 			}
 			move = encodeUCIMove(*board, s.data());
-			std::cout << s.data() << "\n";
+			// std::cout << s.data() << "\n";
 			makeMove(board, move);
 		}
 	}
-	printBoard(board);
+	// printBoard(board);
 }
 
 

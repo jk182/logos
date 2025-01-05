@@ -93,6 +93,10 @@ uint16_t encodeUCIMove(Board board, char *UCImove) {
 		}
 		return encodeMove(startSquare, endSquare, promPiece);
 	}
+	int pawn = board.turn ? W_PAWN : B_PAWN;
+	if (board.epSquare == endSquare && getPieceAtSquare(&board, startSquare) == pawn) {
+		return encodeEPMove(startSquare, endSquare);
+	}
 	return encodeMove(startSquare, endSquare);
 }
 
