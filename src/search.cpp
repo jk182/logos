@@ -190,13 +190,13 @@ uint16_t findBestMove(Board *board, int depth) {
 						bestMove = move;
 					}
 				}
-			} else if (value*factor > 1000) {
+			} else if (value*factor > 1000 && bestValue*factor <= MATE_SCORE) {
 				int random = std::rand() % 2;
 				if (random == 0) {
 					bestMove = move;
 					bestValue = value;
 				}
-			} else if (value*factor > 500) {
+			} else if (value*factor > 500 && bestValue*factor < MATE_SCORE) {
 				int random = std::rand() % 3;
 				if (random == 0) {
 					bestMove = move;
