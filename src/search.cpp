@@ -162,6 +162,7 @@ uint16_t findBestMove(Board *board, int depth) {
 	int bestValue;
 	Undo undo;
 
+	int standingPat = evaluate(board);
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
 		undo = generateUndo(board, move);
@@ -179,7 +180,9 @@ uint16_t findBestMove(Board *board, int depth) {
 				bestValue = value;
 				bestMove = move;
 			} else if (value == bestValue) {
-				if (isCheck(board)) {
+				if (evaluate(board) > standingPat) {
+					bestMove = move;
+				} else if (isCheck(board)) {
 					int random = std::rand() % 5;
 					if (random < 3) {
 						bestMove = move;
