@@ -40,7 +40,7 @@ int main() {
 			history = new Board[256];
 			end = updateHistory(command, board, history);
 		} else if (command.starts_with("go")) {
-			uint16_t move = searchPosition(command, board, history, end-history);
+			uint16_t move = searchPosition(command, board, history, history-end);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		} else if (command.starts_with("debug")) {
 			printBoard(&board);
@@ -107,7 +107,7 @@ Board* updateHistory(std::string command, Board board, Board *history) {
 			index++;
 		}
 	}
-	return history;
+	return history-index;
 }
 
 

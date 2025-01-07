@@ -211,6 +211,7 @@ uint16_t findGameMove(Board *board, int depth, Board *history, int length) {
 		if (isLegalPosition(board)) {
 			for (int i = 0; i < length; i++) {
 				if (isSamePosition(board, history+i)) {
+					std::cout << "REPETITION!" << "\n";
 					value = 0;
 					repetition = true;
 				}
