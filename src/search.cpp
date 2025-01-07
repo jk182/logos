@@ -180,8 +180,10 @@ uint16_t findBestMove(Board *board, int depth) {
 				bestValue = value;
 				bestMove = move;
 			} else if (value == bestValue) {
-				if (evaluate(board) > standingPat) {
-					bestMove = move;
+				if (value*factor > 500) {
+					if (board->halfMoveCounter == 0 || evaluate(board)*factor > standingPat*factor) {
+						bestMove = move;
+					}
 				} else if (isCheck(board)) {
 					int random = std::rand() % 5;
 					if (random < 3) {

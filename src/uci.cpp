@@ -105,6 +105,7 @@ uint16_t searchPosition(std::string command, Board board) {
 		}
 	}
 		
+	std::cout << "Depth: " << depth << "\n";
 	uint16_t move = findBestMove(&board, depth);
 	if (! isLegalMove(board, move)) {
 		printBoard(&board);

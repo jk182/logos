@@ -38,3 +38,4 @@ bool isCheck(Board *board);
 bool isCheckmate(Board *board);
 bool isGameOver(Board *board);
 bool isLegalMove(Board board, uint16_t move);
+bool isSamePosition(Board *b1, Board *b2);

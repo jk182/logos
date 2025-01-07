@@ -304,3 +304,13 @@ bool isLegalMove(Board board, uint16_t move) {
 	}
 	return false;
 }
+
+
+bool isSamePosition(Board *b1, Board *b2) {
+	for (int i = 0; i < PIECES; i++) {
+		if (b1->pieces[i] != b2->pieces[i]) {
+			return false;
+		}
+	}
+	return b1->castling == b2->castling && b1->turn == b2->turn;
+}
