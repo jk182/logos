@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <limits.h>
 
 
@@ -154,7 +155,6 @@ uint16_t findBestMove(Board *board, int depth) {
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(*board, moves);
 	int limit = end-moves;
-	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	bool side = board->turn;
 	int factor = side==WHITE ? 1 : -1;
@@ -162,16 +162,62 @@ uint16_t findBestMove(Board *board, int depth) {
 	int bestValue;
 	Undo undo;
 
-	int standingPat = evaluate(board);
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
 		undo = generateUndo(board, move);
-		// printMove(move);
 		makeMove(board, move);
 		if (isLegalPosition(board)) {
 			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
-			// printBoard(board);
-			// std::cout << value << " " << bestValue << "\n";
+			if (bestMove == NULL_MOVE) {
+				bestMove = move;
+				bestValue = value;
+			}
+			if (value * factor > bestValue * factor) {
+				bestValue = value;
+				bestMove = move;
+			} else if (value == bestValue) {
+				int random = std::rand() % 2;
+				if (random == 0) {
+					bestMove = move;
+				}
+			}
+		}
+		unmakeMove(board, move, &undo);
+	}
+	return bestMove;
+}
+
+
+uint16_t findGameMove(Board *board, int depth, Board *history, int length) {
+	uint16_t bestMove = NULL_MOVE;
+
+	uint16_t *moves = new uint16_t[MAX_MOVES];
+	uint16_t *end = generateAllMoves(*board, moves);
+	int limit = end-moves;
+	uint16_t move;
+	bool side = board->turn;
+	int factor = side==WHITE ? 1 : -1;
+	int value;
+	int bestValue;
+	Undo undo;
+	bool repetition;
+
+	int standingPat = evaluate(board);
+	for (int i = 0; i < limit; i++) {
+		repetition = false;
+		move = *(moves+i);
+		undo = generateUndo(board, move);
+		makeMove(board, move);
+		if (isLegalPosition(board)) {
+			for (int i = 0; i < length; i++) {
+				if (isSamePosition(board, history+i)) {
+					value = 0;
+					repetition = true;
+				}
+			}
+			if (!repetition) {
+				value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
+			}
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
 				bestValue = value;

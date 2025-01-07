@@ -17,6 +17,9 @@ int main() {
 	clearBoard(&board);
 	boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
+	Board *history = new Board[256];
+	Board *end;
+
 	std::string command;
 	while (true) {
 		std::getline(std::cin, command);
@@ -34,8 +37,10 @@ int main() {
 			std::cout << "readyok\n";
 		} else if (command.starts_with("position")) {
 			changePosition(command, &board);
+			history = new Board[256];
+			end = updateHistory(command, board, history);
 		} else if (command.starts_with("go")) {
-			uint16_t move = searchPosition(command, board);
+			uint16_t move = searchPosition(command, board, history, end-history);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		} else if (command.starts_with("debug")) {
 			printBoard(&board);
@@ -68,15 +73,45 @@ void changePosition(std::string command, Board* board) {
 				continue;
 			}
 			move = encodeUCIMove(*board, s.data());
-			// std::cout << s.data() << "\n";
 			makeMove(board, move);
 		}
 	}
-	// printBoard(board);
 }
 
 
-uint16_t searchPosition(std::string command, Board board) {
+Board* updateHistory(std::string command, Board board, Board *history) {
+	// history = new Board[256];
+	std::size_t space = command.find(" ");
+	uint16_t move;
+	int index = 0;
+	if (space != std::string::npos) {
+		std::string token = command.substr(space+1);
+		if (token.starts_with("fen")) {
+			space = token.find(" ");
+			if (space != std::string::npos) {
+				boardFromFEN(&board, token.substr(space+1).c_str());
+			}
+		} else if (token.starts_with("startpos")) {
+			boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+		}
+		space = token.find(" ");
+		std::stringstream stream(token);
+		std::string s;
+		while (std::getline(stream, s, ' ')) {
+			if (s == "startpos" || s == "moves") {
+				continue;
+			}
+			move = encodeUCIMove(board, s.data());
+			makeMove(&board, move);
+			*(history+index) = board;
+			index++;
+		}
+	}
+	return history;
+}
+
+
+uint16_t searchPosition(std::string command, Board board, Board *history, int length) {
 	int depth = -1;
 	int time = -1;
 	std::stringstream stream(command);
@@ -106,11 +141,11 @@ uint16_t searchPosition(std::string command, Board board) {
 	}
 		
 	std::cout << "Depth: " << depth << "\n";
-	uint16_t move = findBestMove(&board, depth);
+	uint16_t move = findGameMove(&board, depth, history, length);
 	if (! isLegalMove(board, move)) {
 		printBoard(&board);
 		std::cout << "ILLEGAL MOVE!\n";
-		move = findBestMove(&board, depth-1);
+		move = findGameMove(&board, depth-1, history, length);
 		if (isLegalMove(board, move)) {
 			return move;
 		}
