@@ -17,7 +17,7 @@ int main() {
 	clearBoard(&board);
 	boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-	Board *history = new Board[256];
+	Board *history = new Board[512];
 	Board *end;
 
 	std::string command;
@@ -37,7 +37,7 @@ int main() {
 			std::cout << "readyok\n";
 		} else if (command.starts_with("position")) {
 			changePosition(command, &board);
-			history = new Board[256];
+			history = new Board[512];
 			end = updateHistory(command, board, history);
 		} else if (command.starts_with("go")) {
 			uint16_t move = searchPosition(command, board, history, history-end);
