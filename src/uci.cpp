@@ -40,7 +40,12 @@ int main() {
 			history = new Board[512];
 			end = updateHistory(command, board, history);
 		} else if (command.starts_with("go")) {
-			uint16_t move = searchPosition(command, board, history, history-end);
+			uint16_t move;
+			if (history-end < 90) {
+				move = searchPosition(command, board, history, history-end);
+			} else {
+				move = searchPosition(command, board, history, 0);
+			}
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		} else if (command.starts_with("debug")) {
 			printBoard(&board);
