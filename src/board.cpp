@@ -4,6 +4,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "types.h"
+#include "zobrist.h"
 
 #include <iostream>
 #include <stdint.h>
@@ -19,6 +20,10 @@ void clearBoard(Board *board) {
 	board->fullMoveCounter = 0;
 	board->epSquare = -1;
 	board->castling = 0;
+	board->hash = 0;
+	for (int i = 0; i < HISTORY_LENGTH; i++) {
+		board->history[i] = 0;
+	}
 }
 
 
@@ -81,12 +86,16 @@ void boardFromFEN(Board *board, const char *fen) {
 					break;
 			}
 			board->pieces[piece] |= 1ull << square;
+			board->hash ^= zobristKeys[piece][square];
 			square--;
 		}
 	}
 	// Side to move
 	token = strtok_r(NULL, " ", &strPos);
 	board->turn = token[0] == 'w' ? true : false;
+	if (! board->turn) {
+		board->hash ^= zobristTurnKey;
+	}
 
 	// Castling rights
 	token = strtok_r(NULL, " ", &strPos);
@@ -106,6 +115,7 @@ void boardFromFEN(Board *board, const char *fen) {
 				break;
 		}
 	}
+	board->hash ^= zobristCastlingKeys[board->castling];
 
 	// En passant square
 	token = strtok_r(NULL, " ", &strPos);
@@ -113,6 +123,7 @@ void boardFromFEN(Board *board, const char *fen) {
 		board->epSquare = -1;
 	} else {
 		board->epSquare = stringToSquare(token);
+		board->hash ^= zobristEpKeys[getFile(board->epSquare)];
 	}
 
 	// Half move counter

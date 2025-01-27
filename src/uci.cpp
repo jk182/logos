@@ -4,6 +4,7 @@
 #include "movegen.h"
 #include "search.h"
 #include "uci.h"
+#include "zobrist.h"
 
 #include <iostream>
 #include <sstream>
@@ -13,6 +14,8 @@
 
 int main() {
 	initSlidingAttacks();
+	initZobrist();
+
 	Board board;
 	clearBoard(&board);
 	boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");

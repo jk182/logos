@@ -16,6 +16,7 @@
 
 int main() {
 	initSlidingAttacks();
+	initZobrist();
 	// generateAllMagics();
 	// testMagics();
 	testMovegen();

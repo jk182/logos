@@ -5,7 +5,8 @@
 
 enum {
 	WHITE = true,
-	BLACK = false
+	BLACK = false,
+	HISTORY_LENGTH = 512
 };
 
 
@@ -16,6 +17,8 @@ struct Board {
 	int fullMoveCounter;
 	int epSquare;
 	uint16_t castling;
+	uint64_t hash;
+	uint64_t history[HISTORY_LENGTH];
 };
 
 struct Undo {
