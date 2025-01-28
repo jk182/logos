@@ -18,6 +18,7 @@ void clearBoard(Board *board) {
 	board->turn = true;
 	board->halfMoveCounter = 0;
 	board->fullMoveCounter = 0;
+	board->numMoves = 0;
 	board->epSquare = -1;
 	board->castling = 0;
 	board->hash = 0;
@@ -123,7 +124,7 @@ void boardFromFEN(Board *board, const char *fen) {
 		board->epSquare = -1;
 	} else {
 		board->epSquare = stringToSquare(token);
-		board->hash ^= zobristEpKeys[getFile(board->epSquare)];
+		board->hash ^= zobristEpKeys[board->epSquare % 8];
 	}
 
 	// Half move counter

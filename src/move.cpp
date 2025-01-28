@@ -2,6 +2,7 @@
 #include "board.h"
 #include "bitboard.h"
 #include "types.h"
+#include "zobrist.h"
 
 #include <iostream>
 #include <string.h>
@@ -137,9 +138,15 @@ bool isCastling(uint16_t move) {
 
 
 void makeMove(Board *board, uint16_t move) {
+	board->history[board->numMoves++] = board->hash;
 	if (! board->turn) {
 		board->fullMoveCounter++;
 	}
+
+	if (board->epSquare != -1) {
+		board->hash ^= zobristEpKeys[board->epSquare % 8];
+	}
+	board->hash ^= zobristTurnKey;
 
 	bool turn = board->turn;
 	board->turn = !turn;
@@ -164,6 +171,7 @@ void makeMove(Board *board, uint16_t move) {
 		} else {
 			board->pieces[W_PAWN] ^= (endBB << 8);
 		}
+		board->hash ^= zobristKeys[piece][startSquare] ^ zobristKeys[piece][endSquare];
 		return;
 	}
 
@@ -182,9 +190,11 @@ void makeMove(Board *board, uint16_t move) {
 			int mult = turn ? 1 : -1;
 			if (endSquare == startSquare+16*mult) {
 				board->epSquare = startSquare+8*mult;
+				board->hash ^= zobristEpKeys[board->epSquare % 8];
 			}
 		}
 		board->pieces[piece] ^= startBB;
+		board->hash ^= zobristKeys[piece][startSquare];
 		// Detecting captures
 		if (isCapture(board, move)) {
 			board->halfMoveCounter = 0;
@@ -192,77 +202,107 @@ void makeMove(Board *board, uint16_t move) {
 			board->pieces[capturedPiece] ^= endBB;
 
 			if (capturedPiece == W_ROOK) {
+				board->hash ^= zobristCastlingKeys[board->castling];
 				if (endSquare == 0) {
 					board->castling &= ~W_KS_CASTLING;
 				} else if (endSquare == 7) {
 					board->castling &= ~W_QS_CASTLING;
 				}
+				board->hash ^= zobristCastlingKeys[board->castling];
 			} else if (capturedPiece == B_ROOK) {
+				board->hash ^= zobristCastlingKeys[board->castling];
 				if (endSquare == 56) {
 					board->castling &= ~B_KS_CASTLING;
 				} else if (endSquare == 63) {
 					board->castling &= ~B_QS_CASTLING;
 				}
+				board->hash ^= zobristCastlingKeys[board->castling];
 			}
+			board->hash ^= zobristKeys[capturedPiece][endSquare];
 		}
 		if (moveIsPromotion(move)) {
 			board->halfMoveCounter = 0;
 			piece = turn ? W_PAWN : B_PAWN;
 			board->pieces[piece+getPromotionPiece(move)] ^= endBB;
+			board->hash ^= zobristKeys[piece+getPromotionPiece(move)][endSquare];
 			return;
 		}
 		board->pieces[piece] ^= endBB;
+		board->hash ^= zobristKeys[piece][endSquare];
 		// Handling castling rights
 		switch (piece) {
 			case W_KING:
+				board->hash ^= zobristCastlingKeys[board->castling];
 				board->castling &= (B_KS_CASTLING | B_QS_CASTLING);
+				board->hash ^= zobristCastlingKeys[board->castling];
 				break;
 			case B_KING:
+				board->hash ^= zobristCastlingKeys[board->castling];
 				board->castling &= (W_KS_CASTLING | W_QS_CASTLING);
+				board->hash ^= zobristCastlingKeys[board->castling];
 				break;
 			case W_ROOK:
 				if (startSquare == 0) {
+					board->hash ^= zobristCastlingKeys[board->castling];
 					board->castling &= ~W_KS_CASTLING;
+					board->hash ^= zobristCastlingKeys[board->castling];
 				} else if (startSquare == 7) {
+					board->hash ^= zobristCastlingKeys[board->castling];
 					board->castling &= ~W_QS_CASTLING;
+					board->hash ^= zobristCastlingKeys[board->castling];
 				}
 				break;
 			case B_ROOK:
 				if (startSquare == 56) {
+					board->hash ^= zobristCastlingKeys[board->castling];
 					board->castling &= ~B_KS_CASTLING;
+					board->hash ^= zobristCastlingKeys[board->castling];
 				} else if (startSquare == 63) {
+					board->hash ^= zobristCastlingKeys[board->castling];
 					board->castling &= ~B_QS_CASTLING;
+					board->hash ^= zobristCastlingKeys[board->castling];
 				}
 				break;
 		}
 		return;
 	} else {
+		board->hash ^= zobristCastlingKeys[board->castling];
 		if (endSquare == 1) {
 			board->castling &= (B_KS_CASTLING | B_QS_CASTLING);
 			// Castling kingside
 			board->pieces[W_KING] ^= 0x000000000000000A;
 			board->pieces[W_ROOK] ^= 0x0000000000000005;
+			board->hash ^= zobristKeys[W_KING][3] ^ zobristKeys[W_KING][1];
+			board->hash ^= zobristKeys[W_ROOK][0] ^ zobristKeys[W_ROOK][2];
 		} else if (endSquare == 5) {
 			board->castling &= (B_KS_CASTLING | B_QS_CASTLING);
 			// Castling queenside
 			board->pieces[W_KING] ^= 0x0000000000000028;
 			board->pieces[W_ROOK] ^= 0x0000000000000090;
+			board->hash ^= zobristKeys[W_KING][3] ^ zobristKeys[W_KING][5];
+			board->hash ^= zobristKeys[W_ROOK][7] ^ zobristKeys[W_ROOK][4];
 		} else if (endSquare == 57) {
 			board->castling &= (W_KS_CASTLING | W_QS_CASTLING);
 			// Castling kingside
 			board->pieces[B_KING] ^= 0x0A00000000000000;
 			board->pieces[B_ROOK] ^= 0x0500000000000000;
+			board->hash ^= zobristKeys[B_KING][59] ^ zobristKeys[B_KING][57];
+			board->hash ^= zobristKeys[B_ROOK][56] ^ zobristKeys[B_ROOK][58];
 		} else if (endSquare == 61) {
 			board->castling &= (W_KS_CASTLING | W_QS_CASTLING);
 			// Castling queenside
 			board->pieces[B_KING] ^= 0x2800000000000000;
 			board->pieces[B_ROOK] ^= 0x9000000000000000;
+			board->hash ^= zobristKeys[B_KING][59] ^ zobristKeys[B_KING][61];
+			board->hash ^= zobristKeys[B_ROOK][63] ^ zobristKeys[B_ROOK][60];
 		}
+		board->hash ^= zobristCastlingKeys[board->castling];
 	}
 }
 
 
 void unmakeMove(Board *board, uint16_t move, Undo *undo) {
+	board->numMoves--;
 	if (board->turn) {
 		board->fullMoveCounter--;
 	}
@@ -282,6 +322,8 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 	board->halfMoveCounter = undo->halfMoveCounter;
 	board->epSquare = isEnPassant(move) ? endSquare : -1;
 	board->castling = undo->castling;
+
+	board->hash = board->history[board->numMoves];
 	
 	if (moveIsPromotion(move)) {
 		piece = board->turn ? W_PAWN : B_PAWN;

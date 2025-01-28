@@ -15,6 +15,7 @@ struct Board {
 	bool turn;
 	int halfMoveCounter;
 	int fullMoveCounter;
+	int numMoves;
 	int epSquare;
 	uint16_t castling;
 	uint64_t hash;
