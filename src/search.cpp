@@ -36,7 +36,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		}
 	}
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *endMove = generateAllMoves(*board, moves); // TODO: generate only captures
+	uint16_t *endMove = generateAllMoves(board, moves); // TODO: generate only captures
 	int limit = endMove-moves;
 	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
@@ -90,7 +90,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 	}
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *end = generateAllMoves(board, moves);
 	int limit = end-moves;
 	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
@@ -153,7 +153,7 @@ uint16_t findBestMove(Board *board, int depth) {
 	uint16_t bestMove = NULL_MOVE;
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *end = generateAllMoves(board, moves);
 	int limit = end-moves;
 	uint16_t move;
 	bool side = board->turn;
@@ -192,7 +192,7 @@ uint16_t findGameMove(Board *board, int depth, Board *history, int length) {
 	uint16_t bestMove = NULL_MOVE;
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *end = generateAllMoves(board, moves);
 	int limit = end-moves;
 	uint16_t move;
 	bool side = board->turn;

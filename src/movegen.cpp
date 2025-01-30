@@ -281,16 +281,16 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves, uint64_t occupied
 }
 
 
-uint16_t* generateAllMoves(Board board, uint16_t *moves) {
-	uint64_t friendly = board.turn ? whitePieces(&board) : blackPieces(&board);
-	uint64_t occupied = occupiedSquares(&board);
-	moves = generatePawnMoves(&board, moves);
-	moves = generateKnightMoves(&board, moves, friendly);
-	moves = generateBishopMoves(&board, moves, friendly, occupied);
-	moves = generateRookMoves(&board, moves, friendly, occupied);
-	moves = generateQueenMoves(&board, moves, friendly, occupied);
-	moves = generateKingMoves(&board, moves, friendly);
-	moves = generateCastlingMoves(&board, moves, occupied);
+uint16_t* generateAllMoves(Board *board, uint16_t *moves) {
+	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t occupied = occupiedSquares(board);
+	moves = generatePawnMoves(board, moves);
+	moves = generateKnightMoves(board, moves, friendly);
+	moves = generateBishopMoves(board, moves, friendly, occupied);
+	moves = generateRookMoves(board, moves, friendly, occupied);
+	moves = generateQueenMoves(board, moves, friendly, occupied);
+	moves = generateKingMoves(board, moves, friendly);
+	moves = generateCastlingMoves(board, moves, occupied);
 
 	return moves;
 }
@@ -325,7 +325,7 @@ int perft(int depth, Board *board) {
 	*/
 	int nodes = 0;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *end = generateAllMoves(board, moves);
 	Undo undo;
 	int limit = end-moves;
 	uint16_t move;

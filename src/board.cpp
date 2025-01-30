@@ -238,7 +238,7 @@ bool isStalemate(Board *board) {
 	}
 
 	uint16_t moves[MAX_MOVES];
-	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *end = generateAllMoves(board, moves);
 	uint16_t move;
 	Undo undo;
 
@@ -286,7 +286,7 @@ bool isCheckmate(Board *board) {
 	}
 
 	uint16_t moves[MAX_MOVES];
-	uint16_t *end = generateAllMoves(*board, moves);
+	uint16_t *end = generateAllMoves(board, moves);
 	uint16_t move;
 	Undo undo;
 
@@ -311,7 +311,7 @@ bool isGameOver(Board *board) {
 
 bool isLegalMove(Board board, uint16_t move) {
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *end = generateAllMoves(board, moves);
+	uint16_t *end = generateAllMoves(&board, moves);
 	Undo undo;
 	for (int i = 0; i < end-moves; i++) {
 		if (move == *(moves+i)) {

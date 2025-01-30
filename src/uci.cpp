@@ -158,7 +158,7 @@ uint16_t searchPosition(std::string command, Board board, Board *history, int le
 			return move;
 		}
 		uint16_t *moves = new uint16_t[MAX_MOVES];
-		uint16_t *end = generateAllMoves(board, moves);
+		uint16_t *end = generateAllMoves(&board, moves);
 		int limit = end-moves;
 		for (int i = 0; i < limit; i++) {
 			move = *(moves+i);
