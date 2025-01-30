@@ -134,15 +134,15 @@ uint64_t kingAttacks(Board *board, bool turn) {
 }
 
 
-uint64_t getAttacks(Board board, bool turn) {
+uint64_t getAttacks(Board *board, bool turn) {
 	uint64_t attacks;
 
-	attacks = pawnAttacks(&board, turn);
-	attacks |= knightAttacks(&board, turn);
-	attacks |= bishopAttacks(&board, turn);
-	attacks |= rookAttacks(&board, turn);
-	attacks |= queenAttacks(&board, turn);
-	attacks |= kingAttacks(&board, turn);
+	attacks = pawnAttacks(board, turn);
+	attacks |= knightAttacks(board, turn);
+	attacks |= bishopAttacks(board, turn);
+	attacks |= rookAttacks(board, turn);
+	attacks |= queenAttacks(board, turn);
+	attacks |= kingAttacks(board, turn);
 
 	return attacks;
 }
@@ -172,5 +172,5 @@ void initSlidingAttacks() {
 
 
 bool isSquareAttacked(Board *board, bool turn, int square) {
-	return (getAttacks(*board, turn) & (1ull<<square)) != 0;
+	return (getAttacks(board, turn) & (1ull<<square)) != 0;
 }

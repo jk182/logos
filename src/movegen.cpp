@@ -252,7 +252,7 @@ uint16_t* generateKingMoves(Board *board, uint16_t *moves, uint64_t friendly) {
 
 uint16_t* generateCastlingMoves(Board *board, uint16_t *moves, uint64_t occupied) {
 	if (board->turn == WHITE && ((board->castling & (W_KS_CASTLING | W_QS_CASTLING)) != 0)) {
-		uint64_t b_attacks = getAttacks(*board, false);
+		uint64_t b_attacks = getAttacks(board, false);
 		if ((board->castling & W_KS_CASTLING) == W_KS_CASTLING && (occupied & 0x6) == 0) {
 			if ((b_attacks & 0xE) == 0) {
 				*(moves++) = encodeCastlingMove(3, 1);
@@ -264,7 +264,7 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves, uint64_t occupied
 			}
 		}
 	} else if (board->turn == BLACK && ((board->castling & (B_KS_CASTLING | B_QS_CASTLING)) != 0)) {
-		uint64_t w_attacks = getAttacks(*board, true);
+		uint64_t w_attacks = getAttacks(board, true);
 		if ((board->castling & B_KS_CASTLING) == B_KS_CASTLING && (occupied & 0x0600000000000000) == 0) {
 			if ((w_attacks & 0x0E00000000000000) == 0) {
 				*(moves++) = encodeCastlingMove(59, 57);
