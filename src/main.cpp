@@ -20,8 +20,8 @@ int main() {
 	initZobrist();
 	// generateAllMagics();
 	// testMagics();
-	// testMovegen();
-	testZobrist();
+	testMovegen();
+	// testZobrist();
 
 	
 	// Board b;

@@ -256,9 +256,21 @@ bool isStalemate(Board *board) {
 }
 
 
+bool isThreefold(Board *board) {
+	if (board->halfMoveCounter < 5) {
+		return false;
+	}
+	int counter = 1;
+	for (int i = 1; i <= board->halfMoveCounter; i++) {
+		if (board->hash == board->history[board->numMoves - i]) counter++;
+		if (counter >= 3) return true;	
+	}
+	return false;
+}
+
+
 bool isDraw(Board *board) {
-	// TODO: add three-fold repetition
-	return (board->halfMoveCounter >= 50) || isInsufficientMaterial(board) || isStalemate(board);
+	return (board->halfMoveCounter >= 50) || isThreefold(board) || isInsufficientMaterial(board) || isStalemate(board);
 }
 
 
