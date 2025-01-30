@@ -1,6 +1,7 @@
 #include "attacks.h"
 #include "bitboard.h"
 #include "board.h"
+#include "magic.h"
 #include "move.h"
 #include "movegen.h"
 #include "types.h"
@@ -175,10 +176,12 @@ uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
 uint16_t* generateBishopMoves(uint64_t bishopBB, uint16_t *moves, uint64_t friendly, uint64_t occupied)  {
 	uint64_t movesBB;
 	int square;
+	Magic table;
 	
 	while (bishopBB) {
 		square = popLSB(&bishopBB);
-		movesBB = bishopAttacks(occupied, square) & ~friendly;
+		table = BISHOP_TABLES[square];
+		movesBB = table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)] & ~friendly;
 		while (movesBB) {
 			*(moves++) = encodeMove(square, popLSB(&movesBB));
 		}
@@ -191,10 +194,14 @@ uint16_t* generateRookMoves(uint64_t rookBB, uint16_t *moves, uint64_t friendly,
 	uint64_t movesBB;
 	uint16_t move;
 	int square;
+	uint64_t edges;
+	Magic table;
 
 	while (rookBB) {
 		square = popLSB(&rookBB);
-		movesBB = rookAttacks(occupied, square) & ~friendly;
+		table = ROOK_TABLES[square];
+		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
+		movesBB = table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)] & ~friendly;
 
 		while (movesBB) {
 			move = encodeMove(square, popLSB(&movesBB));
@@ -213,11 +220,17 @@ uint16_t* generateRookMoves(uint64_t rookBB, uint16_t *moves, uint64_t friendly,
 uint16_t* generateQueenMoves(uint64_t queenBB, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
 	uint64_t movesBB;
 	int square;
+	Magic table;
+	uint64_t edges;
 
 	while (queenBB) {
 		square = popLSB(&queenBB);
-		movesBB = bishopAttacks(occupied, square);
-		movesBB |= rookAttacks(occupied, square);
+		table = BISHOP_TABLES[square];
+		movesBB = table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)];
+
+		table = ROOK_TABLES[square];
+		edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
+		movesBB |= table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)];
 		movesBB &= ~friendly;
 
 		while (movesBB) {

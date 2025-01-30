@@ -1,7 +1,7 @@
-logosMain: main.o board.o bitboard.o move.o movegen.o attacks.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o testZobrist.o logos
+logosMain: main.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o testZobrist.o logos
 	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/testZobrist.o -o ../out/logosMain -Wall -Wextra -pedantic
 
-logos: uci.o board.o bitboard.o move.o movegen.o attacks.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o
+logos: uci.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o
 	clang++ -std=c++20 -g ../out/uci.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o -o ../out/logos -Wall -Wextra -pedantic
 
 uci.o:
@@ -19,11 +19,11 @@ bitboard.o:
 move.o:
 	clang++ -std=c++20 -c move.cpp -o ../out/move.o -Wall -Wextra -pedantic
 
-movegen.o:
-	clang++ -std=c++20 -g -c movegen.cpp -o ../out/movegen.o -Wall -Wextra -pedantic
-
 attacks.o:
 	clang++ -std=c++20 -c attacks.cpp -o ../out/attacks.o -Wall -Wextra -pedantic
+
+movegen.o:
+	clang++ -std=c++20 -g -c movegen.cpp -o ../out/movegen.o -Wall -Wextra -pedantic
 
 evaluation.o:
 	clang++ -std=c++20 -g -c evaluation.cpp -o ../out/evaluation.o -Wall -Wextra -pedantic

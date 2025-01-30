@@ -212,7 +212,7 @@ bool isLegalPosition(Board *board) {
 
 int getPieceAtSquare(Board *board, int square) {
 	for (int p = 0; p < 12; p++) {
-		if (testBit(board->pieces[p], square)) {
+		if (board->pieces[p] & (1ull << square)) {
 			return p;
 		}
 	}

@@ -12,6 +12,9 @@ struct Magic {
 	int index;
 };
 
+extern Magic BISHOP_TABLES[64];
+extern Magic ROOK_TABLES[64];
+
 static const uint64_t KNIGHT_ATTACKS[64] = {
 	0x20400, 0x50800, 0xa1100, 0x142200, 0x284400, 0x508800, 0xa01000, 0x402000, 
 	0x2040004, 0x5080008, 0xa110011, 0x14220022, 0x28440044, 0x50880088, 0xa0100010, 0x40200020, 
