@@ -22,14 +22,14 @@ struct Board {
 	uint16_t castling;
 	uint64_t hash;
 	uint64_t history[HISTORY_LENGTH];
-	uint64_t attacks[2];
+	// uint64_t attacks[2];
 };
 
 struct Undo {
 	uint16_t castling;
 	int halfMoveCounter;
 	int capturedPiece;
-	uint64_t attacks[2];
+	// uint64_t attacks[2];
 };
 
 void boardFromFEN(Board *board, const char *fen);

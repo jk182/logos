@@ -242,5 +242,12 @@ void initSlidingAttacks() {
 
 
 bool isSquareAttacked(Board *board, bool turn, int square) {
+	/*
+	if (turn) {
+		return (board->attacks[0] & (1ull << square)) != 0;
+	} else {
+		return (board->attacks[1] & (1ull << square)) != 0;
+	}
+	*/
 	return (getAttacks(board, turn) & (1ull<<square)) != 0;
 }

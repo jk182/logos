@@ -1,3 +1,4 @@
+#include "attacks.h"
 #include "move.h"
 #include "board.h"
 #include "bitboard.h"
@@ -138,6 +139,7 @@ bool isCastling(uint16_t move) {
 
 
 void makeMove(Board *board, uint16_t move, Undo *undo) {
+	// Generating the Undo
 	undo->castling = board->castling;
 	undo->halfMoveCounter = board->halfMoveCounter;
 	undo->capturedPiece = getPieceAtSquare(board, getEndSquare(move));
@@ -268,7 +270,6 @@ void makeMove(Board *board, uint16_t move, Undo *undo) {
 				}
 				break;
 		}
-		return;
 	} else {
 		board->hash ^= zobristCastlingKeys[board->castling];
 		if (endSquare == 1) {

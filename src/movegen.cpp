@@ -144,9 +144,7 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 }
 
 
-uint16_t* generateKnightMoves(Board *board, uint16_t *moves, uint64_t friendly) {
-	int piece = board->turn ? W_KNIGHT : B_KNIGHT;
-	uint64_t knightBB = board->pieces[piece];
+uint16_t* generateKnightMoves(uint64_t knightBB, uint16_t *moves, uint64_t friendly) {
 	uint64_t movesBB;
 	int square;
 	
@@ -174,9 +172,7 @@ uint64_t slidingMoves(Board *board, int piece, uint64_t mask) {
 }
 
 
-uint16_t* generateBishopMoves(Board *board, uint16_t *moves, uint64_t friendly, uint64_t occupied)  {
-	int piece = board->turn ? W_BISHOP : B_BISHOP;
-	uint64_t bishopBB = board->pieces[piece];
+uint16_t* generateBishopMoves(uint64_t bishopBB, uint16_t *moves, uint64_t friendly, uint64_t occupied)  {
 	uint64_t movesBB;
 	int square;
 	
@@ -191,9 +187,7 @@ uint16_t* generateBishopMoves(Board *board, uint16_t *moves, uint64_t friendly, 
 }
 
 
-uint16_t* generateRookMoves(Board *board, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
-	int piece = board->turn ? W_ROOK : B_ROOK;
-	uint64_t rookBB = board->pieces[piece];
+uint16_t* generateRookMoves(uint64_t rookBB, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
 	uint64_t movesBB;
 	uint16_t move;
 	int square;
@@ -216,9 +210,7 @@ uint16_t* generateRookMoves(Board *board, uint16_t *moves, uint64_t friendly, ui
 }
 
 
-uint16_t* generateQueenMoves(Board *board, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
-	int piece = board->turn ? W_QUEEN : B_QUEEN;
-	uint64_t queenBB = board->pieces[piece];
+uint16_t* generateQueenMoves(uint64_t queenBB, uint16_t *moves, uint64_t friendly, uint64_t occupied) {
 	uint64_t movesBB;
 	int square;
 
@@ -236,11 +228,8 @@ uint16_t* generateQueenMoves(Board *board, uint16_t *moves, uint64_t friendly, u
 }
 
 
-uint16_t* generateKingMoves(Board *board, uint16_t *moves, uint64_t friendly) {
-	int piece = board->turn ? W_KING : B_KING;
-	uint64_t king = board->pieces[piece];
-	int square = popLSB(&king);
-	
+uint16_t* generateKingMoves(uint64_t kingBB, uint16_t *moves, uint64_t friendly) {
+	int square = popLSB(&kingBB);
 	uint64_t movesBB = KING_ATTACKS[square] & ~friendly;
 
 	while (movesBB) {
@@ -284,12 +273,18 @@ uint16_t* generateCastlingMoves(Board *board, uint16_t *moves, uint64_t occupied
 uint16_t* generateAllMoves(Board *board, uint16_t *moves) {
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
 	uint64_t occupied = occupiedSquares(board);
+
+	uint64_t knightBB = board->turn ? board->pieces[W_KNIGHT] : board->pieces[B_KNIGHT];
+	uint64_t bishopBB = board->turn ? board->pieces[W_BISHOP] : board->pieces[B_BISHOP];
+	uint64_t rookBB = board->turn ? board->pieces[W_ROOK] : board->pieces[B_ROOK];
+	uint64_t queenBB = board->turn ? board->pieces[W_QUEEN] : board->pieces[B_QUEEN];
+	uint64_t kingBB = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
 	moves = generatePawnMoves(board, moves);
-	moves = generateKnightMoves(board, moves, friendly);
-	moves = generateBishopMoves(board, moves, friendly, occupied);
-	moves = generateRookMoves(board, moves, friendly, occupied);
-	moves = generateQueenMoves(board, moves, friendly, occupied);
-	moves = generateKingMoves(board, moves, friendly);
+	moves = generateKnightMoves(knightBB, moves, friendly);
+	moves = generateBishopMoves(bishopBB, moves, friendly, occupied);
+	moves = generateRookMoves(rookBB, moves, friendly, occupied);
+	moves = generateQueenMoves(queenBB, moves, friendly, occupied);
+	moves = generateKingMoves(kingBB, moves, friendly);
 	moves = generateCastlingMoves(board, moves, occupied);
 
 	return moves;

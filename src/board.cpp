@@ -221,6 +221,7 @@ int getPieceAtSquare(Board *board, int square) {
 
 
 Undo generateUndo(Board *board, uint16_t move) {
+	// Obsolete
 	Undo undo;
 	undo.castling = board->castling;
 	undo.halfMoveCounter = board->halfMoveCounter;
@@ -286,6 +287,13 @@ bool isDraw(Board *board) {
 bool isCheck(Board *board) {
 	uint64_t bb = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
 	return isSquareAttacked(board, !board->turn, popLSB(&bb));
+	/*
+	if (board->turn) {
+		return (board->attacks[1] & board->pieces[W_KING]) != 0;
+	} else {
+		return (board->attacks[0] & board->pieces[B_KING]) != 0;
+	}
+	*/
 }
 
 
