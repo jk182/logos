@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.h"
+
 #include <stdint.h>
 
 
@@ -11,7 +13,7 @@ enum {
 
 
 struct Board {
-	uint64_t pieces[12];
+	uint64_t pieces[PIECES];
 	bool turn;
 	int halfMoveCounter;
 	int fullMoveCounter;
@@ -20,6 +22,7 @@ struct Board {
 	uint16_t castling;
 	uint64_t hash;
 	uint64_t history[HISTORY_LENGTH];
+	// uint64_t attacks[2];
 };
 
 struct Undo {

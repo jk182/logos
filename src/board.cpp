@@ -173,7 +173,7 @@ void printBoard(Board *board) {
 
 uint64_t whitePieces(Board *board) {
 	uint64_t white = 0ull;
-	for (int i = 0; i <= 5; i++) {
+	for (int i = 0; i < PIECES/2; i++) {
 		white |= board->pieces[i];
 	}
 	return white;
@@ -182,7 +182,7 @@ uint64_t whitePieces(Board *board) {
 
 uint64_t blackPieces(Board *board) {
 	uint64_t black = 0ull;
-	for (int i = 6; i <= 11; i++) {
+	for (int i = 6; i < PIECES; i++) {
 		black |= board->pieces[i];
 	}
 	return black;
@@ -190,7 +190,11 @@ uint64_t blackPieces(Board *board) {
 
 
 uint64_t occupiedSquares(Board *board) {
-	return (whitePieces(board) | blackPieces(board));
+	uint64_t occupied = 0ull;
+	for (int p = 0; p < PIECES; p++) {
+		occupied |= board->pieces[p];
+	}
+	return occupied;
 }
 
 
@@ -198,6 +202,11 @@ bool isLegalPosition(Board *board) {
 	uint64_t bb = board->turn ? board->pieces[B_KING] : board->pieces[W_KING];
 	int square = popLSB(&bb);
 	return !isSquareAttacked(board, board->turn, square);
+	/*
+	uint64_t attacks = board->turn ? board->attacks[0] : board->attacks[1];
+	uint64_t kingBB = board->turn ? board->pieces[B_KING] : board->pieces[W_KING];
+	return (kingBB & attacks) == 0;
+	*/
 }
 
 

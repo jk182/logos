@@ -20,9 +20,6 @@ int main() {
 	clearBoard(&board);
 	boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-	Board *history = new Board[512];
-	Board *end;
-
 	std::string command;
 	while (true) {
 		std::getline(std::cin, command);
@@ -40,15 +37,8 @@ int main() {
 			std::cout << "readyok\n";
 		} else if (command.starts_with("position")) {
 			changePosition(command, &board);
-			history = new Board[512];
-			end = updateHistory(command, board, history);
 		} else if (command.starts_with("go")) {
-			uint16_t move;
-			if (history-end < 90) {
-				move = searchPosition(command, board, history, history-end);
-			} else {
-				move = searchPosition(command, board, history, 0);
-			}
+			uint16_t move = searchPosition(command, board);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		} else if (command.starts_with("debug")) {
 			printBoard(&board);
@@ -119,7 +109,7 @@ Board* updateHistory(std::string command, Board board, Board *history) {
 }
 
 
-uint16_t searchPosition(std::string command, Board board, Board *history, int length) {
+uint16_t searchPosition(std::string command, Board board) {
 	int depth = -1;
 	int time = -1;
 	std::stringstream stream(command);
@@ -149,11 +139,11 @@ uint16_t searchPosition(std::string command, Board board, Board *history, int le
 	}
 		
 	std::cout << "Depth: " << depth << "\n";
-	uint16_t move = findGameMove(&board, depth, history, length);
+	uint16_t move = findGameMove(&board, depth);
 	if (! isLegalMove(board, move)) {
 		printBoard(&board);
 		std::cout << "ILLEGAL MOVE!\n";
-		move = findGameMove(&board, depth-1, history, length);
+		move = findGameMove(&board, depth-1);
 		if (isLegalMove(board, move)) {
 			return move;
 		}

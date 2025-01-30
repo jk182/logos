@@ -188,7 +188,7 @@ uint16_t findBestMove(Board *board, int depth) {
 }
 
 
-uint16_t findGameMove(Board *board, int depth, Board *history, int length) {
+uint16_t findGameMove(Board *board, int depth) {
 	uint16_t bestMove = NULL_MOVE;
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -209,13 +209,6 @@ uint16_t findGameMove(Board *board, int depth, Board *history, int length) {
 		undo = generateUndo(board, move);
 		makeMove(board, move);
 		if (isLegalPosition(board)) {
-			for (int i = 0; i < length; i++) {
-				if (isSamePosition(board, history+i)) {
-					std::cout << "REPETITION!" << "\n";
-					value = 0;
-					repetition = true;
-				}
-			}
 			if (!repetition) {
 				value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
 			}
