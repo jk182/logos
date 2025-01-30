@@ -4,6 +4,7 @@
 #include <cassert>
 #include <iostream>
 #include <stdint.h>
+#include <string.h>
 
 void testCastlingRights() {
 	std::cout << "Testing castling right hashes...\n";
