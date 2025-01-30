@@ -53,6 +53,7 @@ void testZobrist() {
 	Board afterCapture;
 	boardFromFEN(&beforeCapture, "rnbqkbnr/pp1ppppp/8/2p5/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2");
 	boardFromFEN(&afterCapture, "rnbqkbnr/pp1ppppp/8/8/3pP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3");
+	uint64_t bCapHash = beforeCapture.hash;
 	assert(beforeCapture.hash != afterCapture.hash);
 	uint16_t cap = encodeUCIMove(beforeCapture, strdup("c5d4"));
 	Undo undoCap = generateUndo(&beforeCapture, cap);
@@ -60,6 +61,22 @@ void testZobrist() {
 	assert(beforeCapture.hash == afterCapture.hash);
 	unmakeMove(&beforeCapture, cap, &undoCap);
 	assert(beforeCapture.hash != afterCapture.hash);
+	assert(beforeCapture.hash == bCapHash);
+
+	// Promotion
+	Board bProm;
+	Board aProm;
+	boardFromFEN(&bProm, "6r1/5P2/8/2k5/8/3K4/8/8 w - - 0 1");
+	boardFromFEN(&aProm, "6Q1/8/8/2k5/8/3K4/8/8 b - - 0 1");
+	uint64_t bPromHash = bProm.hash;
+	assert(bProm.hash != aProm.hash);
+	uint16_t prom = encodeUCIMove(bProm, strdup("f7g8q"));
+	Undo undoProm = generateUndo(&bProm, prom);
+	makeMove(&bProm, prom);
+	assert(bProm.hash == aProm.hash);
+	unmakeMove(&bProm, prom, &undoProm);
+	assert(bProm.hash != aProm.hash);
+	assert(bProm.hash == bPromHash);
 
 	std::cout << "Zobrist hash tests completed!\n";
 }
