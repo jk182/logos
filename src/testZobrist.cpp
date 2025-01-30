@@ -40,8 +40,9 @@ void testZobrist() {
 
 	// Making and unmaking moves
 	uint16_t e2e4 = encodeUCIMove(startPos, strdup("e2e4"));
-	Undo undo = generateUndo(&startPos, e2e4);
-	makeMove(&startPos, e2e4);
+	// Undo undo = generateUndo(&startPos, e2e4);
+	Undo undo;
+	makeMove(&startPos, e2e4, &undo);
 	assert(startPos.hash == e4.hash);
 	unmakeMove(&startPos, e2e4, &undo);
 	assert(startPos.hash == startHash);
@@ -56,8 +57,9 @@ void testZobrist() {
 	uint64_t bCapHash = beforeCapture.hash;
 	assert(beforeCapture.hash != afterCapture.hash);
 	uint16_t cap = encodeUCIMove(beforeCapture, strdup("c5d4"));
-	Undo undoCap = generateUndo(&beforeCapture, cap);
-	makeMove(&beforeCapture, cap);
+	// Undo undoCap = generateUndo(&beforeCapture, cap);
+	Undo undoCap;
+	makeMove(&beforeCapture, cap, &undo);
 	assert(beforeCapture.hash == afterCapture.hash);
 	unmakeMove(&beforeCapture, cap, &undoCap);
 	assert(beforeCapture.hash != afterCapture.hash);
@@ -71,8 +73,9 @@ void testZobrist() {
 	uint64_t bPromHash = bProm.hash;
 	assert(bProm.hash != aProm.hash);
 	uint16_t prom = encodeUCIMove(bProm, strdup("f7g8q"));
-	Undo undoProm = generateUndo(&bProm, prom);
-	makeMove(&bProm, prom);
+	// Undo undoProm = generateUndo(&bProm, prom);
+	Undo undoProm;
+	makeMove(&bProm, prom, &undo);
 	assert(bProm.hash == aProm.hash);
 	unmakeMove(&bProm, prom, &undoProm);
 	assert(bProm.hash != aProm.hash);

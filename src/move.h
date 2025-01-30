@@ -40,5 +40,5 @@ uint16_t encodeUCIMove(Board board, char *UCImove);
 char* decodeMoveToUCI(uint16_t move);
 bool isEnPassant(uint16_t move);
 bool isCapture(Board *board, uint16_t move);
-void makeMove(Board *board, uint16_t move);
+void makeMove(Board *board, uint16_t move, Undo *undo);
 void unmakeMove(Board *board, uint16_t move, Undo *undo);

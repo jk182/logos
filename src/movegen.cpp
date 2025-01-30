@@ -332,8 +332,8 @@ int perft(int depth, Board *board) {
 
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
-		undo = generateUndo(board, move);
-		makeMove(board, move);
+		// undo = generateUndo(board, move);
+		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			/*
 			if (depth == 2) {

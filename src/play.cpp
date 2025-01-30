@@ -9,9 +9,10 @@ void playGame(Board *board, int depth) {
 	std::string UCIstr;
 	char *UCI;
 	uint16_t userMove;
+	Undo undo;
 	while (! isGameOver(board)) {
 		engineMove = findBestMove(board, depth);
-		makeMove(board, engineMove);
+		makeMove(board, engineMove, &undo);
 		if (! isLegalPosition(board)) {
 			std::cout << "ERROR: Illegal Position" << "\n";
 		}
@@ -21,7 +22,7 @@ void playGame(Board *board, int depth) {
 		std::cin >> UCIstr;
 		UCI = UCIstr.data();
 		userMove = encodeUCIMove(*board, UCI);
-		makeMove(board, userMove);
+		makeMove(board, userMove, &undo);
 		printMove(userMove);
 	}	
 }

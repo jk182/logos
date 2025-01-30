@@ -66,46 +66,15 @@ void changePosition(std::string command, Board* board) {
 		space = token.find(" ");
 		std::stringstream stream(token);
 		std::string s;
+		Undo undo;
 		while (std::getline(stream, s, ' ')) {
 			if (s == "startpos" || s == "moves") {
 				continue;
 			}
 			move = encodeUCIMove(*board, s.data());
-			makeMove(board, move);
+			makeMove(board, move, &undo);
 		}
 	}
-}
-
-
-Board* updateHistory(std::string command, Board board, Board *history) {
-	// history = new Board[256];
-	std::size_t space = command.find(" ");
-	uint16_t move;
-	int index = 0;
-	if (space != std::string::npos) {
-		std::string token = command.substr(space+1);
-		if (token.starts_with("fen")) {
-			space = token.find(" ");
-			if (space != std::string::npos) {
-				boardFromFEN(&board, token.substr(space+1).c_str());
-			}
-		} else if (token.starts_with("startpos")) {
-			boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-		}
-		space = token.find(" ");
-		std::stringstream stream(token);
-		std::string s;
-		while (std::getline(stream, s, ' ')) {
-			if (s == "startpos" || s == "moves") {
-				continue;
-			}
-			move = encodeUCIMove(board, s.data());
-			makeMove(&board, move);
-			*(history+index) = board;
-			index++;
-		}
-	}
-	return history-index;
 }
 
 

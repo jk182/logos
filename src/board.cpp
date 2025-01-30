@@ -253,8 +253,8 @@ bool isStalemate(Board *board) {
 
 	for (int i = 0; i < end-moves; i++) {
 		move = *(moves+i);
-		undo = generateUndo(board, move);
-		makeMove(board, move);
+		// undo = generateUndo(board, move);
+		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			unmakeMove(board, move, &undo);
 			return false;
@@ -301,8 +301,8 @@ bool isCheckmate(Board *board) {
 
 	for (int i = 0; i < end-moves; i++) {
 		move = *(moves+i);
-		undo = generateUndo(board, move);
-		makeMove(board, move);
+		// undo = generateUndo(board, move);
+		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			unmakeMove(board, move, &undo);
 			return false;
@@ -324,8 +324,8 @@ bool isLegalMove(Board board, uint16_t move) {
 	Undo undo;
 	for (int i = 0; i < end-moves; i++) {
 		if (move == *(moves+i)) {
-			undo = generateUndo(&board, move);
-			makeMove(&board, move);
+			// undo = generateUndo(&board, move);
+			makeMove(&board, move, &undo);
 			if (isLegalPosition(&board)) {
 				unmakeMove(&board, move, &undo);
 				return true;

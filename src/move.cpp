@@ -137,7 +137,11 @@ bool isCastling(uint16_t move) {
 }
 
 
-void makeMove(Board *board, uint16_t move) {
+void makeMove(Board *board, uint16_t move, Undo *undo) {
+	undo->castling = board->castling;
+	undo->halfMoveCounter = board->halfMoveCounter;
+	undo->capturedPiece = getPieceAtSquare(board, getEndSquare(move));
+
 	board->history[board->numMoves++] = board->hash;
 	if (! board->turn) {
 		board->fullMoveCounter++;

@@ -47,8 +47,8 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 		move = *(orderedMoves+i);
 		// move = *(moves+i);
 		if (isCapture(board, move)) {
-			undo = generateUndo(board, move);
-			makeMove(board, move);
+			// undo = generateUndo(board, move);
+			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
 				score = qsearch(board, depth-1, alpha, beta);
 				unmakeMove(board, move, &undo);
@@ -101,8 +101,8 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		for (int i = 0; i < limit; i++) {
 			move = *(orderedMoves+i);
 			// move = *(moves+i);
-			undo = generateUndo(board, move);
-			makeMove(board, move);
+			// undo = generateUndo(board, move);
+			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
 				value = std::max(value, alphaBeta(board, depth-1, alpha, beta));
 				alpha = std::max(alpha, value);
@@ -119,8 +119,8 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 		for (int i = 0; i < limit; i++) {
 			move = *(orderedMoves+i);
 			// move = *(moves+i);
-			undo = generateUndo(board, move);
-			makeMove(board, move);
+			// undo = generateUndo(board, move);
+			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
 				value = std::min(value, alphaBeta(board, depth-1, alpha, beta));
 				beta = std::min(beta, value);
@@ -164,8 +164,8 @@ uint16_t findBestMove(Board *board, int depth) {
 
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
-		undo = generateUndo(board, move);
-		makeMove(board, move);
+		// undo = generateUndo(board, move);
+		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
 			if (bestMove == NULL_MOVE) {
@@ -206,8 +206,8 @@ uint16_t findGameMove(Board *board, int depth) {
 	for (int i = 0; i < limit; i++) {
 		repetition = false;
 		move = *(moves+i);
-		undo = generateUndo(board, move);
-		makeMove(board, move);
+		// undo = generateUndo(board, move);
+		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			if (!repetition) {
 				value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
