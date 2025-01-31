@@ -58,6 +58,8 @@ void changePosition(std::string command, Board* board) {
 			if (space != std::string::npos) {
 				clearBoard(board);
 				boardFromFEN(board, token.substr(space+1).c_str());
+				// TODO: allow moves after FEN
+				return;
 			}
 		} else if (token.starts_with("startpos")) {
 			clearBoard(board);

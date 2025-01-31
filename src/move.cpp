@@ -14,8 +14,8 @@ void printMove(uint16_t move) {
 		std::cout << "0000\n";
 		return;
 	}
-	char* startSquare = getSquareName(move & 0x3F);
-	char* endSquare = getSquareName((move & 0xFC0) >> 6);
+	char* startSquare = getSquareName(getStartSquare(move));
+	char* endSquare = getSquareName(getEndSquare(move));
 	int promPiece = (move & 0x7000) >> 12;
 	if (promPiece > 0 && promPiece < 5) {
 		std::cout << startSquare << "->" << endSquare << " " << promPiece << "\n";

@@ -198,20 +198,16 @@ uint16_t findGameMove(Board *board, int depth) {
 	bool side = board->turn;
 	int factor = side==WHITE ? 1 : -1;
 	int value;
-	int bestValue;
+	int bestValue = board->turn ? -MATE_SCORE : MATE_SCORE;
 	Undo undo;
-	bool repetition;
 
 	int standingPat = evaluate(board);
 	for (int i = 0; i < limit; i++) {
-		repetition = false;
 		move = *(moves+i);
 		// undo = generateUndo(board, move);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
-			if (!repetition) {
-				value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
-			}
+			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
 				bestValue = value;
