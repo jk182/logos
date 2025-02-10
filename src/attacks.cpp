@@ -265,5 +265,8 @@ bool isSquareAttacked(Board *board, bool turn, int square) {
 		return (board->attacks[1] & (1ull << square)) != 0;
 	}
 	*/
+	if (turn == board->turn) {
+		return (board->attacks & 1ull<<square) != 0;
+	}
 	return (getAttacks(board, turn) & (1ull<<square)) != 0;
 }

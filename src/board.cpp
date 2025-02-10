@@ -25,6 +25,7 @@ void clearBoard(Board *board) {
 	for (int i = 0; i < HISTORY_LENGTH; i++) {
 		board->history[i] = 0;
 	}
+	board->attacks = 0;
 }
 
 
@@ -144,6 +145,7 @@ void boardFromFEN(Board *board, const char *fen) {
 		counter += c-'0';
 	}
 	board->fullMoveCounter = counter;
+	board->attacks = getAttacks(board, board->turn);
 }
 
 
@@ -199,14 +201,13 @@ uint64_t occupiedSquares(Board *board) {
 
 
 bool isLegalPosition(Board *board) {
+	/*
 	uint64_t bb = board->turn ? board->pieces[B_KING] : board->pieces[W_KING];
 	int square = popLSB(&bb);
 	return !isSquareAttacked(board, board->turn, square);
-	/*
-	uint64_t attacks = board->turn ? board->attacks[0] : board->attacks[1];
-	uint64_t kingBB = board->turn ? board->pieces[B_KING] : board->pieces[W_KING];
-	return (kingBB & attacks) == 0;
 	*/
+	uint64_t bb = board->turn ? board->pieces[B_KING] : board->pieces[W_KING];
+	return (board->attacks & bb) == 0;
 }
 
 
