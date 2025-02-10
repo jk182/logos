@@ -8,6 +8,7 @@
 #include "play.h"
 #include "search.h"
 #include "testMovegen.h"
+#include "testSearch.h"
 #include "testZobrist.h"
 #include "zobrist.h"
 
@@ -20,7 +21,8 @@ int main() {
 	initZobrist();
 	// generateAllMagics();
 	// testMagics();
-	testMovegen();
+	// testMovegen();
+	testSearch();
 	// testZobrist();
 
 	
