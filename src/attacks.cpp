@@ -265,8 +265,17 @@ bool isSquareAttacked(Board *board, bool turn, int square) {
 		return (board->attacks[1] & (1ull << square)) != 0;
 	}
 	*/
+	/*
 	if (turn == board->turn) {
 		return (board->attacks & 1ull<<square) != 0;
 	}
-	return (getAttacks(board, turn) & (1ull<<square)) != 0;
+	*/
+	uint64_t occupied = occupiedSquares(board);
+	uint64_t pawnBB = board->pieces[turn ? W_PAWN : B_PAWN];
+	uint64_t knightBB = board->pieces[turn ? W_KNIGHT : B_KNIGHT];
+	uint64_t bishopBB = board->pieces[turn ? W_BISHOP : B_BISHOP] | board->pieces[turn ? W_QUEEN : B_QUEEN];
+	uint64_t rookBB = board->pieces[turn ? W_ROOK : B_ROOK] | board->pieces[turn ? W_QUEEN : B_QUEEN]; 
+	uint64_t kingBB = board->pieces[turn ? W_KING : B_KING];
+
+	return ((pawnAttacks(pawnBB, turn) | knightAttacks(knightBB) | bishopAttacks(bishopBB, occupied) | rookAttacks(rookBB, occupied) | kingAttacks(kingBB)) & (1ull<<square)) != 0;
 }
