@@ -242,7 +242,7 @@ uint16_t* generateQueenMoves(uint64_t queenBB, uint16_t *moves, uint64_t friendl
 
 
 uint16_t* generateKingMoves(uint64_t kingBB, uint16_t *moves, uint64_t friendly) {
-	int square = popLSB(&kingBB);
+	int square = getLSB(&kingBB);
 	uint64_t movesBB = KING_ATTACKS[square] & ~friendly;
 
 	while (movesBB) {

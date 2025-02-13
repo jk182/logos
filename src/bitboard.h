@@ -64,6 +64,7 @@ bool testBit(uint64_t bb, int i);
 void printBitboard(uint64_t bb);
 int getSquare(char file, int rank);
 char* getSquareName(int square);
+int getLSB(uint64_t *bb);
 int popLSB(uint64_t *bb);
 uint64_t getRank(int square);
 uint64_t getFile(int square);

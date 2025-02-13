@@ -54,14 +54,14 @@ char* getSquareName(int square) {
 }
 
 
+int getLSB(uint64_t *bb) {
+	if (*bb == 0) return -1;
+	return __builtin_ctzll(*bb);
+}
+
+
 int popLSB(uint64_t *bb) {
-	/*
-	auto index = std::countr_zero(*bb);
-	if (index == 64) {
-		return -1;
-	}
-	*/
-	// assert(*bb);
+	// int index = getLSB(bb);
 	if (*bb == 0) return -1;
 	int index = __builtin_ctzll(*bb);
 	*bb &= *bb - 1;

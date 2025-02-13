@@ -289,7 +289,7 @@ bool isDraw(Board *board) {
 
 bool isCheck(Board *board) {
 	uint64_t bb = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
-	return isSquareAttacked(board, !board->turn, popLSB(&bb));
+	return isSquareAttacked(board, !board->turn, getLSB(&bb));
 	/*
 	if (board->turn) {
 		return (board->attacks[1] & board->pieces[W_KING]) != 0;

@@ -203,12 +203,12 @@ uint64_t queenAttacks(uint64_t queenBB, uint64_t occupied) {
 uint64_t kingAttacks(Board *board, bool turn) {
 	uint64_t king = board->pieces[turn ? W_KING : B_KING];
 
-	return KING_ATTACKS[popLSB(&king)];
+	return KING_ATTACKS[getLSB(&king)];
 }
 
 
 uint64_t kingAttacks(uint64_t kingBB) {
-	return KING_ATTACKS[popLSB(&kingBB)];
+	return KING_ATTACKS[getLSB(&kingBB)];
 }
 
 
