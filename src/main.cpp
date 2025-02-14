@@ -21,8 +21,8 @@ int main() {
 	initZobrist();
 	// generateAllMagics();
 	// testMagics();
-	testMovegen();
-	// testSearch();
+	// testMovegen();
+	testSearch();
 	// testZobrist();
 
 	

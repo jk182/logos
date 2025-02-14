@@ -144,6 +144,7 @@ void makeMove(Board *board, uint16_t move, Undo *undo) {
 	undo->halfMoveCounter = board->halfMoveCounter;
 	undo->capturedPiece = getPieceAtSquare(board, getEndSquare(move));
 	undo->attacks = board->attacks;
+	// undo->threats = board->threats;
 
 	board->history[board->numMoves++] = board->hash;
 	if (! board->turn) {
@@ -162,6 +163,7 @@ void makeMove(Board *board, uint16_t move, Undo *undo) {
 
 	if (move == NULL_MOVE) {
 		board->attacks = getAttacks(board, board->turn);
+		// board->threats = getAttacks(board, !board->turn);
 		return;
 	}
 	int startSquare = getStartSquare(move);
@@ -181,6 +183,7 @@ void makeMove(Board *board, uint16_t move, Undo *undo) {
 		}
 		board->hash ^= zobristKeys[piece][startSquare] ^ zobristKeys[piece][endSquare];
 		board->attacks = getAttacks(board, board->turn);
+		// board->threats = getAttacks(board, !board->turn);
 		return;
 	}
 
@@ -234,6 +237,7 @@ void makeMove(Board *board, uint16_t move, Undo *undo) {
 			board->pieces[piece+getPromotionPiece(move)] ^= endBB;
 			board->hash ^= zobristKeys[piece+getPromotionPiece(move)][endSquare];
 			board->attacks = getAttacks(board, board->turn);
+			// board->threats = getAttacks(board, !board->turn);
 			return;
 		}
 		board->pieces[piece] ^= endBB;
@@ -307,6 +311,7 @@ void makeMove(Board *board, uint16_t move, Undo *undo) {
 		board->hash ^= zobristCastlingKeys[board->castling];
 	}
 	board->attacks = getAttacks(board, board->turn);
+	// board->threats = getAttacks(board, !board->turn);
 }
 
 
@@ -332,6 +337,7 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 	board->epSquare = isEnPassant(move) ? endSquare : -1;
 	board->castling = undo->castling;
 	board->attacks = undo->attacks;
+	// board->threats = undo->threats;
 
 	board->hash = board->history[board->numMoves];
 	

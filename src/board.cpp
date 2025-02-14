@@ -26,6 +26,7 @@ void clearBoard(Board *board) {
 		board->history[i] = 0;
 	}
 	board->attacks = 0;
+	// board->threats = 0;
 }
 
 
@@ -146,6 +147,7 @@ void boardFromFEN(Board *board, const char *fen) {
 	}
 	board->fullMoveCounter = counter;
 	board->attacks = getAttacks(board, board->turn);
+	// board->threats = getAttacks(board, !board->turn);
 }
 
 
@@ -290,6 +292,7 @@ bool isDraw(Board *board) {
 bool isCheck(Board *board) {
 	uint64_t bb = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
 	return isSquareAttacked(board, !board->turn, getLSB(&bb));
+	// return (bb & board->threats) != 0;
 	/*
 	if (board->turn) {
 		return (board->attacks[1] & board->pieces[W_KING]) != 0;

@@ -161,13 +161,15 @@ uint16_t findBestMove(Board *board, int depth) {
 	int value;
 	int bestValue;
 	Undo undo;
+	int alpha = -MATE_SCORE;
+	int beta = MATE_SCORE;
 
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
 		// undo = generateUndo(board, move);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
-			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
+			value = alphaBeta(board, depth-1, alpha, beta);
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
 				bestValue = value;
