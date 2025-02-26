@@ -227,6 +227,27 @@ uint16_t* generateKingMoves(uint64_t kingBB, uint16_t *moves, uint64_t friendly)
 }
 
 
+uint16_t* generateKingMoves(Board *board, uint16_t *moves) {
+	uint64_t kingBB = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
+	int square = getLSB(&kingBB);
+	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
+	uint64_t threats = getAttacks(board, !board->turn);
+	uint64_t movesBB = KING_ATTACKS[square] & ~friendly & ~threats;
+	// int endSquare;
+
+	while (movesBB) {
+		*(moves++) = encodeMove(square, popLSB(&movesBB));
+		/*
+		endSquare = popLSB(&movesBB);
+		if (((1ull << endSquare) & threats) == 0) {
+			*(moves++) = encodeMove(square, endSquare);
+		}
+		*/
+	}
+	return moves;
+}
+
+
 uint16_t* generateCastlingMoves(Board *board, uint16_t *moves, uint64_t occupied) {
 	if (board->turn == WHITE && ((board->castling & (W_KS_CASTLING | W_QS_CASTLING)) != 0)) {
 		uint64_t b_attacks = getAttacks(board, false);
@@ -273,6 +294,7 @@ uint16_t* generateAllMoves(Board *board, uint16_t *moves) {
 	moves = generateRookMoves(rookBB, moves, friendly, occupied);
 	moves = generateQueenMoves(queenBB, moves, friendly, occupied);
 	moves = generateKingMoves(kingBB, moves, friendly);
+	// moves = generateKingMoves(board, moves);
 	moves = generateCastlingMoves(board, moves, occupied);
 
 	return moves;
