@@ -14,130 +14,105 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 	uint64_t wPieces = whitePieces(board);
 	uint64_t bPieces = blackPieces(board);
 	uint64_t occupied = wPieces | bPieces;
-	uint64_t empty = ~occupied;
-	uint64_t movesBB;
 	uint64_t pawnBB;
-	int endSquare;
-	uint64_t epBB;
-	int epSquare = board->epSquare;
+	int startSquare;
 
 	if (board->turn == WHITE) {
 		pawnBB = board->pieces[W_PAWN];
 		
-		// Double pawn moves
-		movesBB = ((pawnBB & RANK_2) << 16) & empty;
-		// Make sure that pawns don't jump over pieces on the third rank
-		movesBB &= ~(occupied & RANK_3) << 8;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			*(moves++) = encodeMove(endSquare-16, endSquare);
-		}
-
-		// Single pawn moves
-		movesBB = (pawnBB << 8) & empty;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			if (endSquare >= 56) {
-				// Adding the promoting pieces
-				// N=1, B=2, R=3, Q=4
-				for (int p = 1; p <= 4; p++) {
-					*(moves++) = encodeMove(endSquare-8, endSquare, p);
+		while (pawnBB) {
+			startSquare = popLSB(&pawnBB);
+			if (startSquare >= 48) {
+				// pawn promotions
+				if ((1ull << (startSquare+8) & occupied) == 0) {
+					// N=1, B=2, R=3, Q=4
+					for (int p = 1; p <= 4; p++) {
+						*(moves++) = encodeMove(startSquare, startSquare+8, p);
+					}
+				}
+				// captures
+				if (startSquare != 48 && ((1ull << (startSquare+7) & bPieces) != 0)) {
+					for (int p = 1; p <= 4; p++) {
+						*(moves++) = encodeMove(startSquare, startSquare+7, p);
+					}
+				}
+				if (startSquare != 55 && ((1ull << (startSquare+9) & bPieces) != 0)) {
+					for (int p = 1; p <= 4; p++) {
+						*(moves++) = encodeMove(startSquare, startSquare+9, p);
+					}
 				}
 			} else {
-				*(moves++) = encodeMove(endSquare-8, endSquare);
-			}
-		}
-
-		// Pawn captures
-		epBB = epSquare > -1 ? 1ull << epSquare : 0ull;
-		movesBB = (pawnBB & (~H_FILE)) << 7;
-		if ((movesBB & epBB) != 0) {
-			*(moves++) = encodeEPMove(epSquare-7, epSquare);
-		}
-		movesBB &= bPieces;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			if (endSquare >= 56) {
-				// Pawn promotions
-				for (int p = 1; p <= 4; p++) {
-					*(moves++) = encodeMove(endSquare-7, endSquare, p);
+				if ((1ull << (startSquare+8) & occupied) == 0) {
+					*(moves++) = encodeMove(startSquare, startSquare+8);
+					if (startSquare >= 8 && startSquare <= 15) {
+						if ((1ull << (startSquare+16) & occupied) == 0) {
+							*(moves++) = encodeMove(startSquare, startSquare+16);
+						}
+					}
 				}
-			} else {
-				*(moves++) = encodeMove(endSquare-7, endSquare);
-			}
-		}
-		movesBB = (pawnBB & (~A_FILE)) << 9;
-		if ((movesBB & epBB) != 0) {
-			*(moves++) = encodeEPMove(epSquare-9, epSquare);
-		}
-		movesBB &= bPieces;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			if (endSquare >= 56) {
-				for (int p = 1; p <= 4; p++) {
-					*(moves++) = encodeMove(endSquare-9, endSquare, p);
+				if (startSquare % 8 != 0) {
+					if (((1ull << (startSquare+7)) & bPieces) != 0) {
+						*(moves++) = encodeMove(startSquare, startSquare+7);
+					} else if (startSquare+7 == board->epSquare) {
+						*(moves++) = encodeEPMove(startSquare, startSquare+7);
+					}
 				}
-			} else {
-				*(moves++) = encodeMove(endSquare-9, endSquare);
+				if (startSquare % 8 != 7) {
+					if (((1ull << (startSquare+9)) & bPieces) != 0) {
+						*(moves++) = encodeMove(startSquare, startSquare+9);
+					} else if (startSquare+9 == board->epSquare) {
+						*(moves++) = encodeEPMove(startSquare, startSquare+9);
+					}
+				}
 			}
 		}
 	} else {
 		pawnBB = board->pieces[B_PAWN];
 		
-		// Double pawn moves
-		movesBB = ((pawnBB & RANK_7) >> 16) & empty;
-		// Make sure that pawns don't jump over pieces on the third rank
-		movesBB &= ~(occupied & RANK_6) >> 8;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			*(moves++) = encodeMove(endSquare+16, endSquare);
-		}
-
-		// Single pawn moves
-		movesBB = (pawnBB >> 8) & empty;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			if (endSquare <= 7) {
-				// Adding the promoting pieces
-				// N=1, B=2, R=3, Q=4
-				for (int p = 1; p <= 4; p++) {
-					*(moves++) = encodeMove(endSquare+8, endSquare, p);
+		while (pawnBB) {
+			startSquare = popLSB(&pawnBB);
+			if (startSquare <= 15) {
+				// pawn promotions
+				if ((1ull << (startSquare-8) & occupied) == 0) {
+					// N=1, B=2, R=3, Q=4
+					for (int p = 1; p <= 4; p++) {
+						*(moves++) = encodeMove(startSquare, startSquare-8, p);
+					}
+				}
+				// captures
+				if (startSquare != 15 && ((1ull << (startSquare-7) & wPieces) != 0)) {
+					for (int p = 1; p <= 4; p++) {
+						*(moves++) = encodeMove(startSquare, startSquare-7, p);
+					}
+				}
+				if (startSquare != 8 && ((1ull << (startSquare-9) & wPieces) != 0)) {
+					for (int p = 1; p <= 4; p++) {
+						*(moves++) = encodeMove(startSquare, startSquare-9, p);
+					}
 				}
 			} else {
-				*(moves++) = encodeMove(endSquare+8, endSquare);
-			}
-		}
-
-		// Pawn captures
-		epBB = epSquare > -1 ? 1ull << epSquare : 0ull;
-		movesBB = (pawnBB & (~H_FILE)) >> 9;
-		if ((movesBB & epBB) != 0) {
-			*(moves++) = encodeEPMove(epSquare+9, epSquare);
-		}
-		movesBB &= wPieces;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			if (endSquare <= 7) {
-				for (int p = 1; p <= 4; p++) {
-					*(moves++) = encodeMove(endSquare+9, endSquare, p);
+				if ((1ull << (startSquare-8) & occupied) == 0) {
+					*(moves++) = encodeMove(startSquare, startSquare-8);
+					if (startSquare <= 55 && startSquare >= 48) {
+						if ((1ull << (startSquare-16) & occupied) == 0) {
+							*(moves++) = encodeMove(startSquare, startSquare-16);
+						}
+					}
 				}
-			} else {
-				*(moves++) = encodeMove(endSquare+9, endSquare);
-			}
-		}
-		movesBB = (pawnBB & (~A_FILE)) >> 7;
-		if ((movesBB & epBB) != 0) {
-			*(moves++) = encodeEPMove(epSquare+7, epSquare);
-		}
-		movesBB &= wPieces;
-		while (movesBB) {
-			endSquare = popLSB(&movesBB);
-			if (endSquare <= 7) {
-				for (int p = 1; p <= 4; p++) {
-					*(moves++) = encodeMove(endSquare+7, endSquare, p);
+				if (startSquare % 8 != 7) {
+					if (((1ull << (startSquare-7)) & wPieces) != 0) {
+						*(moves++) = encodeMove(startSquare, startSquare-7);
+					} else if (startSquare-7 == board->epSquare) {
+						*(moves++) = encodeEPMove(startSquare, startSquare-7);
+					}
 				}
-			} else {
-				*(moves++) = encodeMove(endSquare+7, endSquare);
+				if (startSquare % 8 != 0) {
+					if (((1ull << (startSquare-9)) & wPieces) != 0) {
+						*(moves++) = encodeMove(startSquare, startSquare-9);
+					} else if (startSquare-9 == board->epSquare) {
+						*(moves++) = encodeEPMove(startSquare, startSquare-9);
+					}
+				}
 			}
 		}
 	}
