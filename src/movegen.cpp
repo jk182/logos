@@ -10,16 +10,11 @@
 #include <iostream>
 
 
-uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
-	uint64_t wPieces = whitePieces(board);
-	uint64_t bPieces = blackPieces(board);
-	uint64_t occupied = wPieces | bPieces;
-	uint64_t pawnBB;
+uint16_t* generatePawnMoves(uint64_t pawnBB, uint64_t friendly, uint64_t occupied, bool turn, int epSquare, uint16_t *moves) {
+	uint64_t enemy = friendly ^ occupied;
 	int startSquare;
 
-	if (board->turn == WHITE) {
-		pawnBB = board->pieces[W_PAWN];
-		
+	if (turn) {
 		while (pawnBB) {
 			startSquare = popLSB(&pawnBB);
 			if (startSquare >= 48) {
@@ -31,12 +26,12 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 					}
 				}
 				// captures
-				if (startSquare != 48 && ((1ull << (startSquare+7) & bPieces) != 0)) {
+				if (startSquare != 48 && ((1ull << (startSquare+7) & enemy) != 0)) {
 					for (int p = 1; p <= 4; p++) {
 						*(moves++) = encodeMove(startSquare, startSquare+7, p);
 					}
 				}
-				if (startSquare != 55 && ((1ull << (startSquare+9) & bPieces) != 0)) {
+				if (startSquare != 55 && ((1ull << (startSquare+9) & enemy) != 0)) {
 					for (int p = 1; p <= 4; p++) {
 						*(moves++) = encodeMove(startSquare, startSquare+9, p);
 					}
@@ -51,24 +46,22 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 					}
 				}
 				if (startSquare % 8 != 0) {
-					if (((1ull << (startSquare+7)) & bPieces) != 0) {
+					if (((1ull << (startSquare+7)) & enemy) != 0) {
 						*(moves++) = encodeMove(startSquare, startSquare+7);
-					} else if (startSquare+7 == board->epSquare) {
+					} else if (startSquare+7 == epSquare) {
 						*(moves++) = encodeEPMove(startSquare, startSquare+7);
 					}
 				}
 				if (startSquare % 8 != 7) {
-					if (((1ull << (startSquare+9)) & bPieces) != 0) {
+					if (((1ull << (startSquare+9)) & enemy) != 0) {
 						*(moves++) = encodeMove(startSquare, startSquare+9);
-					} else if (startSquare+9 == board->epSquare) {
+					} else if (startSquare+9 == epSquare) {
 						*(moves++) = encodeEPMove(startSquare, startSquare+9);
 					}
 				}
 			}
 		}
 	} else {
-		pawnBB = board->pieces[B_PAWN];
-		
 		while (pawnBB) {
 			startSquare = popLSB(&pawnBB);
 			if (startSquare <= 15) {
@@ -80,12 +73,12 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 					}
 				}
 				// captures
-				if (startSquare != 15 && ((1ull << (startSquare-7) & wPieces) != 0)) {
+				if (startSquare != 15 && ((1ull << (startSquare-7) & enemy) != 0)) {
 					for (int p = 1; p <= 4; p++) {
 						*(moves++) = encodeMove(startSquare, startSquare-7, p);
 					}
 				}
-				if (startSquare != 8 && ((1ull << (startSquare-9) & wPieces) != 0)) {
+				if (startSquare != 8 && ((1ull << (startSquare-9) & enemy) != 0)) {
 					for (int p = 1; p <= 4; p++) {
 						*(moves++) = encodeMove(startSquare, startSquare-9, p);
 					}
@@ -100,16 +93,16 @@ uint16_t* generatePawnMoves(Board *board, uint16_t *moves) {
 					}
 				}
 				if (startSquare % 8 != 7) {
-					if (((1ull << (startSquare-7)) & wPieces) != 0) {
+					if (((1ull << (startSquare-7)) & enemy) != 0) {
 						*(moves++) = encodeMove(startSquare, startSquare-7);
-					} else if (startSquare-7 == board->epSquare) {
+					} else if (startSquare-7 == epSquare) {
 						*(moves++) = encodeEPMove(startSquare, startSquare-7);
 					}
 				}
 				if (startSquare % 8 != 0) {
-					if (((1ull << (startSquare-9)) & wPieces) != 0) {
+					if (((1ull << (startSquare-9)) & enemy) != 0) {
 						*(moves++) = encodeMove(startSquare, startSquare-9);
-					} else if (startSquare-9 == board->epSquare) {
+					} else if (startSquare-9 == epSquare) {
 						*(moves++) = encodeEPMove(startSquare, startSquare-9);
 					}
 				}
@@ -283,20 +276,41 @@ uint16_t* generateAllMoves(Board *board, uint16_t *moves) {
 	uint64_t friendly = board->turn ? whitePieces(board) : blackPieces(board);
 	uint64_t occupied = occupiedSquares(board);
 
+	uint64_t pawnBB = board->turn ? board->pieces[W_PAWN] : board->pieces[B_PAWN];
 	uint64_t knightBB = board->turn ? board->pieces[W_KNIGHT] : board->pieces[B_KNIGHT];
 	uint64_t bishopBB = board->turn ? board->pieces[W_BISHOP] : board->pieces[B_BISHOP];
 	uint64_t rookBB = board->turn ? board->pieces[W_ROOK] : board->pieces[B_ROOK];
 	uint64_t queenBB = board->turn ? board->pieces[W_QUEEN] : board->pieces[B_QUEEN];
 	uint64_t kingBB = board->turn ? board->pieces[W_KING] : board->pieces[B_KING];
-	moves = generatePawnMoves(board, moves);
+	moves = generatePawnMoves(pawnBB, friendly, occupied, board->turn, board->epSquare, moves);
 	moves = generateKnightMoves(knightBB, moves, friendly);
 	moves = generateBishopMoves(bishopBB, moves, friendly, occupied);
 	moves = generateRookMoves(rookBB, moves, friendly, occupied);
 	moves = generateQueenMoves(queenBB, moves, friendly, occupied);
-	moves = generateKingMoves(kingBB, moves, friendly);
+	moves = generateKingMoves(kingBB, moves, friendly|getAttacks(board, !board->turn));
 	// moves = generateKingMoves(board, moves);
 	moves = generateCastlingMoves(board, moves, occupied);
 
+	return moves;
+}
+
+
+uint16_t* generatePawnCaptures(uint64_t pawnBB, uint64_t enemy, bool turn, uint16_t *moves) {
+	uint64_t moveBB;
+	int endSquare;
+	if (turn) {
+		moveBB = (pawnBB << 7) & enemy & ~H_FILE;
+		while (moveBB) {
+			endSquare = popLSB(&moveBB);
+			// if (endSquare < 56) {
+		}
+	}
+	return moves;
+}
+
+
+uint16_t* generateNoisyMoves(Board *board, uint16_t *moves) {
+	// TODO
 	return moves;
 }
 
