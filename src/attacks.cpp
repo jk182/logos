@@ -270,12 +270,28 @@ bool isSquareAttacked(Board *board, bool turn, int square) {
 		return (board->attacks & 1ull<<square) != 0;
 	}
 	*/
-	uint64_t occupied = occupiedSquares(board);
-	uint64_t pawnBB = board->pieces[turn ? W_PAWN : B_PAWN];
 	uint64_t knightBB = board->pieces[turn ? W_KNIGHT : B_KNIGHT];
-	uint64_t bishopBB = board->pieces[turn ? W_BISHOP : B_BISHOP] | board->pieces[turn ? W_QUEEN : B_QUEEN];
-	uint64_t rookBB = board->pieces[turn ? W_ROOK : B_ROOK] | board->pieces[turn ? W_QUEEN : B_QUEEN]; 
+	if ((KNIGHT_ATTACKS[square] & knightBB) != 0) return true;
 	uint64_t kingBB = board->pieces[turn ? W_KING : B_KING];
+	if ((KING_ATTACKS[square] & kingBB) != 0) return true;
 
-	return ((pawnAttacks(pawnBB, turn) | knightAttacks(knightBB) | bishopAttacks(bishopBB, occupied) | rookAttacks(rookBB, occupied) | kingAttacks(kingBB)) & (1ull<<square)) != 0;
+	uint64_t occupied = occupiedSquares(board);
+	uint64_t bishopBB = board->pieces[turn ? W_BISHOP : B_BISHOP];
+	uint64_t queenBB = board->pieces[turn ? W_QUEEN : B_QUEEN];
+	Magic table = BISHOP_TABLES[square];
+	if ((table.table[(((occupied | EDGES) & table.mask) * table.magic) >> (64-table.index)] & (bishopBB | queenBB)) != 0) return true;
+
+	int64_t rookBB = board->pieces[turn ? W_ROOK : B_ROOK]; 
+	table = ROOK_TABLES[square];
+	uint64_t edges = ((A_FILE | H_FILE) & ~getFile(square)) | ((RANK_1 | RANK_8) & ~getRank(square));
+	if ((table.table[(((occupied | edges) & table.mask) * table.magic) >> (64-table.index)] & (rookBB | queenBB)) != 0) return true;
+
+	uint64_t pawnBB = board->pieces[turn ? W_PAWN : B_PAWN];
+	return (pawnAttacks(pawnBB, turn) & (1ull << square)) != 0;
+	if (turn) {
+		return ((((1ull << (square-7)) & ~A_FILE) | ((1ull << (square-9)) & ~H_FILE)) & pawnBB) != 0;
+	} else {
+		return ((((1ull << (square+7)) & ~H_FILE) | ((1ull << (square+9)) & ~A_FILE)) & pawnBB) != 0;
+	}
+	// return ((pawnAttacks(pawnBB, turn) | knightAttacks(knightBB) | bishopAttacks(bishopBB, occupied) | rookAttacks(rookBB, occupied) | kingAttacks(kingBB)) & (1ull<<square)) != 0;
 }

@@ -287,7 +287,8 @@ uint16_t* generateAllMoves(Board *board, uint16_t *moves) {
 	moves = generateBishopMoves(bishopBB, moves, friendly, occupied);
 	moves = generateRookMoves(rookBB, moves, friendly, occupied);
 	moves = generateQueenMoves(queenBB, moves, friendly, occupied);
-	moves = generateKingMoves(kingBB, moves, friendly|getAttacks(board, !board->turn));
+	// moves = generateKingMoves(kingBB, moves, friendly|getAttacks(board, !board->turn));
+	moves = generateKingMoves(kingBB, moves, friendly);
 	// moves = generateKingMoves(board, moves);
 	moves = generateCastlingMoves(board, moves, occupied);
 

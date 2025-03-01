@@ -161,15 +161,20 @@ uint16_t findBestMove(Board *board, int depth) {
 	int value;
 	int bestValue;
 	Undo undo;
-	int alpha = -MATE_SCORE;
-	int beta = MATE_SCORE;
+	int alpha = -MATE_SCORE-10;
+	int beta = MATE_SCORE+10;
 
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
-		// undo = generateUndo(board, move);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			value = alphaBeta(board, depth-1, alpha, beta);
+			/*
+			if (!board->turn) {
+				alpha = std::max(alpha, value);
+			} else {
+				beta = std::min(beta, value);
+			}*/
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
 				bestValue = value;
@@ -185,6 +190,9 @@ uint16_t findBestMove(Board *board, int depth) {
 			}
 		}
 		unmakeMove(board, move, &undo);
+		if (alpha >= MATE_SCORE || beta <= -MATE_SCORE) {
+			break;
+		}
 	}
 	return bestMove;
 }
