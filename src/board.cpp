@@ -328,7 +328,25 @@ bool isCheckmate(Board *board) {
 
 
 bool isGameOver(Board *board) {
-	return isDraw(board) || isCheckmate(board);
+	// return isDraw(board) || isCheckmate(board);
+	if (isThreefold(board) || isInsufficientMaterial(board)) {
+		return true;
+	}
+	uint16_t moves[MAX_MOVES];
+	uint16_t *end = generateAllMoves(board, moves);
+	uint16_t move;
+	Undo undo;
+
+	for (int i = 0; i < end-moves; i++) {
+		move = *(moves+i);
+		makeMove(board, move, &undo);
+		if (isLegalPosition(board)) {
+			unmakeMove(board, move, &undo);
+			return false;
+		}
+		unmakeMove(board, move, &undo);
+	}
+	return true;
 }
 
 

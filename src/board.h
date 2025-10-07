@@ -28,6 +28,7 @@ struct Board {
 struct Undo {
 	uint16_t castling;
 	int halfMoveCounter;
+	int movedPiece;
 	int capturedPiece;
 	uint64_t attacks;
 };
