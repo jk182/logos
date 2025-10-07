@@ -1,8 +1,8 @@
-logosMain: main.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o testZobrist.o testSearch.o logos
-	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/testZobrist.o ../out/testSearch.o -o ../out/logosMain -Wall -Wextra -pedantic
+logosMain: main.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o testZobrist.o testSearch.o thread.o logos
+	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/testZobrist.o ../out/testSearch.o ../out/thread.o -o ../out/logosMain -Wall -Wextra -pedantic
 
-logos: uci.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o
-	clang++ -std=c++20 -g ../out/uci.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o -o ../out/logos -Wall -Wextra -pedantic
+logos: uci.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o thread.o
+	clang++ -std=c++20 -g ../out/uci.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/thread.o -o ../out/logos -Wall -Wextra -pedantic
 
 uci.o:
 	clang++ -std=c++20 -c uci.cpp -o ../out/uci.o -Wall -Wextra -pedantic
@@ -39,6 +39,9 @@ testMovegen.o:
 
 magic.o:
 	clang++ -std=c++20 -g -c magic.cpp -o ../out/magic.o -Wall -Wextra -pedantic
+
+thread.o:
+	clang++ -std=c++20 -g -c thread.cpp -o ../out/thread.o -Wall -Wextra -pedantic
 
 zobrist.o:
 	clang++ -std=c++20 -g -c zobrist.cpp -o ../out/zobrist.o -Wall -Wextra -pedantic

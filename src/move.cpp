@@ -324,9 +324,8 @@ void unmakeMove(Board *board, uint16_t move, Undo *undo) {
 		board->turn = !board->turn;
 		return;
 	}
-	int startSquare = getStartSquare(move);
 	int endSquare = getEndSquare(move);
-	uint64_t startBB = 1ull << startSquare;
+	uint64_t startBB = 1ull << getStartSquare(move);
 	uint64_t endBB = 1ull << endSquare;
 	int piece;
 	int capturedPiece = undo->capturedPiece;
