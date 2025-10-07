@@ -74,6 +74,7 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 			}
 		}
 	}
+	delete[] moves;
 	return standingPat;
 	// return board->turn!=WHITE ? alpha : beta;
 }
@@ -136,6 +137,7 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 			}
 		}
 	}
+	delete[] moves;
 	return value;
 }
 
@@ -199,6 +201,7 @@ uint16_t findBestMove(Thread *thread, int depth) {
 			break;
 		}
 	}
+	delete[] moves;
 	return bestMove;
 }
 
