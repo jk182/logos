@@ -4,6 +4,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "search.h"
+#include "thread.h"
 
 #include <algorithm>
 #include <iostream>
@@ -11,12 +12,13 @@
 #include <limits.h>
 
 
-int qsearch(Board *board, int depth, int alpha, int beta) {
+int qsearch(Thread *thread, int depth, int alpha, int beta) {
+	Board *board = &(thread->board);
 	if (depth <= 0 || isGameOver(board)) {
 		return evaluate(board);
 	}
 	if (isCheck(board)) {
-		return alphaBeta(board, 1, alpha, beta);
+		return alphaBeta(thread, 1, alpha, beta);
 	}
 
 	int standingPat = evaluate(board);
@@ -50,7 +52,7 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
-				score = qsearch(board, depth-1, alpha, beta);
+				score = qsearch(thread, depth-1, alpha, beta);
 				unmakeMove(board, move, &undo);
 				if (board->turn != WHITE) {	// Reverse side to move since a move was made
 					if (score >= beta) {
@@ -77,10 +79,11 @@ int qsearch(Board *board, int depth, int alpha, int beta) {
 }
 
 
-int alphaBeta(Board *board, int depth, int alpha, int beta) {
+int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 	if (depth <= 0) {
-		return qsearch(board, 1, alpha, beta);
+		return qsearch(thread, 1, alpha, beta);
 	}
+	Board *board = &(thread->board);
 	if (isCheckmate(board)) {
 		int factor = board->turn ? 1 : -1;
 		return evaluate(board)-depth*factor;
@@ -104,7 +107,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
-				value = std::max(value, alphaBeta(board, depth-1, alpha, beta));
+				value = std::max(value, alphaBeta(thread, depth-1, alpha, beta));
 				alpha = std::max(alpha, value);
 				unmakeMove(board, move, &undo);
 				if (value >= beta) {
@@ -122,7 +125,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
-				value = std::min(value, alphaBeta(board, depth-1, alpha, beta));
+				value = std::min(value, alphaBeta(thread, depth-1, alpha, beta));
 				beta = std::min(beta, value);
 				unmakeMove(board, move, &undo);
 				if (value <= alpha) {
@@ -137,19 +140,21 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 }
 
 
-int iterativeDeepening(Board *board, int depth) {
+int iterativeDeepening(Thread *thread, int depth) {
+	Board *board = &(thread->board);
 	if (depth == 0 || isGameOver(board)) {
 		return evaluate(board);
 	}
 	int score;
 	for (int d = 0; d <= depth; d++) {
-		score = alphaBeta(board, d, -MATE_SCORE, MATE_SCORE);
+		score = alphaBeta(thread, d, -MATE_SCORE, MATE_SCORE);
 	}
 	return score;
 }
 
 
-uint16_t findBestMove(Board *board, int depth) {
+uint16_t findBestMove(Thread *thread, int depth) {
+	Board *board = &(thread->board);
 	uint16_t bestMove = NULL_MOVE;
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -168,7 +173,7 @@ uint16_t findBestMove(Board *board, int depth) {
 		move = *(moves+i);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
-			value = alphaBeta(board, depth-1, alpha, beta);
+			value = alphaBeta(thread, depth-1, alpha, beta);
 			/*
 			if (!board->turn) {
 				alpha = std::max(alpha, value);
@@ -198,7 +203,8 @@ uint16_t findBestMove(Board *board, int depth) {
 }
 
 
-uint16_t findGameMove(Board *board, int depth) {
+uint16_t findGameMove(Thread *thread, int depth) {
+	Board *board = &(thread->board);
 	uint16_t bestMove = NULL_MOVE;
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -217,7 +223,7 @@ uint16_t findGameMove(Board *board, int depth) {
 		// undo = generateUndo(board, move);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
-			value = alphaBeta(board, depth-1, -MATE_SCORE, MATE_SCORE);
+			value = alphaBeta(thread, depth-1, -MATE_SCORE, MATE_SCORE);
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
 				bestValue = value;

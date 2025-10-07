@@ -8,3 +8,4 @@ struct Thread {
 };
 
 Thread* createThread();
+Thread* createThread(Board *board);

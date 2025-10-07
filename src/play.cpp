@@ -1,6 +1,7 @@
 #include "board.h"
 #include "move.h"
 #include "search.h"
+#include "thread.h"
 
 #include <iostream>
 
@@ -10,8 +11,9 @@ void playGame(Board *board, int depth) {
 	char *UCI;
 	uint16_t userMove;
 	Undo undo;
+	Thread *thread = createThread(board);
 	while (! isGameOver(board)) {
-		engineMove = findBestMove(board, depth);
+		engineMove = findBestMove(thread, depth);
 		makeMove(board, engineMove, &undo);
 		if (! isLegalPosition(board)) {
 			std::cout << "ERROR: Illegal Position" << "\n";

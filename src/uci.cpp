@@ -3,6 +3,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "search.h"
+#include "thread.h"
 #include "uci.h"
 #include "zobrist.h"
 
@@ -110,11 +111,12 @@ uint16_t searchPosition(std::string command, Board board) {
 	}
 		
 	std::cout << "Depth: " << depth << "\n";
-	uint16_t move = findGameMove(&board, depth);
+	Thread *thread = createThread(&board);
+	uint16_t move = findGameMove(thread, depth);
 	if (! isLegalMove(board, move)) {
 		printBoard(&board);
 		std::cout << "ILLEGAL MOVE!\n";
-		move = findGameMove(&board, depth-1);
+		move = findGameMove(thread, depth-1);
 		if (isLegalMove(board, move)) {
 			return move;
 		}
