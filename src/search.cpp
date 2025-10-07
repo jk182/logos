@@ -15,6 +15,7 @@
 int qsearch(Thread *thread, int depth, int alpha, int beta) {
 	Board *board = &(thread->board);
 	if (depth <= 0 || isGameOver(board)) {
+		thread->nodes ++;
 		return evaluate(board);
 	}
 	if (isCheck(board)) {
@@ -24,6 +25,7 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 	int standingPat = evaluate(board);
 	if (board->turn == WHITE) {
 		if (standingPat >= beta) {
+			thread->nodes ++;
 			return beta;
 		}
 		if (standingPat > alpha) {
@@ -31,6 +33,7 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 		}
 	} else {
 		if (standingPat <= alpha) {
+			thread->nodes ++;
 			return alpha;
 		}
 		if (standingPat < beta) {
@@ -87,9 +90,11 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 	Board *board = &(thread->board);
 	if (isCheckmate(board)) {
 		int factor = board->turn ? 1 : -1;
+		thread->nodes ++;
 		return evaluate(board)-depth*factor;
 	}
 	if (isDraw(board)) {
+		thread->nodes ++;
 		return 0;
 	}
 	int value;
@@ -105,7 +110,6 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 		for (int i = 0; i < limit; i++) {
 			move = *(orderedMoves+i);
 			// move = *(moves+i);
-			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
 				value = std::max(value, alphaBeta(thread, depth-1, alpha, beta));
@@ -123,7 +127,6 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 		for (int i = 0; i < limit; i++) {
 			move = *(orderedMoves+i);
 			// move = *(moves+i);
-			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
 				value = std::min(value, alphaBeta(thread, depth-1, alpha, beta));
