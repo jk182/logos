@@ -3,6 +3,7 @@
 #include "evaluation.h"
 #include "types.h"
 
+#include <algorithm>
 #include <iostream>
 
 const int PIECE_VALUES[6] = {100, 320, 330, 500, 900, 0};
@@ -73,6 +74,17 @@ const int KING_OFFSET[64] = {
 	 20, 30, 10,  0,  0,  0, 30, 20
 };
 
+const int KING_ENDGAME_OFFSET[64] = {
+	-30,-20,-20,-20,-20,-20,-20,-30,
+	-20,-10,-10,-10,-10,-10,-20,-20,
+	-20,-10,  0,  0,  0,  0,-10,-20,
+	-20,-10,  0, 10, 10,  0,-10,-20,
+	-20,-10,  0, 10, 10,  0,-10,-20,
+	-20,-10,  0,  0,  0,  0,-10,-20,
+	-20,-10,-10,-10,-10,-10,-10,-20,
+	-30,-20,-20,-20,-20,-20,-20,-30
+};
+
 const int *PIECE_OFFSETS[6] = {
 	PAWN_OFFSET, KNIGHT_OFFSET, BISHOP_OFFSET, ROOK_OFFSET, QUEEN_OFFSET, KING_OFFSET
 };
@@ -82,13 +94,30 @@ int countMaterial(Board *board) {
 	int material = 0;
 	uint64_t bb;
 	int square;
+	int pieceCount = 0;
 	
 	for (int p = 0; p < PIECES; p++) {
 		bb = board->pieces[p];
 		square = popLSB(&bb);
 		while (square >= 0) {
-		       	if (p <= W_KING) {
+			if (p != W_PAWN && p != B_PAWN) {
+				pieceCount++;
+			}
+		       	if (p < W_KING) {
 				material += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
+			} else if (p == W_KING) {
+				if (pieceCount > 3) {
+					material += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
+				} else {
+					material += PIECE_VALUES[p%(PIECES/2)] + KING_ENDGAME_OFFSET[63-square];
+				}
+				pieceCount = 0;
+			} else if (p == B_KING) {
+				if (pieceCount > 3) {
+					material -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
+				} else {
+					material -= PIECE_VALUES[p%(PIECES/2)] + KING_ENDGAME_OFFSET[square];
+				}
 			} else {
 				material -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
 			}
@@ -106,7 +135,6 @@ int evaluate(Board *board) {
 	if (isCheckmate(board)) {
 		if (board->turn) {
 			return -MATE_SCORE;
-			printBoard(board);
 		} else {
 			return MATE_SCORE;
 		}
