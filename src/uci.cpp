@@ -7,6 +7,7 @@
 #include "uci.h"
 #include "zobrist.h"
 
+#include <bitset>
 #include <iostream>
 #include <sstream>
 #include <string.h>

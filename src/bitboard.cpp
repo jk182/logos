@@ -41,16 +41,16 @@ int getSquare(char file, int rank) {
 
 
 char* getSquareName(int square) {
-	char* ret = new char;
 	if (square > 63 || square < 0) {
-		ret =  strdup("-");
+		return strdup("-");
 	} else {
 		int rank = square/8 + 1;
 		char file = 'h' - (square%8);
-		ret = strcat(new char(file), new char(rank + '0'));
+		std::string name;
+		name += file;
+		name += std::to_string(rank);
+		return strdup(name.c_str());
 	}
-
-	return ret;
 }
 
 

@@ -25,7 +25,6 @@ int main() {
 	testSearch();
 	// testZobrist();
 
-	
 	// Board b;
 	// boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	// std::cout << perft(6, &b) << "\n";
