@@ -237,7 +237,19 @@ uint16_t findGameMove(Thread *thread, int depth) {
 			if (value * factor > bestValue * factor) {
 				bestValue = value;
 				bestMove = move;
-			} else if (value == bestValue) {
+			} else if (value * factor > 500 && (bestValue*factor - value*factor) < 200 && board->halfMoveCounter == 0) {
+				bestMove = move;
+				bestValue = value;
+				break;
+			} else if (value*factor >= bestValue*factor*0.95) {
+				int random = std::rand() % 2;
+				if (random == 0) {
+					bestMove = move;
+					bestValue = value;
+				}
+			}
+			/*
+			else if (value == bestValue) {
 				if (value*factor > 500) {
 					if (board->halfMoveCounter == 0 || evaluate(board)*factor > standingPat*factor) {
 						bestMove = move;
@@ -253,7 +265,11 @@ uint16_t findGameMove(Thread *thread, int depth) {
 						bestMove = move;
 					}
 				}
-			} else if (value*factor > 1000 && bestValue*factor <= MATE_SCORE) {
+			} else if (board->halfMoveCounter == 0 && value*factor > 500) {
+				bestMove = move;
+				bestValue = value;
+				break;
+			} else if (value*factor > 1000 && bestValue*factor < MATE_SCORE) {
 				int random = std::rand() % 2;
 				if (random == 0) {
 					bestMove = move;
@@ -266,6 +282,7 @@ uint16_t findGameMove(Thread *thread, int depth) {
 					bestValue = value;
 				}
 			}
+			*/
 		}
 		unmakeMove(board, move, &undo);
 	}

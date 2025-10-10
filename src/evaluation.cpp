@@ -95,6 +95,8 @@ int countMaterial(Board *board) {
 	uint64_t bb;
 	int square;
 	int pieceCount = 0;
+	int wKingSq;
+	int bKingSq;
 	
 	for (int p = 0; p < PIECES; p++) {
 		bb = board->pieces[p];
@@ -103,26 +105,23 @@ int countMaterial(Board *board) {
 			if (p != W_PAWN && p != B_PAWN) {
 				pieceCount++;
 			}
-		       	if (p < W_KING) {
+		       	if (p <= W_KING) {
+				if (p == W_KING) {
+					wKingSq = square;
+				}
 				material += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
-			} else if (p == W_KING) {
-				if (pieceCount > 3) {
-					material += PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][63-square];
-				} else {
-					material += PIECE_VALUES[p%(PIECES/2)] + KING_ENDGAME_OFFSET[63-square];
-				}
-				pieceCount = 0;
-			} else if (p == B_KING) {
-				if (pieceCount > 3) {
-					material -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
-				} else {
-					material -= PIECE_VALUES[p%(PIECES/2)] + KING_ENDGAME_OFFSET[square];
-				}
 			} else {
+				if (p == B_KING) {
+					bKingSq = square;
+				}
 				material -= PIECE_VALUES[p%(PIECES/2)] + PIECE_OFFSETS[p%(PIECES/2)][square];
 			}
 			square = popLSB(&bb);
 		}
+	}
+	// Endgame 
+	if (pieceCount <= 7) {
+		material += (KING_ENDGAME_OFFSET[63-wKingSq] - KING_ENDGAME_OFFSET[bKingSq]) * (8 - pieceCount);
 	}
 	return material;
 }
