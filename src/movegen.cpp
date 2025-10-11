@@ -311,8 +311,25 @@ uint16_t* generatePawnCaptures(uint64_t pawnBB, uint64_t enemy, bool turn, uint1
 
 
 uint16_t* generateNoisyMoves(Board *board, uint16_t *moves) {
-	// TODO
-	return moves;
+	uint16_t *noisyMoves = new uint16_t[MAX_MOVES];
+	uint16_t *endMove = generateAllMoves(board, moves);
+	int limit = endMove-moves;
+	uint16_t move;
+	Undo undo;
+	int index = 0;
+	bool isCap = false;
+
+	for (int i = 0; i < limit; i++) {
+		move = *(moves+i);
+		isCap = isCapture(board, move);
+		makeMove(board, move, &undo);
+		if (isCap || isCheck(board)) {
+			*(noisyMoves++) = move;
+			index++;
+		}
+		unmakeMove(board, move, &undo);
+	}
+	return noisyMoves-index;
 }
 
 

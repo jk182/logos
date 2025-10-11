@@ -41,16 +41,38 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 		}
 	}
 	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *endMove = generateAllMoves(board, moves); // TODO: generate only captures
+	// uint16_t *endMove = generateNoisyMoves(board, moves);
+	uint16_t *endMove = generateAllMoves(board, moves);
 	int limit = endMove-moves;
-	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
+	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	Undo undo;
 	int score;
 
 	for (int i = 0; i < limit; i++) {
-		move = *(orderedMoves+i);
-		// move = *(moves+i);
+		/* Using noisy moves is slower as the moves have to be made and unmade multiple times
+		move = *(moves+i);
+		makeMove(board, move, &undo);
+		score = qsearch(thread, depth-1, alpha, beta);
+		unmakeMove(board, move, &undo);
+		if (board->turn != WHITE) { //TODO: check logic, see comment below
+			if (score >= beta) {
+				return beta;
+			}
+			if (score > alpha) {
+				alpha = score;
+			}
+		} else {
+			if (score <= alpha) {
+				return alpha;
+			}
+			if (score < beta) {
+				beta = score;
+			}
+		}
+		*/
+		// move = *(orderedMoves+i);
+		move = *(moves+i);
 		if (isCapture(board, move)) {
 			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
@@ -237,10 +259,22 @@ uint16_t findGameMove(Thread *thread, int depth) {
 			if (value * factor > bestValue * factor) {
 				bestValue = value;
 				bestMove = move;
-			} else if (value * factor > 500 && (bestValue*factor - value*factor) < 200 && board->halfMoveCounter == 0) {
+			} else if (value == bestValue) {
+				if (board->halfMoveCounter == 0 && value*factor > 300) {
+					bestMove = move;
+					bestValue = value;
+				} else {
+					int random = std::rand() % 2;
+					if (random == 0) {
+						bestMove = move;
+						bestValue = value;
+					}
+				}
+			}
+			/* 
+			else if (value * factor > 500 && (bestValue*factor - value*factor) < 200 && board->halfMoveCounter == 0) {
 				bestMove = move;
 				bestValue = value;
-				break;
 			} else if (value*factor >= bestValue*factor*0.95) {
 				int random = std::rand() % 2;
 				if (random == 0) {
@@ -248,6 +282,7 @@ uint16_t findGameMove(Thread *thread, int depth) {
 					bestValue = value;
 				}
 			}
+			*/
 			/*
 			else if (value == bestValue) {
 				if (value*factor > 500) {
