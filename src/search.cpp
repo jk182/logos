@@ -172,10 +172,25 @@ int iterativeDeepening(Thread *thread, int depth) {
 	if (depth == 0 || isGameOver(board)) {
 		return evaluate(board);
 	}
-	int score;
-	for (int d = 0; d <= depth; d++) {
-		score = alphaBeta(thread, d, -MATE_SCORE, MATE_SCORE);
+	int score = 0;
+	Undo undo;
+	uint16_t move;
+	Node *nodes = new Node[thread->nodeStackHeight];
+	Node node;
+	for (int d = 1; d <= depth; d++) {
+		for (int i = 0; i < thread->nodeStackHeight; i++) {
+			node = *(thread->nodeStack+i);
+			move = node.move;
+			makeMove(board, move, &undo);
+			node.eval = alphaBeta(thread, d-1, -MATE_SCORE, MATE_SCORE);
+			unmakeMove(board, move, &undo);
+			node.move = move;
+			node.depth = d;
+			*(nodes+i) = node;
+		}
+		updateNodeStack(thread, nodes);
 	}
+	printMove((thread->nodeStack+0)->move);
 	return score;
 }
 

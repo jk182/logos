@@ -10,6 +10,7 @@
 #include "testMovegen.h"
 #include "testSearch.h"
 #include "testZobrist.h"
+#include "thread.h"
 #include "zobrist.h"
 
 #include <iostream>
@@ -22,11 +23,13 @@ int main() {
 	// generateAllMagics();
 	// testMagics();
 	// testMovegen();
-	testSearch();
+	// testSearch();
 	// testZobrist();
 
-	// Board b;
-	// boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	Board b;
+	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	Thread *thread = createThread(&b);
+	iterativeDeepening(thread, 7);
 	// std::cout << perft(6, &b) << "\n";
 	// boardFromFEN(&b, "8/4k3/8/3q4/8/4N3/4K3/8 w - - 0 1");
 	// printBoard(&b);

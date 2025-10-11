@@ -11,7 +11,10 @@ struct Thread {
 	uint16_t PV[MAX_MOVES];
 	int depth, seldepth;
 	Undo undo;
+	Node nodeStack[MAX_MOVES];
+	int nodeStackHeight;
 };
 
 Thread* createThread();
 Thread* createThread(Board *board);
+void updateNodeStack(Thread *thread, Node *nodes);

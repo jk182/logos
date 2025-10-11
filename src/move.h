@@ -10,6 +10,12 @@
 // 			7: en-passant move
 // 	bit 15:		castling move
 
+struct Node {
+	uint16_t move;
+	int eval;
+	int depth;
+};
+
 enum {
 	NULL_MOVE = 0,
 	W_KS_CASTLING = 0x1,
