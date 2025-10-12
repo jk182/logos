@@ -2,6 +2,7 @@
 
 #include "board.h"
 #include "move.h"
+#include "transposition.h"
 
 
 struct Thread {
@@ -13,6 +14,7 @@ struct Thread {
 	Undo undo;
 	Node nodeStack[MAX_MOVES];
 	int nodeStackHeight;
+	TranspositionTable tt;
 };
 
 Thread* createThread();

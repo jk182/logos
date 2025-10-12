@@ -116,8 +116,13 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 		return evaluate(board)-depth*factor;
 	}
 	if (isDraw(board)) {
-		thread->nodes ++;
+		thread->nodes++;
 		return 0;
+	}
+	int ttValue = probeTranspositionTable(&(thread->tt), board, depth);
+	if (ttValue != UNKNOWN_EVAL) {
+		std::cout << ttValue << "\n";
+		return ttValue;
 	}
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -183,6 +188,7 @@ int iterativeDeepening(Thread *thread, int depth) {
 			move = node.move;
 			makeMove(board, move, &undo);
 			node.eval = alphaBeta(thread, d-1, -MATE_SCORE, MATE_SCORE);
+			updateTranspositionTable(&(thread->tt), board, d-1, node.eval, node.move);
 			unmakeMove(board, move, &undo);
 			node.move = move;
 			node.depth = d;

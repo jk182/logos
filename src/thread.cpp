@@ -15,6 +15,7 @@ Thread* createThread() {
 	thread->nodes = 0ull;
 	thread->depth = 0;
 	thread->seldepth = 0;
+	initTT(&(thread->tt));
 	return thread;
 }
 
@@ -26,6 +27,7 @@ Thread* createThread(Board *board) {
 	thread->nodes = 0ull;
 	thread->depth = 0;
 	thread->seldepth = 0;
+	initTT(&(thread->tt));
 	uint16_t move;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(board, moves);

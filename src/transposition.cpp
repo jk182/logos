@@ -16,7 +16,7 @@ void initTT(TranspositionTable *tt) {
 
 int probeTranspositionTable(TranspositionTable *tt, Board *board, int depth) {
 	TTEntry entry = tt->ttTable[board->hash % TTSIZE];
-	if (entry.zobristHash == board->hash || entry.depth >= depth) {
+	if (entry.zobristHash == board->hash && entry.depth >= depth) {
 		return entry.evaluation;
 	}
 	return UNKNOWN_EVAL;
@@ -24,6 +24,9 @@ int probeTranspositionTable(TranspositionTable *tt, Board *board, int depth) {
 
 
 void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, int evaluation, uint16_t bestMove) {
+	if (tt->ttTable[board->hash % TTSIZE].depth > depth) {
+		return;
+	}
 	TTEntry entry;
 	entry.zobristHash = board->hash;
 	entry.depth = depth;

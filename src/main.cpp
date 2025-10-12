@@ -29,9 +29,11 @@ int main() {
 	Board b;
 	boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	Thread *thread = createThread(&b);
-	iterativeDeepening(thread, 7);
+	printMove(findBestMove(thread, 7));
+	std::cout << thread->nodes << "\n";
 	// std::cout << perft(6, &b) << "\n";
 	// boardFromFEN(&b, "8/4k3/8/3q4/8/4N3/4K3/8 w - - 0 1");
+	// Thread *thread2 = createThread(&b);
 	// printBoard(&b);
  	// boardFromFEN(&b, "r1bqk2r/pppp2pp/2n2n2/1Nb5/5B2/8/PPP1PPPP/R2QKBNR b KQkq - 5 6");
 	// printBoard(&b);
