@@ -1,8 +1,8 @@
-logosMain: main.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o testZobrist.o testSearch.o thread.o logos
-	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/testZobrist.o ../out/testSearch.o ../out/thread.o -o ../out/logosMain -Wall -Wextra -pedantic
+logosMain: main.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o testZobrist.o testSearch.o thread.o transposition.o logos
+	clang++ -std=c++20 -g ../out/main.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/testZobrist.o ../out/testSearch.o ../out/thread.o ../out/transposition.o -o ../out/logosMain -Wall -Wextra -pedantic
 
-logos: uci.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o thread.o
-	clang++ -std=c++20 -g ../out/uci.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/thread.o -o ../out/logos -Wall -Wextra -pedantic
+logos: uci.o board.o bitboard.o move.o attacks.o movegen.o evaluation.o search.o play.o testMovegen.o magic.o zobrist.o thread.o transposition.o
+	clang++ -std=c++20 -g ../out/uci.o ../out/board.o ../out/bitboard.o ../out/move.o ../out/movegen.o ../out/attacks.o ../out/evaluation.o ../out/search.o ../out/play.o ../out/testMovegen.o ../out/magic.o ../out/zobrist.o ../out/thread.o ../out/transposition.o -o ../out/logos -Wall -Wextra -pedantic
 
 uci.o:
 	clang++ -std=c++20 -c uci.cpp -o ../out/uci.o -Wall -Wextra -pedantic
@@ -42,6 +42,9 @@ magic.o:
 
 thread.o:
 	clang++ -std=c++20 -g -c thread.cpp -o ../out/thread.o -Wall -Wextra -pedantic
+
+transposition.o:
+	clang++ -std=c++20 -g -c transposition.cpp -o ../out/transposition.o -Wall -Wextra -pedantic
 
 zobrist.o:
 	clang++ -std=c++20 -g -c zobrist.cpp -o ../out/zobrist.o -Wall -Wextra -pedantic
