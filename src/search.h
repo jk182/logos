@@ -4,6 +4,7 @@
 #include "thread.h"
 
 
+int search(Thread *thread, int depth, int alpha, int beta, int color);
 int qsearch(Thread *thread, int depth, int alpha, int beta);
 int alphaBeta(Thread *thread, int depth, int alpha, int beta);
 int iterativeDeepening(Thread *thread, int depth);

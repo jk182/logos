@@ -6,7 +6,10 @@
 
 enum {
 	TTSIZE =  4096,
-	UNKNOWN_EVAL = 123456789
+	UNKNOWN_EVAL = 123456789,
+	EXACT_FLAG = 0,
+	ALPHA_FLAG = 1,
+	BETA_FLAG = 2
 };
 
 struct TTEntry {
@@ -14,6 +17,7 @@ struct TTEntry {
 	int depth;
 	int evaluation;
 	uint16_t bestMove;
+	int flag;
 };
 
 struct TranspositionTable {
@@ -21,5 +25,5 @@ struct TranspositionTable {
 };
 
 void initTT(TranspositionTable *tt);
-int probeTranspositionTable(TranspositionTable *tt, Board *board, int depth);
-void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, int evaluation, uint16_t bestMove);
+TTEntry probeTranspositionTable(TranspositionTable *tt, Board *board);
+void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, int evaluation, uint16_t bestMove, int flag);

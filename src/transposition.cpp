@@ -8,23 +8,20 @@ void initTT(TranspositionTable *tt) {
 	entry.depth = -1;
 	entry.evaluation = UNKNOWN_EVAL;
 	entry.bestMove = NULL_MOVE;
+	entry.flag = EXACT_FLAG;
 	for (int i = 0; i < TTSIZE; i++) {
 		tt->ttTable[i] = entry;
 	}
 }
 
 
-int probeTranspositionTable(TranspositionTable *tt, Board *board, int depth) {
-	TTEntry entry = tt->ttTable[board->hash % TTSIZE];
-	if (entry.zobristHash == board->hash && entry.depth >= depth) {
-		return entry.evaluation;
-	}
-	return UNKNOWN_EVAL;
+TTEntry probeTranspositionTable(TranspositionTable *tt, Board *board) {
+	return tt->ttTable[board->hash % TTSIZE];
 }
 
 
-void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, int evaluation, uint16_t bestMove) {
-	if (tt->ttTable[board->hash % TTSIZE].depth > depth) {
+void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, int evaluation, uint16_t bestMove, int flag) {
+	if (tt->ttTable[board->hash % TTSIZE].depth > depth) { // TODO: maybe also overwrite non-exact values?
 		return;
 	}
 	TTEntry entry;
@@ -32,5 +29,6 @@ void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, i
 	entry.depth = depth;
 	entry.evaluation = evaluation;
 	entry.bestMove = bestMove;
+	entry.flag = flag;
 	tt->ttTable[board->hash % TTSIZE] = entry;
 }

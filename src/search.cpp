@@ -14,85 +14,50 @@
 
 int qsearch(Thread *thread, int depth, int alpha, int beta) {
 	Board *board = &(thread->board);
+	thread->nodes ++;
 	if (depth <= 0 || isGameOver(board)) {
-		thread->nodes ++;
 		return evaluate(board);
 	}
+	/*
 	if (isCheck(board)) {
 		return alphaBeta(thread, 1, alpha, beta);
 	}
+	*/
 
-	int standingPat = evaluate(board);
-	if (board->turn == WHITE) {
-		if (standingPat >= beta) {
-			thread->nodes ++;
-			return beta;
-		}
-		if (standingPat > alpha) {
-			alpha = standingPat;
-		}
-	} else {
-		if (standingPat <= alpha) {
-			thread->nodes ++;
-			return alpha;
-		}
-		if (standingPat < beta) {
-			beta = standingPat;
-		}
+	int bestScore = evaluate(board);
+	if (bestScore >= beta) {
+		return bestScore;
 	}
+	if (bestScore > alpha) {
+		alpha = bestScore;
+	}
+
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	// uint16_t *endMove = generateNoisyMoves(board, moves);
 	uint16_t *endMove = generateAllMoves(board, moves);
 	int limit = endMove-moves;
-	// uint16_t *orderedMoves = moveOrdering(board, moves, limit);
+	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
 	uint16_t move;
 	Undo undo;
 	int score;
 
 	for (int i = 0; i < limit; i++) {
-		/* Using noisy moves is slower as the moves have to be made and unmade multiple times
-		move = *(moves+i);
-		makeMove(board, move, &undo);
-		score = qsearch(thread, depth-1, alpha, beta);
-		unmakeMove(board, move, &undo);
-		if (board->turn != WHITE) { //TODO: check logic, see comment below
-			if (score >= beta) {
-				return beta;
-			}
-			if (score > alpha) {
-				alpha = score;
-			}
-		} else {
-			if (score <= alpha) {
-				return alpha;
-			}
-			if (score < beta) {
-				beta = score;
-			}
-		}
-		*/
-		// move = *(orderedMoves+i);
-		move = *(moves+i);
+		move = *(orderedMoves+i);
 		if (isCapture(board, move)) {
-			// undo = generateUndo(board, move);
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
-				score = qsearch(thread, depth-1, alpha, beta);
+				score = -qsearch(thread, depth-1, -beta, -alpha);
 				unmakeMove(board, move, &undo);
-				if (board->turn != WHITE) {	// Reverse side to move since a move was made
-					if (score >= beta) {
-						return beta;
-					}
-					if (score > alpha) {
-						alpha = score;
-					}
-				} else {
-					if (score <= alpha) {
-						return alpha;
-					}
-					if (score < beta) {
-						beta = score;
-					}
+				if (score >= beta) {
+					return score;
+				}
+				/*
+				if (score > bestScore) {
+					bestScore = score;
+				}
+				*/
+				if (score > alpha) {
+					alpha = score;
 				}
 			} else {
 				unmakeMove(board, move, &undo);
@@ -100,16 +65,18 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 		}
 	}
 	delete[] moves;
-	return standingPat;
+	return alpha;
 	// return board->turn!=WHITE ? alpha : beta;
 }
 
 
 int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
-	if (depth <= 0) {
-		return qsearch(thread, 1, alpha, beta);
-	}
 	Board *board = &(thread->board);
+	if (depth <= 0) {
+		thread->nodes ++;
+		return evaluate(board);
+		// return qsearch(thread, 1, alpha, beta);
+	}
 	if (isCheckmate(board)) {
 		int factor = board->turn ? 1 : -1;
 		thread->nodes ++;
@@ -119,11 +86,20 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 		thread->nodes++;
 		return 0;
 	}
-	int ttValue = probeTranspositionTable(&(thread->tt), board, depth);
-	if (ttValue != UNKNOWN_EVAL) {
-		std::cout << ttValue << "\n";
-		return ttValue;
+	/*
+	TTEntry entry = probeTranspositionTable(&(thread->tt), board);
+	if (entry.zobristHash == board->hash && entry.depth >= depth) {
+		if (entry.flag == EXACT_FLAG) {
+			return entry.evaluation;
+		}
+		if (entry.flag == BETA_FLAG && entry.evaluation >= beta) {
+			return entry.evaluation;
+		}
+		if (entry.flag == ALPHA_FLAG && entry.evaluation <= alpha) {
+			return entry.evaluation;
+		}
 	}
+	*/
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(board, moves);
@@ -141,9 +117,13 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 			if (isLegalPosition(board)) {
 				value = std::max(value, alphaBeta(thread, depth-1, alpha, beta));
 				alpha = std::max(alpha, value);
-				unmakeMove(board, move, &undo);
 				if (value >= beta) {
+					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, BETA_FLAG);
+					unmakeMove(board, move, &undo);
 					break;
+				} else {
+					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, EXACT_FLAG);
+					unmakeMove(board, move, &undo);
 				}
 			} else {
 				unmakeMove(board, move, &undo);
@@ -158,15 +138,91 @@ int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
 			if (isLegalPosition(board)) {
 				value = std::min(value, alphaBeta(thread, depth-1, alpha, beta));
 				beta = std::min(beta, value);
-				unmakeMove(board, move, &undo);
 				if (value <= alpha) {
+					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, ALPHA_FLAG);
+					unmakeMove(board, move, &undo);
 					break;
+				} else {
+					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, EXACT_FLAG);
+					unmakeMove(board, move, &undo);
 				}
 			} else {
 				unmakeMove(board, move, &undo);
 			}
 		}
 	}
+	delete[] moves;
+	return value;
+}
+
+
+int search(Thread *thread, int depth, int alpha, int beta, int color) {
+	Board *board = &(thread->board);
+	if (depth <= 0) {
+		// thread->nodes ++;
+		// return evaluate(board) * color;
+		
+		if (color == 1) {
+			return qsearch(thread, 1, alpha, beta);
+		} else {
+			return qsearch(thread, 1, -beta, -alpha);
+		}
+		
+		// return qsearch(thread, 1, alpha, beta, color);
+	}
+	if (isCheckmate(board)) {
+		thread->nodes ++;
+		return (evaluate(board)-depth)*color;
+	}
+	if (isDraw(board)) {
+		thread->nodes++;
+		return 0;
+	}
+	TTEntry entry = probeTranspositionTable(&(thread->tt), board);
+	if (entry.zobristHash == board->hash && entry.depth >= depth) {
+		if (entry.flag == EXACT_FLAG) {
+			return entry.evaluation;
+		}
+		if (entry.flag == BETA_FLAG && entry.evaluation >= beta) {
+			return entry.evaluation;
+		}
+		if (entry.flag == ALPHA_FLAG && entry.evaluation <= alpha) {
+			return entry.evaluation;
+		}
+	}
+	int value;
+	uint16_t *moves = new uint16_t[MAX_MOVES];
+	uint16_t *end = generateAllMoves(board, moves);
+	int limit = end-moves;
+	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
+	uint16_t move;
+	Undo undo;
+
+	value = -MATE_SCORE;
+	for (int i = 0; i < limit; i++) {
+		move = *(orderedMoves+i);
+		// move = *(moves+i);
+		makeMove(board, move, &undo);
+		if (isLegalPosition(board)) {
+			value = std::max(value, -search(thread, depth-1, -beta, -alpha, -color));
+			alpha = std::max(alpha, value);
+			unmakeMove(board, move, &undo);
+			if (alpha >= beta) {
+				break;
+			}
+		} else {
+			unmakeMove(board, move, &undo);
+		}
+	}
+	int ttFlag;
+	if (value <= alpha) {
+		ttFlag = ALPHA_FLAG;
+	} else if (value <= beta) {
+		ttFlag = BETA_FLAG;
+	} else {
+		ttFlag = EXACT_FLAG;
+	}
+	updateTranspositionTable(&(thread->tt), board, depth, value, NULL_MOVE, ttFlag);
 	delete[] moves;
 	return value;
 }
@@ -188,7 +244,7 @@ int iterativeDeepening(Thread *thread, int depth) {
 			move = node.move;
 			makeMove(board, move, &undo);
 			node.eval = alphaBeta(thread, d-1, -MATE_SCORE, MATE_SCORE);
-			updateTranspositionTable(&(thread->tt), board, d-1, node.eval, node.move);
+			updateTranspositionTable(&(thread->tt), board, d-1, node.eval, node.move, EXACT_FLAG);
 			unmakeMove(board, move, &undo);
 			node.move = move;
 			node.depth = d;
@@ -209,8 +265,7 @@ uint16_t findBestMove(Thread *thread, int depth) {
 	uint16_t *end = generateAllMoves(board, moves);
 	int limit = end-moves;
 	uint16_t move;
-	bool side = board->turn;
-	int factor = side==WHITE ? 1 : -1;
+	int factor = board->turn ? 1 : -1;
 	int value;
 	int bestValue;
 	Undo undo;
@@ -221,7 +276,8 @@ uint16_t findBestMove(Thread *thread, int depth) {
 		move = *(moves+i);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
-			value = alphaBeta(thread, depth-1, alpha, beta);
+			value = search(thread, depth-1, alpha, beta, -factor) * -factor;
+			// value = alphaBeta(thread, depth-1, alpha, beta);
 			/*
 			if (!board->turn) {
 				alpha = std::max(alpha, value);
@@ -266,7 +322,6 @@ uint16_t findGameMove(Thread *thread, int depth) {
 	int bestValue = board->turn ? -MATE_SCORE : MATE_SCORE;
 	Undo undo;
 
-	int standingPat = evaluate(board);
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
 		// undo = generateUndo(board, move);
@@ -292,53 +347,6 @@ uint16_t findGameMove(Thread *thread, int depth) {
 					}
 				}
 			}
-			/* 
-			else if (value * factor > 500 && (bestValue*factor - value*factor) < 200 && board->halfMoveCounter == 0) {
-				bestMove = move;
-				bestValue = value;
-			} else if (value*factor >= bestValue*factor*0.95) {
-				int random = std::rand() % 2;
-				if (random == 0) {
-					bestMove = move;
-					bestValue = value;
-				}
-			}
-			*/
-			/*
-			else if (value == bestValue) {
-				if (value*factor > 500) {
-					if (board->halfMoveCounter == 0 || evaluate(board)*factor > standingPat*factor) {
-						bestMove = move;
-					}
-				} else if (isCheck(board)) {
-					int random = std::rand() % 5;
-					if (random < 3) {
-						bestMove = move;
-					}
-				} else {
-					int random = std::rand() % 2;
-					if (random == 0) {
-						bestMove = move;
-					}
-				}
-			} else if (board->halfMoveCounter == 0 && value*factor > 500) {
-				bestMove = move;
-				bestValue = value;
-				break;
-			} else if (value*factor > 1000 && bestValue*factor < MATE_SCORE) {
-				int random = std::rand() % 2;
-				if (random == 0) {
-					bestMove = move;
-					bestValue = value;
-				}
-			} else if (value*factor > 500 && bestValue*factor < MATE_SCORE) {
-				int random = std::rand() % 3;
-				if (random == 0) {
-					bestMove = move;
-					bestValue = value;
-				}
-			}
-			*/
 		}
 		unmakeMove(board, move, &undo);
 	}
