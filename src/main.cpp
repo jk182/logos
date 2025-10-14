@@ -26,11 +26,13 @@ int main() {
 	testSearch();
 	// testZobrist();
 
-	// Board b;
+	Board b;
 	// boardFromFEN(&b, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
- 	// boardFromFEN(&b, "r1bqk2r/pppp2pp/2n2n2/1Nb5/5B2/8/PPP1PPPP/R2QKBNR b KQkq - 5 6");
-	// Thread *thread = createThread(&b);
+ 	boardFromFEN(&b, "4r1k1/2pb1ppp/p1n2b2/3P3P/3P4/P3PBP1/1r1NN3/2R1K2R b - - 0 36");
+	Thread *thread = createThread(&b);
 	// std::cout << search(thread, 6, -MATE_SCORE, MATE_SCORE, -1) << "\n";
+	printMove(findBestMove(thread, 2));
+	// printMove(findBestMove(thread, 3));
 	// Thread *thread2 = createThread(&b);
 	// std::cout << alphaBeta(thread2, 6, -MATE_SCORE, MATE_SCORE) << "\n";
 	// printMove(findBestMove(thread, 7));

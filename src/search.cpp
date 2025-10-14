@@ -12,24 +12,19 @@
 #include <limits.h>
 
 
-int qsearch(Thread *thread, int depth, int alpha, int beta) {
+int qsearch(Thread *thread, int depth, int alpha, int beta, int color) {
 	Board *board = &(thread->board);
 	thread->nodes ++;
 	if (depth <= 0 || isGameOver(board)) {
-		return evaluate(board);
+		return evaluate(board) * color;
 	}
-	/*
-	if (isCheck(board)) {
-		return alphaBeta(thread, 1, alpha, beta);
-	}
-	*/
 
-	int bestScore = evaluate(board);
-	if (bestScore >= beta) {
-		return bestScore;
+	int standingPat = evaluate(board) * color;
+	if (standingPat >= beta) {
+		return standingPat;
 	}
-	if (bestScore > alpha) {
-		alpha = bestScore;
+	if (standingPat > alpha) {
+		alpha = standingPat;
 	}
 
 	uint16_t *moves = new uint16_t[MAX_MOVES];
@@ -46,14 +41,14 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 		if (isCapture(board, move)) {
 			makeMove(board, move, &undo);
 			if (isLegalPosition(board)) {
-				score = -qsearch(thread, depth-1, -beta, -alpha);
+				score = -qsearch(thread, depth-1, -beta, -alpha, -color);
 				unmakeMove(board, move, &undo);
 				if (score >= beta) {
 					return score;
 				}
 				/*
-				if (score > bestScore) {
-					bestScore = score;
+				if (score > standingPat) {
+					standingPat = score;
 				}
 				*/
 				if (score > alpha) {
@@ -65,110 +60,21 @@ int qsearch(Thread *thread, int depth, int alpha, int beta) {
 		}
 	}
 	delete[] moves;
-	return alpha;
-	// return board->turn!=WHITE ? alpha : beta;
-}
-
-
-int alphaBeta(Thread *thread, int depth, int alpha, int beta) {
-	Board *board = &(thread->board);
-	if (depth <= 0) {
-		thread->nodes ++;
-		return evaluate(board);
-		// return qsearch(thread, 1, alpha, beta);
-	}
-	if (isCheckmate(board)) {
-		int factor = board->turn ? 1 : -1;
-		thread->nodes ++;
-		return evaluate(board)-depth*factor;
-	}
-	if (isDraw(board)) {
-		thread->nodes++;
-		return 0;
-	}
-	/*
-	TTEntry entry = probeTranspositionTable(&(thread->tt), board);
-	if (entry.zobristHash == board->hash && entry.depth >= depth) {
-		if (entry.flag == EXACT_FLAG) {
-			return entry.evaluation;
-		}
-		if (entry.flag == BETA_FLAG && entry.evaluation >= beta) {
-			return entry.evaluation;
-		}
-		if (entry.flag == ALPHA_FLAG && entry.evaluation <= alpha) {
-			return entry.evaluation;
-		}
-	}
-	*/
-	int value;
-	uint16_t *moves = new uint16_t[MAX_MOVES];
-	uint16_t *end = generateAllMoves(board, moves);
-	int limit = end-moves;
-	uint16_t *orderedMoves = moveOrdering(board, moves, limit);
-	uint16_t move;
-	Undo undo;
-
-	if (board->turn == WHITE) {
-		value = -MATE_SCORE;
-		for (int i = 0; i < limit; i++) {
-			move = *(orderedMoves+i);
-			// move = *(moves+i);
-			makeMove(board, move, &undo);
-			if (isLegalPosition(board)) {
-				value = std::max(value, alphaBeta(thread, depth-1, alpha, beta));
-				alpha = std::max(alpha, value);
-				if (value >= beta) {
-					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, BETA_FLAG);
-					unmakeMove(board, move, &undo);
-					break;
-				} else {
-					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, EXACT_FLAG);
-					unmakeMove(board, move, &undo);
-				}
-			} else {
-				unmakeMove(board, move, &undo);
-			}
-		}
-	} else {
-		value = MATE_SCORE;
-		for (int i = 0; i < limit; i++) {
-			move = *(orderedMoves+i);
-			// move = *(moves+i);
-			makeMove(board, move, &undo);
-			if (isLegalPosition(board)) {
-				value = std::min(value, alphaBeta(thread, depth-1, alpha, beta));
-				beta = std::min(beta, value);
-				if (value <= alpha) {
-					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, ALPHA_FLAG);
-					unmakeMove(board, move, &undo);
-					break;
-				} else {
-					// updateTranspositionTable(&(thread->tt), board,  depth-1, value, move, EXACT_FLAG);
-					unmakeMove(board, move, &undo);
-				}
-			} else {
-				unmakeMove(board, move, &undo);
-			}
-		}
-	}
-	delete[] moves;
-	return value;
+	return standingPat;
 }
 
 
 int search(Thread *thread, int depth, int alpha, int beta, int color) {
 	Board *board = &(thread->board);
 	if (depth <= 0) {
-		// thread->nodes ++;
-		// return evaluate(board) * color;
-		
-		if (color == 1) {
-			return qsearch(thread, 1, alpha, beta);
+		/* TODO: search extra depth if the position is a check, but this doesn't pass the search tests
+		if (isCheck(board)) {
+			return search(thread, 1, alpha, beta, color);
 		} else {
-			return qsearch(thread, 1, -beta, -alpha);
+			return qsearch(thread, 1, alpha, beta, color);
 		}
-		
-		// return qsearch(thread, 1, alpha, beta, color);
+		*/
+		return qsearch(thread, 1, alpha, beta, color);
 	}
 	if (isCheckmate(board)) {
 		thread->nodes ++;
@@ -178,6 +84,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 		thread->nodes++;
 		return 0;
 	}
+
 	TTEntry entry = probeTranspositionTable(&(thread->tt), board);
 	if (entry.zobristHash == board->hash && entry.depth >= depth) {
 		if (entry.flag == EXACT_FLAG) {
@@ -190,6 +97,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 			return entry.evaluation;
 		}
 	}
+
 	int value;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *end = generateAllMoves(board, moves);
@@ -201,7 +109,6 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 	value = -MATE_SCORE;
 	for (int i = 0; i < limit; i++) {
 		move = *(orderedMoves+i);
-		// move = *(moves+i);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			value = std::max(value, -search(thread, depth-1, -beta, -alpha, -color));
@@ -214,6 +121,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 			unmakeMove(board, move, &undo);
 		}
 	}
+
 	int ttFlag;
 	if (value <= alpha) {
 		ttFlag = ALPHA_FLAG;
@@ -223,6 +131,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 		ttFlag = EXACT_FLAG;
 	}
 	updateTranspositionTable(&(thread->tt), board, depth, value, NULL_MOVE, ttFlag);
+
 	delete[] moves;
 	return value;
 }
@@ -237,13 +146,14 @@ int iterativeDeepening(Thread *thread, int depth) {
 	Undo undo;
 	uint16_t move;
 	Node *nodes = new Node[thread->nodeStackHeight];
+	int colorFactor = board->turn ? -1 : 1;
 	Node node;
 	for (int d = 1; d <= depth; d++) {
 		for (int i = 0; i < thread->nodeStackHeight; i++) {
 			node = *(thread->nodeStack+i);
 			move = node.move;
 			makeMove(board, move, &undo);
-			node.eval = alphaBeta(thread, d-1, -MATE_SCORE, MATE_SCORE);
+			node.eval = search(thread, d-1, -MATE_SCORE, MATE_SCORE, colorFactor) * colorFactor;
 			updateTranspositionTable(&(thread->tt), board, d-1, node.eval, node.move, EXACT_FLAG);
 			unmakeMove(board, move, &undo);
 			node.move = move;
@@ -277,7 +187,6 @@ uint16_t findBestMove(Thread *thread, int depth) {
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
 			value = search(thread, depth-1, alpha, beta, -factor) * -factor;
-			// value = alphaBeta(thread, depth-1, alpha, beta);
 			/*
 			if (!board->turn) {
 				alpha = std::max(alpha, value);
@@ -324,10 +233,9 @@ uint16_t findGameMove(Thread *thread, int depth) {
 
 	for (int i = 0; i < limit; i++) {
 		move = *(moves+i);
-		// undo = generateUndo(board, move);
 		makeMove(board, move, &undo);
 		if (isLegalPosition(board)) {
-			value = alphaBeta(thread, depth-1, -MATE_SCORE, MATE_SCORE);
+			value = search(thread, depth-1, -MATE_SCORE, MATE_SCORE, -factor) * -factor;
 			if (bestMove == NULL_MOVE) {
 				bestMove = move;
 				bestValue = value;
