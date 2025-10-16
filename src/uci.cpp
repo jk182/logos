@@ -104,19 +104,21 @@ uint16_t searchPosition(std::string command, Board board) {
 	Thread *thread = createThread(&board);
 	if (depth < 0) {
 		if (time > 300000) {
-			return timedSearch(thread, 10);
+			return timedSearch(thread, 10000);
 		} else if (time > 180000) {
-			return timedSearch(thread, 5);
+			return timedSearch(thread, 5000);
 		} else if (time > 120000) {
-			return timedSearch(thread, 4);
+			return timedSearch(thread, 4000);
 		} else if (time > 60000) {
-			return timedSearch(thread, 3);
+			return timedSearch(thread, 3000);
 		} else if (time > 40000) {
-			return timedSearch(thread, 2);
+			return timedSearch(thread, 2000);
 		} else if (time > 30000) {
-			return timedSearch(thread, 1);
+			return timedSearch(thread, 1000);
+		} else if (time > 15000) {
+			return timedSearch(thread, 500);
 		} else if (time > 0) {
-			return timedSearch(thread, 1);
+			return timedSearch(thread, 100);
 		} else {
 			std::cout << "No timed search" << "\n";
 			depth = 5;
@@ -147,6 +149,7 @@ uint16_t searchPosition(std::string command, Board board) {
 
 
 uint16_t timedSearch(Thread *thread, int thinkingTime) {
+	// The thinking time is in milliseconds
 	int maxDepth = 30;
 	Board *board = &(thread->board);
 
@@ -178,9 +181,9 @@ uint16_t timedSearch(Thread *thread, int thinkingTime) {
 
 			depthEnd = std::chrono::system_clock::now();
 			totalTime = depthEnd-depthStart;
-			if (totalTime.count() > 0.9 * thinkingTime) {
+			if (totalTime.count() * 1000 > 0.95 * thinkingTime) {
 				updateNodeStack(thread, nodes);
-				std::cout << "Move time: " << totalTime.count() << " depth: " << depth << "\n";
+				std::cout << "Move time: " << totalTime.count() << " depth (partial): " << depth << "\n";
 				std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
 				return movePicker(thread);
 			}
@@ -190,7 +193,7 @@ uint16_t timedSearch(Thread *thread, int thinkingTime) {
 		depthEnd = std::chrono::system_clock::now();
 		depthTime = depthEnd-depthStart;
 		totalTime = depthEnd-startTime;
-		if (depthTime.count() > 0.5 * thinkingTime || totalTime.count() > 0.75 * thinkingTime) {
+		if (totalTime.count() * 1000 > 0.85 * thinkingTime) {
 			std::cout << "Move time: " << totalTime.count() << " depth: " << depth << "\n";
 			std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
 			return movePicker(thread);
