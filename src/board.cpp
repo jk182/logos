@@ -283,7 +283,7 @@ bool isThreefold(Board *board) {
 
 
 bool isDraw(Board *board) {
-	return (board->halfMoveCounter >= 50) || isThreefold(board) || isInsufficientMaterial(board) || isStalemate(board);
+	return (board->halfMoveCounter >= 100) || isThreefold(board) || isInsufficientMaterial(board) || isStalemate(board);
 	// return (board->halfMoveCounter >= 50) || isThreefold(board) || isInsufficientMaterial(board) || isStalemate(board);
 	// TODO: using the halfMoveCounter causes problems when decoding moves in UCI
 }

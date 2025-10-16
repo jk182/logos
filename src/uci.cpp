@@ -169,6 +169,7 @@ uint16_t timedSearch(Thread *thread, int thinkingTime) {
 			node = *(thread->nodeStack+i);
 			move = node.move;
 			makeMove(board, move, &undo);
+			if (isCheckmate(board)) { return move; }
 			node.eval = -search(thread, depth-1, alpha, beta, -factor);
 			// updateTranspositionTable(&(thread->tt), board, depth-1, node.eval, node.move, EXACT_FLAG);
 			unmakeMove(board, move, &undo);

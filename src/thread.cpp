@@ -82,6 +82,9 @@ void updateNodeStack(Thread *thread, Node *nodes) {
 uint16_t movePicker(Thread *thread) {
 	int bestMoves = 1;
 	int bestEval = (thread->nodeStack+0)->eval;
+	if (bestEval >= MATE_SCORE) {
+		return (thread->nodeStack+0)->move;
+	}
 	for (int i = 1; i < thread->nodeStackHeight; i++) {
 		if ((thread->nodeStack+i)->eval  == bestEval) {
 			bestMoves++;

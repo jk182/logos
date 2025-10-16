@@ -78,7 +78,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 	}
 	if (isCheckmate(board)) {
 		thread->nodes ++;
-		return (evaluate(board)-depth)*color;
+		return (evaluate(board)+depth)*color;
 	}
 	if (isDraw(board)) {
 		thread->nodes++;
