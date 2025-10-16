@@ -1,5 +1,6 @@
 #include "attacks.h"
 #include "board.h"
+#include "evaluation.h"
 #include "move.h"
 #include "movegen.h"
 #include "search.h"
@@ -8,6 +9,7 @@
 #include "zobrist.h"
 
 #include <bitset>
+#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <string.h>
@@ -99,20 +101,29 @@ uint16_t searchPosition(std::string command, Board board) {
 			time = std::stoi(vec[word+1]);
 		}
 	}
+	Thread *thread = createThread(&board);
 	if (depth < 0) {
-		if (time > 60000) {
-			depth = 5;
+		if (time > 300000) {
+			return timedSearch(thread, 10);
+		} else if (time > 180000) {
+			return timedSearch(thread, 5);
+		} else if (time > 120000) {
+			return timedSearch(thread, 4);
+		} else if (time > 60000) {
+			return timedSearch(thread, 3);
+		} else if (time > 40000) {
+			return timedSearch(thread, 2);
 		} else if (time > 30000) {
-			depth = 4;
+			return timedSearch(thread, 1);
 		} else if (time > 0) {
-			depth = 3;
+			return timedSearch(thread, 1);
 		} else {
+			std::cout << "No timed search" << "\n";
 			depth = 5;
 		}
 	}
 		
 	std::cout << "Depth: " << depth << "\n";
-	Thread *thread = createThread(&board);
 	uint16_t move = findGameMove(thread, depth);
 	if (! isLegalMove(board, move)) {
 		printBoard(&board);
@@ -132,4 +143,57 @@ uint16_t searchPosition(std::string command, Board board) {
 		}
 	} 
 	return move;
+}
+
+
+uint16_t timedSearch(Thread *thread, int thinkingTime) {
+	int maxDepth = 30;
+	Board *board = &(thread->board);
+
+	auto startTime = std::chrono::system_clock::now();
+	std::chrono::duration<double> depthTime;
+	std::chrono::duration<double> totalTime;
+	auto depthStart = std::chrono::system_clock::now();
+	auto depthEnd = std::chrono::system_clock::now();
+
+	uint16_t move;
+	Undo undo;
+	Node *nodes = new Node[thread->nodeStackHeight];
+	Node node;
+	int factor = board->turn ? 1 : -1;
+	int alpha = -MATE_SCORE-10;
+	int beta = MATE_SCORE+10;
+
+	for (int depth = 1; depth <= maxDepth; depth++) {
+		for (int i = 0; i < thread->nodeStackHeight; i++) {
+			node = *(thread->nodeStack+i);
+			move = node.move;
+			makeMove(board, move, &undo);
+			node.eval = -search(thread, depth-1, alpha, beta, -factor);
+			// updateTranspositionTable(&(thread->tt), board, depth-1, node.eval, node.move, EXACT_FLAG);
+			unmakeMove(board, move, &undo);
+			node.depth = depth;
+			*(nodes+i) = node;
+
+			depthEnd = std::chrono::system_clock::now();
+			totalTime = depthEnd-depthStart;
+			if (totalTime.count() > 0.9 * thinkingTime) {
+				updateNodeStack(thread, nodes);
+				std::cout << "Move time: " << totalTime.count() << " depth: " << depth << "\n";
+				std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
+				return movePicker(thread);
+			}
+		}
+		updateNodeStack(thread, nodes);
+
+		depthEnd = std::chrono::system_clock::now();
+		depthTime = depthEnd-depthStart;
+		totalTime = depthEnd-startTime;
+		if (depthTime.count() > 0.5 * thinkingTime || totalTime.count() > 0.75 * thinkingTime) {
+			std::cout << "Move time: " << totalTime.count() << " depth: " << depth << "\n";
+			std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
+			return movePicker(thread);
+		}
+	}
+	return movePicker(thread);
 }

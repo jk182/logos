@@ -130,7 +130,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 	} else {
 		ttFlag = EXACT_FLAG;
 	}
-	updateTranspositionTable(&(thread->tt), board, depth, value, NULL_MOVE, ttFlag);
+	// updateTranspositionTable(&(thread->tt), board, depth, value, NULL_MOVE, ttFlag);
 
 	delete[] moves;
 	return value;
@@ -142,7 +142,6 @@ int iterativeDeepening(Thread *thread, int depth) {
 	if (depth == 0 || isGameOver(board)) {
 		return evaluate(board);
 	}
-	int score = 0;
 	Undo undo;
 	uint16_t move;
 	Node *nodes = new Node[thread->nodeStackHeight];
@@ -163,7 +162,7 @@ int iterativeDeepening(Thread *thread, int depth) {
 		updateNodeStack(thread, nodes);
 	}
 	printMove((thread->nodeStack+0)->move);
-	return score;
+	return (thread->nodeStack+0)->eval;
 }
 
 

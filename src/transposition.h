@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 enum {
-	TTSIZE =  4096,
+	TTSIZE =  2048,
 	UNKNOWN_EVAL = 123456789,
 	EXACT_FLAG = 0,
 	ALPHA_FLAG = 1,

@@ -20,3 +20,4 @@ struct Thread {
 Thread* createThread();
 Thread* createThread(Board *board);
 void updateNodeStack(Thread *thread, Node *nodes);
+uint16_t movePicker(Thread *thread);
