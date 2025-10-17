@@ -121,11 +121,11 @@ uint16_t searchPosition(std::string command, Thread *thread) {
 		} else if (time > 60000) {
 			return timedSearch(thread, 3000);
 		} else if (time > 40000) {
-			return timedSearch(thread, 2000);
+			return timedSearch(thread, 1500);
 		} else if (time > 30000) {
-			return timedSearch(thread, 1000);
+			return timedSearch(thread, 700);
 		} else if (time > 15000) {
-			return timedSearch(thread, 500);
+			return timedSearch(thread, 400);
 		} else if (time > 0) {
 			return timedSearch(thread, 100);
 		} else {
@@ -193,7 +193,7 @@ uint16_t timedSearch(Thread *thread, int thinkingTime) {
 			depthEnd = std::chrono::system_clock::now();
 			totalTime = depthEnd-depthStart;
 			if (totalTime.count() * 1000 > 0.95 * thinkingTime) {
-				updateNodeStack(thread, nodes);
+				// updateNodeStack(thread, nodes);
 				std::cout << "Thinking time: " << thinkingTime/1000 << " Move time: " << totalTime.count() << " depth (partial): " << depth << "\n";
 				std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
 				return movePicker(thread);
