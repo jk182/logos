@@ -23,6 +23,7 @@ int main() {
 	Board board;
 	clearBoard(&board);
 	boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	Thread *thread = createThread(&board);
 
 	std::string command;
 	while (true) {
@@ -35,24 +36,25 @@ int main() {
 
 			std::cout << "uciok\n";
 		} else if (command == "ucinewgame") {
-			clearBoard(&board);
-			boardFromFEN(&board, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+			clearBoard(&(thread->board));
+			boardFromFEN(&(thread->board), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 		} else if (command == "isready") {
 			std::cout << "readyok\n";
 		} else if (command.starts_with("position")) {
-			changePosition(command, &board);
+			changePosition(command, thread);
 		} else if (command.starts_with("go")) {
-			uint16_t move = searchPosition(command, board);
+			uint16_t move = searchPosition(command, thread);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
 		} else if (command.starts_with("debug")) {
-			printBoard(&board);
+			printBoard(&(thread->board));
 		}
 	}
 	return 0;
 }
 
 
-void changePosition(std::string command, Board* board) {
+void changePosition(std::string command, Thread *thread) {
+	Board *board = &(thread->board);
 	std::size_t space = command.find(" ");
 	uint16_t move;
 	if (space != std::string::npos) {
@@ -63,6 +65,7 @@ void changePosition(std::string command, Board* board) {
 				clearBoard(board);
 				boardFromFEN(board, token.substr(space+1).c_str());
 				// TODO: allow moves after FEN
+				initNodeStack(thread);
 				return;
 			}
 		} else if (token.starts_with("startpos")) {
@@ -79,17 +82,24 @@ void changePosition(std::string command, Board* board) {
 			}
 			move = encodeUCIMove(*board, s.data());
 			makeMove(board, move, &undo);
+			if (board->halfMoveCounter == 0) {
+				board->numMoves = 0;
+			}
 		}
 	}
+	initNodeStack(thread);
 }
 
 
-uint16_t searchPosition(std::string command, Board board) {
+uint16_t searchPosition(std::string command, Thread *thread) {
 	int depth = -1;
 	int time = -1;
 	std::stringstream stream(command);
 	std::string c;
 	std::vector<std::string> vec;
+
+	Board board = thread->board;
+
 	while (stream >> c) {
 		vec.push_back(c);
 	}
@@ -101,7 +111,6 @@ uint16_t searchPosition(std::string command, Board board) {
 			time = std::stoi(vec[word+1]);
 		}
 	}
-	Thread *thread = createThread(&board);
 	if (depth < 0) {
 		if (time > 300000) {
 			return timedSearch(thread, 10000);
@@ -164,26 +173,28 @@ uint16_t timedSearch(Thread *thread, int thinkingTime) {
 	Node *nodes = new Node[thread->nodeStackHeight];
 	Node node;
 	int factor = board->turn ? 1 : -1;
-	int alpha = -MATE_SCORE-10;
 	int beta = MATE_SCORE+10;
 
 	for (int depth = 1; depth <= maxDepth; depth++) {
+		int alpha = -MATE_SCORE-10;
 		for (int i = 0; i < thread->nodeStackHeight; i++) {
 			node = *(thread->nodeStack+i);
 			move = node.move;
 			makeMove(board, move, &undo);
-			if (isCheckmate(board)) { return move; }
+			// if (isCheckmate(board)) { return move; }
 			node.eval = -search(thread, depth-1, alpha, beta, -factor);
-			// updateTranspositionTable(&(thread->tt), board, depth-1, node.eval, node.move, EXACT_FLAG);
+			updateTranspositionTable(&(thread->tt), board, depth-1, node.eval, node.move, EXACT_FLAG);
 			unmakeMove(board, move, &undo);
 			node.depth = depth;
 			*(nodes+i) = node;
+
+			alpha = std::max(alpha, node.eval);
 
 			depthEnd = std::chrono::system_clock::now();
 			totalTime = depthEnd-depthStart;
 			if (totalTime.count() * 1000 > 0.95 * thinkingTime) {
 				updateNodeStack(thread, nodes);
-				std::cout << "Move time: " << totalTime.count() << " depth (partial): " << depth << "\n";
+				std::cout << "Thinking time: " << thinkingTime/1000 << " Move time: " << totalTime.count() << " depth (partial): " << depth << "\n";
 				std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
 				return movePicker(thread);
 			}
@@ -194,7 +205,7 @@ uint16_t timedSearch(Thread *thread, int thinkingTime) {
 		depthTime = depthEnd-depthStart;
 		totalTime = depthEnd-startTime;
 		if (totalTime.count() * 1000 > 0.85 * thinkingTime) {
-			std::cout << "Move time: " << totalTime.count() << " depth: " << depth << "\n";
+			std::cout << "Thinking time: " << thinkingTime/1000 << " Move time: " << totalTime.count() << " depth: " << depth << "\n";
 			std::cout << "Eval: " << (thread->nodeStack+0)->eval << "\n";
 			return movePicker(thread);
 		}

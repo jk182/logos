@@ -1,6 +1,8 @@
 #include "move.h"
 #include "transposition.h"
 
+#include <iostream>
+
 
 void initTT(TranspositionTable *tt) {
 	TTEntry entry;
@@ -31,4 +33,15 @@ void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, i
 	entry.bestMove = bestMove;
 	entry.flag = flag;
 	tt->ttTable[board->hash % TTSIZE] = entry;
+}
+
+
+void printTTInfo(TranspositionTable *tt) {
+	int entries = 0;
+	for (int i = 0; i < TTSIZE; i++) {
+		if (tt->ttTable[i].evaluation != UNKNOWN_EVAL) {
+			entries++;
+		}
+	}
+	std::cout << "Transpotion table entries/total: " << entries << "/" << TTSIZE << "\n";
 }

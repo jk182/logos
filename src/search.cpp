@@ -44,6 +44,7 @@ int qsearch(Thread *thread, int depth, int alpha, int beta, int color) {
 				score = -qsearch(thread, depth-1, -beta, -alpha, -color);
 				unmakeMove(board, move, &undo);
 				if (score >= beta) {
+					delete[] moves;
 					return score;
 				}
 				/*
@@ -65,7 +66,6 @@ int qsearch(Thread *thread, int depth, int alpha, int beta, int color) {
 
 
 int search(Thread *thread, int depth, int alpha, int beta, int color) {
-	Board *board = &(thread->board);
 	if (depth <= 0) {
 		/* TODO: search extra depth if the position is a check, but this doesn't pass the search tests
 		if (isCheck(board)) {
@@ -76,6 +76,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 		*/
 		return qsearch(thread, 1, alpha, beta, color);
 	}
+	Board *board = &(thread->board);
 	if (isCheckmate(board)) {
 		thread->nodes ++;
 		return (evaluate(board)+depth)*color;
@@ -121,6 +122,7 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 			unmakeMove(board, move, &undo);
 		}
 	}
+	delete[] moves;
 
 	int ttFlag;
 	if (value <= alpha) {
@@ -130,9 +132,8 @@ int search(Thread *thread, int depth, int alpha, int beta, int color) {
 	} else {
 		ttFlag = EXACT_FLAG;
 	}
-	// updateTranspositionTable(&(thread->tt), board, depth, value, NULL_MOVE, ttFlag);
+	updateTranspositionTable(&(thread->tt), board, depth, value, NULL_MOVE, ttFlag);
 
-	delete[] moves;
 	return value;
 }
 
@@ -161,7 +162,8 @@ int iterativeDeepening(Thread *thread, int depth) {
 		}
 		updateNodeStack(thread, nodes);
 	}
-	printMove((thread->nodeStack+0)->move);
+	// printMove((thread->nodeStack+0)->move);
+	delete[] nodes;
 	return (thread->nodeStack+0)->eval;
 }
 
@@ -257,6 +259,7 @@ uint16_t findGameMove(Thread *thread, int depth) {
 		}
 		unmakeMove(board, move, &undo);
 	}
+	delete[] moves;
 	std::cout << bestValue << "\n";
 	return bestMove;
 }

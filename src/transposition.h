@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 enum {
-	TTSIZE =  2048,
+	TTSIZE =  8192,
 	UNKNOWN_EVAL = 123456789,
 	EXACT_FLAG = 0,
 	ALPHA_FLAG = 1,
@@ -27,3 +27,4 @@ struct TranspositionTable {
 void initTT(TranspositionTable *tt);
 TTEntry probeTranspositionTable(TranspositionTable *tt, Board *board);
 void updateTranspositionTable(TranspositionTable *tt, Board *board, int depth, int evaluation, uint16_t bestMove, int flag);
+void printTTInfo(TranspositionTable *tt);

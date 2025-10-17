@@ -28,6 +28,14 @@ Thread* createThread(Board *board) {
 	thread->depth = 0;
 	thread->seldepth = 0;
 	initTT(&(thread->tt));
+	initNodeStack(thread);
+	return thread;
+}
+
+
+void initNodeStack(Thread *thread) {
+	Board *board = &(thread->board);
+	thread->nodeStackHeight = 0;
 	uint16_t move;
 	uint16_t *moves = new uint16_t[MAX_MOVES];
 	uint16_t *endMove = generateAllMoves(board, moves);
@@ -54,7 +62,7 @@ Thread* createThread(Board *board) {
 		}
 		unmakeMove(board, move, &undo);
 	}
-	return thread;
+	delete[] moves;
 }
 
 
@@ -65,7 +73,7 @@ void updateNodeStack(Thread *thread, Node *nodes) {
 		currentNode = *(nodes+i);
 		for (int j = i+1; j < thread->nodeStackHeight; j++) {
 			node = *(nodes+j);
-			if (node.eval > currentNode.eval) {
+			if (node.eval > currentNode.eval && node.depth >= currentNode.depth) {
 				*(nodes+i) = node;
 				*(nodes+j) = currentNode;
 				currentNode = node;
@@ -86,7 +94,7 @@ uint16_t movePicker(Thread *thread) {
 		return (thread->nodeStack+0)->move;
 	}
 	for (int i = 1; i < thread->nodeStackHeight; i++) {
-		if ((thread->nodeStack+i)->eval  == bestEval) {
+		if ((thread->nodeStack+i)->eval == bestEval) {
 			bestMoves++;
 		} else {
 			break;
