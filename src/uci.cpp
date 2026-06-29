@@ -57,14 +57,30 @@ void changePosition(std::string command, Thread *thread) {
 	Board *board = &(thread->board);
 	std::size_t space = command.find(" ");
 	uint16_t move;
+	std::string moveS;
+	Undo undo;
 	if (space != std::string::npos) {
 		std::string token = command.substr(space+1);
 		if (token.starts_with("fen")) {
 			space = token.find(" ");
 			if (space != std::string::npos) {
 				clearBoard(board);
-				boardFromFEN(board, token.substr(space+1).c_str());
-				// TODO: allow moves after FEN
+				std::size_t end = token.find("moves");
+				if (end != std::string::npos) {
+					boardFromFEN(board, token.substr(space+1, end-space-2).c_str());
+					moveS = token.substr(end+6);
+					space = moveS.find(" ");
+					while (space != std::string::npos) {
+						move = encodeUCIMove(*board, moveS.substr(0, space+1).data());
+						makeMove(board, move, &undo);
+						moveS = moveS.substr(space+1);
+						space = moveS.find(" ");
+					}
+					move = encodeUCIMove(*board, moveS.data());
+					makeMove(board, move, &undo);
+				} else {
+					boardFromFEN(board, token.substr(space+1).c_str());
+				}
 				initNodeStack(thread);
 				return;
 			}
@@ -75,7 +91,7 @@ void changePosition(std::string command, Thread *thread) {
 		space = token.find(" ");
 		std::stringstream stream(token);
 		std::string s;
-		Undo undo;
+		// Undo undo;
 		while (std::getline(stream, s, ' ')) {
 			if (s == "startpos" || s == "moves") {
 				continue;
