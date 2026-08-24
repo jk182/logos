@@ -43,8 +43,11 @@ int main() {
 		} else if (command.starts_with("position")) {
 			changePosition(command, thread);
 		} else if (command.starts_with("go")) {
+			// handleSearchCommand(command);
 			uint16_t move = searchPosition(command, thread);
 			std::cout << "bestmove " << decodeMoveToUCI(move) << "\n";
+		} else if (command.starts_with("stop")) {
+			std::cout << "TODO: implement stop\n";
 		} else if (command.starts_with("debug")) {
 			printBoard(&(thread->board));
 		}
@@ -104,6 +107,36 @@ void changePosition(std::string command, Thread *thread) {
 		}
 	}
 	initNodeStack(thread);
+}
+
+
+void handleSearchCommand(std::string command) {
+	std::string token;
+	std::size_t space;
+
+	if (command.length() <= 3) {
+		std::cout << "TODO: default search\n";
+		return;
+	}
+
+	token = command.substr(3);
+	space = token.find(" ");
+
+	// I need to somehow implement the searchmoves command, to only search specific moves
+	std::size_t searchMoves = token.find("searchmoves");
+	if (searchMoves != std::string::npos) {
+		std::cout << "TODO: implement search moves\n";
+	}
+	
+	if (token.substr(0, space) == "infinite") {
+		std::cout << "TODO: Infinite search\n";
+	} else if (token.substr(0, space) == "depth") {
+		std::cout << "TODO: Depth search\n";
+	} else if (token.substr(0, space) == "nodes") {
+		std::cout << "TODO: depth search\n";
+	} else if (token.substr(0, space) == "mate") {
+		std::cout << "TODO: mate search\n";
+	}
 }
 
 
